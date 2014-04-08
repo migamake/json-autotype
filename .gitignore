@@ -1,0 +1,6 @@
+*.dyn_hi
+*.dyn_o
+*.hi
+*.o
+*.p_hi
+*.p_o

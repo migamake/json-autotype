@@ -48,7 +48,7 @@ newDecl kvList = do i          :: Int <- stepM
     fieldDecls :: [Text]
     fieldDecls = map fieldDecl kvList
     fieldDecl  :: (Text, Text) -> Text
-    fieldDecl (name, fType) = Text.concat ["    ", name, " : ", fType]
+    fieldDecl (name, fType) = Text.concat ["    ", name, " :: ", fType]
 
 formatType' :: Type -> DeclM Text
 formatType'  TString                      = return "Text"

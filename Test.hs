@@ -1,5 +1,7 @@
+{-# LANGUAGE TemplateHaskell #-}
 module Main where
 
+import           Control.Lens.TH
 import qualified Data.ByteString.Lazy.Char8 as BSL
 import qualified Data.HashMap.Strict as Hash
 import qualified Data.Set            as Set
@@ -21,6 +23,14 @@ data Value
   | Bool !Bool
   | Null
  -}
+
+
+data DeclState = DeclState_ { decls_   :: [Text]
+                            , counter_ :: Int
+                            }
+  deriving (Eq, Show, Ord)
+
+makeLenses ''DeclState
 
 valueSize :: Value -> Int
 valueSize  Null      = 1
@@ -95,6 +105,18 @@ mkUnionType t            = TUnion $ Set.singleton t
 
 isObject (TObj _) = False
 isObject _        = True
+
+{-
+formatType' :: Type -> CounterM [Text]
+formatType' (i, TNull   )                    = ["Maybe Text"]
+formatType' (i, TString )                    = ["Text"]
+formatType' (i, TNum    )                    = ["Int"]
+formatType' (i, TUnion u) | uu <- u `Set.difference` Set.singleton TNull,
+                      Set.size uu == 1 =
+  ["Maybe " `Text.append` formatType u]
+formatType (i, TArray a)                    = [Text.concat ["[", formatType (i, a), "]"]]
+formatType (i, TObj   o)                    = Text.concat $ ["{"] ++ ++ ["}"]
+-}
 
 unifyTypes TBool        TBool                         = TBool
 unifyTypes TNum         TNum                          = TNum

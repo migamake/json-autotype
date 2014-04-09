@@ -17,6 +17,8 @@ import           Data.HashMap.Strict(HashMap)
 import           Data.List          (sort, foldl1')
 import           Data.Ord           (Ord(..), comparing)
 
+type Map = HashMap
+
 valueSize :: Value -> Int
 valueSize  Null      = 1
 valueSize (Bool   _) = 1
@@ -42,7 +44,7 @@ valueDepth (Array  a) = (1+) . V.foldl' max 0 $ V.map valueDepth a
 valueDepth (Object o) = (1+) . maximum . (0:) . map valueDepth . Hash.elems $ o
 
 -- * Dictionary of types indexed by names.
-newtype Dict = Dict { unDict :: HashMap Text Type }
+newtype Dict = Dict { unDict :: Map Text Type }
   deriving (Show, Eq)
 
 instance Ord Dict where
@@ -58,6 +60,7 @@ get key = Hash.lookupDefault emptyType key . unDict
 
 data Type = TNull | TBool | TNum | TString |
             TUnion (Set.Set      Type)     |
+            TLabel Text                    |
             TObj   Dict                    |
             TArray Type
   deriving (Show,Eq, Ord)

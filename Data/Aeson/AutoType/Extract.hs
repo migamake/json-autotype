@@ -88,8 +88,8 @@ extractType (Array  a)                   = V.foldl1' unifyTypes $ V.map extractT
 simplifyUnion (TUnion s) | Set.size s == 1 = head $ Set.toList s
 simplifyUnion t                            = t
 
-mkUnionType t@(TUnion _) = t
-mkUnionType t            = TUnion $ Set.singleton t
+typeAsSet t@(TUnion s) = s
+typeAsSet t            = Set.singleton t
 
 isObject (TObj _) = False
 isObject _        = True
@@ -106,10 +106,7 @@ unifyTypes (TObj d)     (TObj  e)                     = TObj $ newDict
     allKeys :: [Text]
     allKeys = Set.toList (keys d `Set.union` keys e)
 unifyTypes (TArray u)   (TArray v)                    = TArray $ u `unifyTypes` v
-unifyTypes (TUnion u)   (TUnion v)                    = u `unifyUnion` v
-unifyTypes (TUnion u)   t                             = u `unifyUnion` Set.singleton t
-unifyTypes t            (TUnion u)                    = u `unifyUnion` Set.singleton t
-unifyTypes t            r                             = union $ Set.fromList [t, r]
+unifyTypes t            s                             = typeAsSet t `unifyUnion` typeAsSet s
 
 unifyUnion u v = union $ uSimple `Set.union`
                          vSimple `Set.union`

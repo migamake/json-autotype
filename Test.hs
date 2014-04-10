@@ -109,8 +109,8 @@ splitTypeByLabel' l (TObj   o) = do kvs <- forM d $ \(k, v) -> do
 splitTypeByLabel' l TNull      = return TNull
 splitTypeByLabel' l t          = error $ "ERROR: Don't know how to handle: " ++ show t
 
-splitTypeByLabel :: Type -> Map Text [Type]
-splitTypeByLabel t = finalState -- Map.map (foldl1' unifyTypes) finalState
+splitTypeByLabel :: Type -> Map Text Type
+splitTypeByLabel t = Map.map (foldl1' unifyTypes) finalState
   where
     topLabel = "TopLevel"
     job = do r <- splitTypeByLabel' topLabel t
@@ -130,6 +130,7 @@ main = do bs <- BSL.readFile "test/test.json"
           print $ typeSize t
           let splitted = splitTypeByLabel t
           print splitted
+          {-
           forM_ (Map.toList splitted) $ \(label, types) -> do
             Text.putStr label
             putStr " : "
@@ -138,7 +139,7 @@ main = do bs <- BSL.readFile "test/test.json"
             --print $ foldl1' unifyTypes types
             forM_ (zip types $ tail types) $ \(t1, t2) -> do
               putStrLn $ show t1 ++ " <> " ++ show t2
-              print $ t1 `unifyTypes` t2
+              print $ t1 `unifyTypes` t2-}
 
           
 

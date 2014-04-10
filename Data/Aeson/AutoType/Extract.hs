@@ -105,19 +105,33 @@ unifyTypes (TObj d)     (TObj  e)                     = TObj $ newDict
                                         get k e) | k <- allKeys ]
     allKeys :: [Text]
     allKeys = Set.toList (keys d `Set.union` keys e)
-unifyTypes (TUnion u)   (TUnion v)                    = union $ uSimple `Set.union`
-                                                                vSimple `Set.union`
-                                                                oset
+unifyTypes (TArray u)   (TArray v)                    = TArray $ u `unifyTypes` v
+unifyTypes (TUnion u)   (TUnion v)                    = u `unifyUnion` v
+unifyTypes (TUnion u)   t                             = u `unifyUnion` Set.singleton t
+unifyTypes t            (TUnion u)                    = u `unifyUnion` Set.singleton t
+unifyTypes t            r                             = union $ Set.fromList [t, r]
+
+unifyUnion u v = union $ uSimple `Set.union`
+                         vSimple `Set.union`
+                         oset
   where
-    (uObj, uSimple) = Set.partition isObject u
-    (vObj, vSimple) = Set.partition isObject v
+    (uSimple, uCompound) = Set.partition isSimple u
+    (vSimple, vCompound) = Set.partition isSimple v
+    (uObj, uArr) = Set.partition isObject uCompound
+    (vObj, vArr) = Set.partition isObject vCompound
     oset    = Set.fromList $ if objects == []
                                then []
                                else [foldl1' unifyTypes objects]
-    objects = Set.toList uObj ++ Set.toList vObj
-unifyTypes u@(TUnion _) t                             = u `unifyTypes` mkUnionType t
-unifyTypes t            u@(TUnion _)                  = u `unifyTypes` mkUnionType t
-unifyTypes t            r                             = union $ Set.fromList [t, r]
+    aset    = Set.fromList $ if arrays  == []
+                               then []
+                               else [foldl1' unifyTypes arrays]
+    objects = Set.toList $ uObj `Set.union` vObj
+    arrays  = Set.toList $ uArr `Set.union` vArr
+
+isSimple x = not (isObject x) || not (isArray x)
+
+isArray (TArray _) = True
+isArray _          = False
 
 union = simplifyUnion . TUnion
 

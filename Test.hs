@@ -128,7 +128,8 @@ displaySplitTypes dict = runDecl decls
     decls = do
       forM (Map.toList dict) $ \(name, typ) -> do
         content <- formatType' typ
-        return $! wrapDecl name content
+        return $! Text.concat ["-- ", name, ":\n",
+                               wrapDecl name content]
 
 main = do bs <- BSL.readFile "test/test.json"
           let Just v = decode bs

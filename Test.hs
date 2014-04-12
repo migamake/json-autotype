@@ -39,17 +39,20 @@ stepM = counter %%= (\i -> (i, i+1))
 tShow :: (Show a) => a -> Text
 tShow = Text.pack . show 
 
+wrapDecl identifier contents = Text.unlines $ [header, contents, "  }"]
+  where
+    header = Text.concat ["data ", identifier, " = ", identifier, " { "]
+
 -- * Naive type printing.
 newDecl :: [(Text, Text)] -> DeclM Text
 newDecl kvList = do i              :: Int <- stepM
                     let identifier :: Text = "Obj" `Text.append` tShow i
-                        header = Text.concat ["data ", identifier, " = ", identifier, " { "]
-                        decl   = Text.unlines $ [header] ++ fieldDecls ++ ["  }"]
+                    let decl = wrapDecl identifier fieldDecls
                     decls %%= (\ds -> ((), decl:ds))
                     return identifier
   where
-    fieldDecls :: [Text]
-    fieldDecls = map fieldDecl kvList
+    fieldDecls :: Text
+    fieldDecls = Text.unlines $ map fieldDecl kvList
     fieldDecl  :: (Text, Text) -> Text
     fieldDecl (name, fType) = Text.concat ["    ", name, " :: ", fType]
 
@@ -77,10 +80,13 @@ formatType'  TNull                        = return "Maybe Text"
 formatType'  e         | e == emptyType   = return "Maybe Text"
 formatType' t                             = return $ "ERROR: Don't know how to handle: " `Text.append` tShow t
 
-formatType t = Text.unlines $ finalState ^. decls
+
+formatType = runDecl . formatType'
+
+runDecl decl = Text.unlines $ finalState ^. decls
   where
     initialState    = DeclState [] 1
-    (_, finalState) = runState (formatType' t) initialState
+    (_, finalState) = runState decl initialState
 
 -- * Splitting object types by label for unification.
 type TypeTree    = Map Text [Type]
@@ -109,27 +115,35 @@ splitTypeByLabel' l (TObj   o) = do kvs <- forM d $ \(k, v) -> do
 splitTypeByLabel' l TNull      = return TNull
 splitTypeByLabel' l t          = error $ "ERROR: Don't know how to handle: " ++ show t
 
-splitTypeByLabel :: Type -> Map Text Type
-splitTypeByLabel t = Map.map (foldl1' unifyTypes) finalState
+splitTypeByLabel :: Text -> Type -> Map Text Type
+splitTypeByLabel topLabel t = Map.map (foldl1' unifyTypes) finalState
   where
-    topLabel = "TopLevel"
     job = do r <- splitTypeByLabel' topLabel t
              addType topLabel r
     initialState    = Map.empty
     (_, finalState) = runState job initialState
 
+displaySplitTypes dict = runDecl decls
+  where
+    decls = do
+      forM (Map.toList dict) $ \(name, typ) -> do
+        content <- formatType' typ
+        return $! wrapDecl name content
+
 main = do bs <- BSL.readFile "test/test.json"
           let Just v = decode bs
           -- print (v :: Value)
           let t = extractType v
-          print t
-          putStrLn "Bungwa!!!"
+          --print t
+          --putStrLn "Bungwa!!!"
           Text.putStrLn $ formatType t
           print $ valueSize v
           print $ valueTypeSize v
           print $ typeSize t
-          let splitted = splitTypeByLabel t
-          print splitted
+          let splitted = splitTypeByLabel "TopLevel" t
+          --print splitted
+          let result = displaySplitTypes splitted
+          Text.putStrLn result
           {-
           forM_ (Map.toList splitted) $ \(label, types) -> do
             Text.putStr label

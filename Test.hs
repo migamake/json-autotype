@@ -61,12 +61,14 @@ newDecl identifier kvs = do attrs <- forM kvs $ \(k, v) -> do
     fieldDecl  :: (Text, Text) -> Text
     fieldDecl (name, fType) = Text.concat ["    ", name, " :: ", fType]
 
+emptySetLikes = Set.fromList [TNull, TArray $ TUnion $ Set.fromList []]
+
 formatType' :: Type -> DeclM Text
 formatType'  TString                      = return "Text"
 formatType'  TNum                         = return "Int"
 formatType'  TBool                        = return "Bool"
-formatType' (TLabel l)                    = return l
-formatType' (TUnion u) | uu <- u `Set.difference` Set.singleton TNull,
+formatType' (TLabel l)                    = return $ normalizeTypeName l
+formatType' (TUnion u) | uu <- u `Set.difference` emptySetLikes,
                          Set.size uu == 1 = do fmt <- formatType' $ head $ Set.toList u
                                                return $ "Maybe " `Text.append` fmt
 formatType' (TUnion u)                    = do tys <- forM (Set.toList u) formatType'
@@ -141,7 +143,7 @@ displaySplitTypes dict = runDecl decls
                                wrapDecl name' content]
 
 normalizeTypeName :: Text -> Text
-normalizeTypeName = Text.unwords             .
+normalizeTypeName = Text.concat              .
                     map capitalize           .
                     filter (not . Text.null) .
                     Text.split (not . isAlpha)

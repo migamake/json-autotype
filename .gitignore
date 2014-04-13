@@ -5,3 +5,4 @@
 *.p_hi
 *.p_o
 Test
+dist/

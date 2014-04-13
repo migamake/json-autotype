@@ -17,6 +17,7 @@ import           Data.Text          (Text)
 import           Data.Set           (Set )
 import           Data.List          (sort, foldl1')
 import           Data.Ord           (Ord(..), comparing)
+import           Data.Char          (isAlpha)
 import           Control.Monad.State.Class
 import           Control.Monad.State.Strict(State, runState)
 
@@ -43,16 +44,20 @@ wrapDecl identifier contents = Text.unlines $ [header, contents, "  }"]
   where
     header = Text.concat ["data ", identifier, " = ", identifier, " { "]
 
+genericIdentifier = do
+  i <- stepM
+  return $! ("Obj" `Text.append` tShow i)
+
 -- * Naive type printing.
-newDecl :: [(Text, Text)] -> DeclM Text
-newDecl kvList = do i              :: Int <- stepM
-                    let identifier :: Text = "Obj" `Text.append` tShow i
-                    let decl = wrapDecl identifier fieldDecls
-                    decls %%= (\ds -> ((), decl:ds))
-                    return identifier
+newDecl :: Text -> [(Text, Type)] -> DeclM Text
+newDecl identifier kvs = do attrs <- forM kvs $ \(k, v) -> do
+                              formatted <- formatType' v
+                              return (k, formatted)
+                            let decl = wrapDecl identifier $ fieldDecls attrs
+                            decls %%= (\ds -> ((), decl:ds))
+                            return identifier
   where
-    fieldDecls :: Text
-    fieldDecls = Text.unlines $ map fieldDecl kvList
+    fieldDecls attrList = Text.unlines $ map fieldDecl attrList
     fieldDecl  :: (Text, Text) -> Text
     fieldDecl (name, fType) = Text.concat ["    ", name, " :: ", fType]
 
@@ -70,10 +75,8 @@ formatType' (TUnion u)                    = do tys <- forM (Set.toList u) format
                                                                      ")"]
 formatType' (TArray a)                    = do inner <- formatType' a
                                                return $ Text.concat ["[", inner, "]"]
-formatType' (TObj   o)                    = do kvs <- forM d $ \(k, v) -> do
-                                                        formatted <- formatType' v
-                                                        return (k, formatted)
-                                               newDecl kvs
+formatType' (TObj   o)                    = do ident <- genericIdentifier
+                                               newDecl ident d
   where
     d = Map.toList $ unDict o 
 formatType'  TNull                        = return "Maybe Text"
@@ -123,13 +126,30 @@ splitTypeByLabel topLabel t = Map.map (foldl1' unifyTypes) finalState
     initialState    = Map.empty
     (_, finalState) = runState job initialState
 
+formatObjectType identifier (TObj o) = newDecl identifier d
+  where
+    d = Map.toList $ unDict o
+formatObjectType identifier other    = formatType' other
+
 displaySplitTypes dict = runDecl decls
   where
     decls = do
       forM (Map.toList dict) $ \(name, typ) -> do
-        content <- formatType' typ
-        return $! Text.concat ["-- ", name, ":\n",
-                               wrapDecl name content]
+        let name' = normalizeTypeName name
+        content <- formatObjectType name' typ
+        return $! Text.concat ["-- ", name', ":\n",
+                               wrapDecl name' content]
+
+normalizeTypeName :: Text -> Text
+normalizeTypeName = Text.unwords             .
+                    map capitalize           .
+                    filter (not . Text.null) .
+                    Text.split (not . isAlpha)
+
+capitalize :: Text -> Text
+capitalize word = Text.toUpper first `Text.append` rest
+  where
+    (first, rest) = Text.splitAt 1 word
 
 main = do bs <- BSL.readFile "test/test.json"
           let Just v = decode bs

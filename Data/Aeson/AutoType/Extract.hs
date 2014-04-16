@@ -1,4 +1,3 @@
-{-# LANGUAGE TemplateHaskell #-}
 module Data.Aeson.AutoType.Extract(valueSize, typeSize, valueTypeSize,
                                    valueDepth, Dict(..),
                                    Type(..), emptyType,
@@ -82,7 +81,7 @@ extractType  Null                        = TNull
 extractType (Bool   b)                   = TBool
 extractType (Number n)                   = TNum
 extractType (String s)                   = TString
-extractType (Array  a) | V.null a        = TArray $ emptyType
+extractType (Array  a) | V.null a        = TArray emptyType
 extractType (Array  a)                   = V.foldl1' unifyTypes $ V.map extractType a
 
 simplifyUnion (TUnion s) | Set.size s == 1 = head $ Set.toList s
@@ -98,7 +97,7 @@ unifyTypes TBool        TBool                         = TBool
 unifyTypes TNum         TNum                          = TNum
 unifyTypes TString      TString                       = TString
 unifyTypes TNull        TNull                         = TNull
-unifyTypes (TObj d)     (TObj  e)                     = TObj $ newDict 
+unifyTypes (TObj d)     (TObj  e)                     = TObj newDict 
   where
     newDict :: Dict
     newDict = Dict $ Hash.fromList [(k, get k d `unifyTypes`
@@ -116,10 +115,10 @@ unifyUnion u v = union $ uSimple `Set.union`
     (vSimple, vCompound) = Set.partition isSimple v
     (uObj, uArr) = Set.partition isObject uCompound
     (vObj, vArr) = Set.partition isObject vCompound
-    oset    = Set.fromList $ if objects == []
+    oset    = Set.fromList $ if null objects
                                then []
                                else [foldl1' unifyTypes objects]
-    aset    = Set.fromList $ if arrays  == []
+    aset    = Set.fromList $ if null arrays
                                then []
                                else [foldl1' unifyTypes arrays]
     objects = Set.toList $ uObj `Set.union` vObj

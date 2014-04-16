@@ -40,7 +40,7 @@ stepM = counter %%= (\i -> (i, i+1))
 tShow :: (Show a) => a -> Text
 tShow = Text.pack . show 
 
-wrapDecl identifier contents = Text.unlines $ [header, contents, "  }"]
+wrapDecl identifier contents = Text.unlines [header, contents, "  }"]
   where
     header = Text.concat ["data ", identifier, " = ", identifier, " { "]
 
@@ -64,26 +64,26 @@ newDecl identifier kvs = do attrs <- forM kvs $ \(k, v) -> do
 emptySetLikes = Set.fromList [TNull, TArray $ TUnion $ Set.fromList []]
 
 formatType' :: Type -> DeclM Text
-formatType'  TString                      = return "Text"
-formatType'  TNum                         = return "Int"
-formatType'  TBool                        = return "Bool"
-formatType' (TLabel l)                    = return $ normalizeTypeName l
+formatType'  TString                          = return "Text"
+formatType'  TNum                             = return "Int"
+formatType'  TBool                            = return "Bool"
+formatType' (TLabel l)                        = return $ normalizeTypeName l
 formatType' (TUnion u) | uu <- u `Set.difference` emptySetLikes,
-                         Set.size uu == 1 = do fmt <- formatType' $ head $ Set.toList u
-                                               return $ "Maybe " `Text.append` fmt
-formatType' (TUnion u)                    = do tys <- forM (Set.toList u) formatType'
-                                               return $ Text.concat ["(",
-                                                                     "\n|" `Text.intercalate` tys,
-                                                                     ")"]
-formatType' (TArray a)                    = do inner <- formatType' a
-                                               return $ Text.concat ["[", inner, "]"]
-formatType' (TObj   o)                    = do ident <- genericIdentifier
-                                               newDecl ident d
+                         Set.size uu == 1     = do fmt <- formatType' $ head $ Set.toList u
+                                                   return $ "Maybe " `Text.append` fmt
+formatType' (TUnion u)                        = do tys <- forM (Set.toList u) formatType'
+                                                   return $ Text.concat ["(",
+                                                                         "\n|" `Text.intercalate` tys,
+                                                                         ")"]
+formatType' (TArray a)                        = do inner <- formatType' a
+                                                   return $ Text.concat ["[", inner, "]"]
+formatType' (TObj   o)                        = do ident <- genericIdentifier
+                                                   newDecl ident d
   where
     d = Map.toList $ unDict o 
-formatType'  TNull                        = return "Maybe Text"
-formatType'  e         | e == emptyType   = return "Maybe Text"
-formatType' t                             = return $ "ERROR: Don't know how to handle: " `Text.append` tShow t
+formatType'  TNull                            = return "Maybe Text"
+formatType'  e | e `Set.member` emptySetLikes = return "Maybe Text"
+formatType'  t                                = return $ "ERROR: Don't know how to handle: " `Text.append` tShow t
 
 
 formatType = runDecl . formatType'
@@ -135,7 +135,7 @@ formatObjectType identifier other    = formatType' other
 
 displaySplitTypes dict = runDecl decls
   where
-    decls = do
+    decls =
       forM (Map.toList dict) $ \(name, typ) -> do
         let name' = normalizeTypeName name
         content <- formatObjectType name' typ

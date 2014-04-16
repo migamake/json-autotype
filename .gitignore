@@ -6,3 +6,6 @@
 *.p_o
 Test
 dist/
+JSONTypes.hs
+Test
+JSONTypes

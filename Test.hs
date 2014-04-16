@@ -40,7 +40,8 @@ stepM = counter %%= (\i -> (i, i+1))
 tShow :: (Show a) => a -> Text
 tShow = Text.pack . show 
 
-wrapDecl identifier contents = Text.unlines [header, contents, "  }"]
+wrapDecl identifier contents = Text.unlines [header, contents, "  } deriving (Show,Eq)"
+                                            ,"\nderiveJSON defaultOptions ''" `Text.append` identifier]
   where
     header = Text.concat ["data ", identifier, " = ", identifier, " { "]
 
@@ -58,9 +59,16 @@ newDecl identifier kvs = do attrs <- forM kvs $ \(k, v) -> do
                             decls %%= (\ds -> ((), decl:ds))
                             return identifier
   where
-    fieldDecls attrList = Text.unlines $ map fieldDecl attrList
+    fieldDecls attrList = Text.intercalate ",\n" $ map fieldDecl attrList
     fieldDecl  :: (Text, Text) -> Text
-    fieldDecl (name, fType) = Text.concat ["    ", name, " :: ", fType]
+    fieldDecl (name, fType) = Text.concat ["    ", normalizeFieldName name, " :: ", fType]
+
+normalizeFieldName = escapeKeywords . uncapitalize . normalizeTypeName
+
+keywords = Set.fromList ["type", "data", "module"]
+
+escapeKeywords k | k `Set.member` keywords = k `Text.append` "_"
+escapeKeywords k                           = k
 
 emptySetLikes = Set.fromList [TNull, TArray $ TUnion $ Set.fromList []]
 
@@ -158,7 +166,8 @@ displaySplitTypes dict = runDecl decls
 -}
 
 normalizeTypeName :: Text -> Text
-normalizeTypeName = Text.concat              .
+normalizeTypeName = escapeKeywords           .
+                    Text.concat              .
                     map capitalize           .
                     filter (not . Text.null) .
                     Text.split (not . isAlpha)
@@ -168,16 +177,28 @@ capitalize word = Text.toUpper first `Text.append` rest
   where
     (first, rest) = Text.splitAt 1 word
 
+uncapitalize :: Text -> Text
+uncapitalize word = Text.toLower first `Text.append` rest
+  where
+    (first, rest) = Text.splitAt 1 word
+
 assertM v = assert v $ return ()
+
+header = Text.unlines ["{-# LANGUAGE TemplateHaskell #-}"
+                      ,"module JSONTypes where"
+                      ,""
+                      ,"import           Data.Text (Text)"
+                      ,"import           Data.Aeson(decode, Value(..), FromJSON(..),"
+                      ,"                            (.:), (.:?), (.!=))"
+                      ,"import           Data.Aeson.TH"
+                      ,""]
 
 main = do bs <- BSL.readFile "test/test.json"
           let Just v = decode bs
           let t = extractType v
-          --print $ valueSize v
-          --print $ valueTypeSize v
-          --print $ typeSize t
           let splitted = splitTypeByLabel "TopLevel" t
-          print $ Map.filter hasNonTopTObj splitted
+          Text.putStrLn header
+          --print $ Map.filter hasNonTopTObj splitted
           let result = displaySplitTypes splitted
           Text.putStrLn result
           assertM $ not $ any hasNonTopTObj $ Map.elems splitted

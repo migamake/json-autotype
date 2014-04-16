@@ -44,9 +44,10 @@ wrapDecl identifier contents = Text.unlines [header, contents, "  }"]
   where
     header = Text.concat ["data ", identifier, " = ", identifier, " { "]
 
+-- | Makes a generic identifier name.
 genericIdentifier = do
   i <- stepM
-  return $! ("Obj" `Text.append` tShow i)
+  return $! "Obj" `Text.append` tShow i
 
 -- * Naive type printing.
 newDecl :: Text -> [(Text, Type)] -> DeclM Text
@@ -81,7 +82,6 @@ formatType' (TObj   o)                        = do ident <- genericIdentifier
                                                    newDecl ident d
   where
     d = Map.toList $ unDict o 
-formatType'  TNull                            = return "Maybe Text"
 formatType'  e | e `Set.member` emptySetLikes = return "Maybe Text"
 formatType'  t                                = return $ "ERROR: Don't know how to handle: " `Text.append` tShow t
 
@@ -101,13 +101,27 @@ type TypeTreeM a = State TypeTree a
 addType :: Text -> Type -> TypeTreeM ()
 addType label typ = modify (Map.insertWith (++) label [typ])
 
+hasNonTopTObj (TObj o) = any hasTObj $ Map.elems $ unDict o
+hasNonTopTObj other    = False
+
+nonTObj (TObj _) = False
+nonTObj _        = True
+
+hasTObj (TObj   _) = True
+hasTObj (TArray a) = hasTObj a
+hasTObj (TUnion u) = any u
+  where
+    any = Set.foldr ((||) . hasTObj) False
+hasTObj _          = False
+
 splitTypeByLabel' :: Text -> Type -> TypeTreeM Type
 splitTypeByLabel' l  TString   = return TString
 splitTypeByLabel' l  TNum      = return TNum
 splitTypeByLabel' l  TBool     = return TBool
+splitTypeByLabel' l  TNull     = return TNull
 splitTypeByLabel' l (TLabel r) = assert False $ return $ TLabel r -- unnecessary?
 splitTypeByLabel' l (TUnion u) = do m <- mapM (splitTypeByLabel' l) $ Set.toList u
-                                    return $! TUnion $ Set.fromList m
+                                    return $! TUnion $! Set.fromList m
 splitTypeByLabel' l (TArray a) = do m <- splitTypeByLabel' (l `Text.append` "Elt") a
                                     return $! TArray m
 splitTypeByLabel' l (TObj   o) = do kvs <- forM d $ \(k, v) -> do
@@ -117,14 +131,13 @@ splitTypeByLabel' l (TObj   o) = do kvs <- forM d $ \(k, v) -> do
                                     return $! TLabel l
   where
     d = Map.toList $ unDict o 
-splitTypeByLabel' l TNull      = return TNull
-splitTypeByLabel' l t          = error $ "ERROR: Don't know how to handle: " ++ show t
+--splitTypeByLabel' l  t         = error $ "ERROR: Don't know how to handle: " ++ show t
 
 splitTypeByLabel :: Text -> Type -> Map Text Type
 splitTypeByLabel topLabel t = Map.map (foldl1' unifyTypes) finalState
   where
-    job = do r <- splitTypeByLabel' topLabel t
-             addType topLabel r
+    job = splitTypeByLabel' topLabel t
+          --   addType topLabel r
     initialState    = Map.empty
     (_, finalState) = runState job initialState
 
@@ -138,9 +151,11 @@ displaySplitTypes dict = runDecl decls
     decls =
       forM (Map.toList dict) $ \(name, typ) -> do
         let name' = normalizeTypeName name
-        content <- formatObjectType name' typ
+        formatObjectType name' typ
+{-        content <- formatObjectType name' typ
         return $! Text.concat ["-- ", name', ":\n",
                                wrapDecl name' content]
+-}
 
 normalizeTypeName :: Text -> Text
 normalizeTypeName = Text.concat              .
@@ -153,30 +168,19 @@ capitalize word = Text.toUpper first `Text.append` rest
   where
     (first, rest) = Text.splitAt 1 word
 
+assertM v = assert v $ return ()
+
 main = do bs <- BSL.readFile "test/test.json"
           let Just v = decode bs
-          -- print (v :: Value)
           let t = extractType v
-          --print t
-          --putStrLn "Bungwa!!!"
-          Text.putStrLn $ formatType t
-          print $ valueSize v
-          print $ valueTypeSize v
-          print $ typeSize t
+          --print $ valueSize v
+          --print $ valueTypeSize v
+          --print $ typeSize t
           let splitted = splitTypeByLabel "TopLevel" t
-          --print splitted
+          print $ Map.filter hasNonTopTObj splitted
           let result = displaySplitTypes splitted
           Text.putStrLn result
-          {-
-          forM_ (Map.toList splitted) $ \(label, types) -> do
-            Text.putStr label
-            putStr " : "
-            putStrLn $ show types
-            putStr " -> -> -> -> -> "
-            --print $ foldl1' unifyTypes types
-            forM_ (zip types $ tail types) $ \(t1, t2) -> do
-              putStrLn $ show t1 ++ " <> " ++ show t2
-              print $ t1 `unifyTypes` t2-}
+          assertM $ not $ any hasNonTopTObj $ Map.elems splitted
 
           
 

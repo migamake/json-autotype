@@ -1,6 +1,7 @@
 {-# LANGUAGE TemplateHaskell, ScopedTypeVariables, OverloadedStrings #-}
 module Main where
 
+import           Control.Arrow((&&&))
 import           Control.Lens.TH
 import           Control.Lens
 import           Control.Monad    (forM, forM_)
@@ -18,10 +19,12 @@ import           Data.Set           (Set )
 import           Data.List          (sort, foldl1')
 import           Data.Ord           (Ord(..), comparing)
 import           Data.Char          (isAlpha)
+import           Data.Tuple.Utils   (fst3)
 import           Control.Monad.State.Class
 import           Control.Monad.State.Strict(State, runState)
 
 import           Data.Aeson.AutoType.Extract
+import qualified Data.Graph          as Graph
 
 data DeclState = DeclState { _decls   :: [Text]
                            , _counter :: Int
@@ -157,13 +160,9 @@ formatObjectType identifier other    = formatType' other
 displaySplitTypes dict = runDecl decls
   where
     decls =
-      forM (Map.toList dict) $ \(name, typ) -> do
+      forM (toposort dict) $ \(name, typ) -> do
         let name' = normalizeTypeName name
         formatObjectType name' typ
-{-        content <- formatObjectType name' typ
-        return $! Text.concat ["-- ", name', ":\n",
-                               wrapDecl name' content]
--}
 
 normalizeTypeName :: Text -> Text
 normalizeTypeName = escapeKeywords           .
@@ -193,6 +192,21 @@ header = Text.unlines ["{-# LANGUAGE TemplateHaskell #-}"
                       ,"import           Data.Aeson.TH"
                       ,""]
 
+toposort :: Map Text Type -> [(Text, Type)]  
+toposort splitted = map ((id &&& (splitted Map.!)) . fst3 . graphKey) $ Graph.topSort graph
+  where
+    (graph, graphKey) = Graph.graphFromEdges' $ map makeEntry $ Map.toList splitted
+    makeEntry (k, v) = (k, k, allLabels v)
+
+allLabels :: Type -> [Text]
+allLabels = flip go []
+  where
+    go (TLabel l) ls = l:ls
+    go (TArray t) ls = go t ls
+    go (TUnion u) ls = Set.foldr go ls          u
+    go (TObj   o) ls = Map.foldr go ls $ unDict o
+    go other      ls = ls
+
 main = do bs <- BSL.readFile "test/test.json"
           let Just v = decode bs
           let t = extractType v
@@ -202,6 +216,8 @@ main = do bs <- BSL.readFile "test/test.json"
           let result = displaySplitTypes splitted
           Text.putStrLn result
           assertM $ not $ any hasNonTopTObj $ Map.elems splitted
+          putStr "--" 
+          print $ map fst $ toposort splitted
 
           
 

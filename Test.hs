@@ -1,27 +1,28 @@
 {-# LANGUAGE TemplateHaskell, ScopedTypeVariables, OverloadedStrings #-}
 module Main where
 
-import           Control.Arrow((&&&))
+import           Control.Arrow             ((&&&))
 import           Control.Lens.TH
 import           Control.Lens
-import           Control.Monad    (forM, forM_)
+import           Control.Monad             (forM, forM_)
 import           Control.Exception(assert)
 import qualified Data.ByteString.Lazy.Char8 as BSL
-import qualified Data.HashMap.Strict as Map
-import qualified Data.Set            as Set
-import qualified Data.Vector         as V
+import qualified Data.HashMap.Strict        as Map
+import qualified Data.Set                   as Set
+import qualified Data.Vector                as V
 import           Data.Aeson
 import           Data.Aeson.Types
-import qualified Data.Text           as Text
-import qualified Data.Text.IO        as Text
-import           Data.Text          (Text)
-import           Data.Set           (Set )
-import           Data.List          (sort, foldl1')
-import           Data.Ord           (Ord(..), comparing)
-import           Data.Char          (isAlpha)
-import           Data.Tuple.Utils   (fst3)
+import qualified Data.Text                  as Text
+import qualified Data.Text.IO               as Text
+import           Data.Text                 (Text)
+import           Data.Set                  (Set )
+import           Data.List                 (sort, foldl1')
+import           Data.Ord                  (Ord(..), comparing)
+import           Data.Char                 (isAlpha)
+import           Data.Tuple.Utils          (fst3)
 import           Control.Monad.State.Class
 import           Control.Monad.State.Strict(State, runState)
+import           Data.Hashable             (Hashable(..))
 
 import           Data.Aeson.AutoType.Extract
 import qualified Data.Graph          as Graph
@@ -192,12 +193,14 @@ header = Text.unlines ["{-# LANGUAGE TemplateHaskell #-}"
                       ,"import           Data.Aeson.TH"
                       ,""]
 
+-- | Topological sorting of splitted types so that it is accepted declaration order.
 toposort :: Map Text Type -> [(Text, Type)]  
 toposort splitted = map ((id &&& (splitted Map.!)) . fst3 . graphKey) $ Graph.topSort graph
   where
     (graph, graphKey) = Graph.graphFromEdges' $ map makeEntry $ Map.toList splitted
     makeEntry (k, v) = (k, k, allLabels v)
 
+-- | Computes all type labels referenced by a given type.
 allLabels :: Type -> [Text]
 allLabels = flip go []
   where
@@ -207,18 +210,61 @@ allLabels = flip go []
     go (TObj   o) ls = Map.foldr go ls $ unDict o
     go other      ls = ls
 
+-- * Finding candidates for extra unifications
+instance Hashable a => Hashable (Set a) where
+  hashWithSalt = Set.foldr (flip hashWithSalt)
+
+-- | For a given splitted types, it returns candidates for extra
+-- unifications.
+unificationCandidates = Map.elems             .
+                        Map.filter candidates .
+                        Map.fromListWith (++) .
+                        map entry             .
+                        Map.toList
+  where
+    candidates [ ] = False
+    candidates [a] = False
+    candidates _   = True
+    entry (k, TObj o) = (Set.fromList $ Map.keys $ unDict o, [k])
+    entry (_, other ) = error $ "Unexpected type: " ++ show other
+
+-- | Unifies candidates on a give input list.
+unifyCandidates :: [[Text]] -> Map Text Type -> Map Text Type
+unifyCandidates candidates splitted = Map.map (remapLabels labelMapping) $ replacements splitted
+  where
+    unifiedType  :: [Text] -> Type
+    unifiedType cset      = foldr1 unifyTypes         $ 
+                            map (splitted Map.!) cset
+    replace      :: [Text] -> Map Text Type -> Map Text Type
+    replace  cset@(c:_) s = Map.insert c (unifiedType cset) (foldr Map.delete s cset)
+    replacements :: Map Text Type -> Map Text Type
+    replacements        s = foldr replace s candidates
+    labelMapping :: Map Text Text
+    labelMapping          = Map.fromList $ concatMap mapEntry candidates
+    mapEntry cset@(c:_)   = [(x, c) | x <- cset]
+
+-- | Remaps type labels according to a `Map`.
+remapLabels :: Map Text Text -> Type -> Type
+remapLabels ls (TObj   o) = TObj   $ Dict $ Map.map (remapLabels ls) $ unDict o
+remapLabels ls (TArray t) = TArray $                 remapLabels ls  t
+remapLabels ls (TUnion u) = TUnion $        Set.map (remapLabels ls) u
+remapLabels ls (TLabel l) = TLabel $ Map.lookupDefault l l ls
+remapLabels ls other      = other
+
 main = do bs <- BSL.readFile "test/test.json"
           let Just v = decode bs
           let t = extractType v
           let splitted = splitTypeByLabel "TopLevel" t
           Text.putStrLn header
-          --print $ Map.filter hasNonTopTObj splitted
           let result = displaySplitTypes splitted
-          Text.putStrLn result
+          --Text.putStrLn result
           assertM $ not $ any hasNonTopTObj $ Map.elems splitted
-          putStr "--" 
-          print $ map fst $ toposort splitted
-
-          
-
+          putStr "--"
+          --print $ map fst $ toposort splitted
+          let uCands = unificationCandidates splitted
+          forM_ uCands $ \cs -> do
+            putStr "-- "
+            Text.putStrLn $ "=" `Text.intercalate` cs
+          let unified = unifyCandidates uCands splitted
+          Text.putStrLn $ displaySplitTypes unified
 

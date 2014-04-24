@@ -24,6 +24,7 @@ import           Control.Monad.State.Class
 import           Control.Monad.State.Strict(State, runState)
 import           Data.Hashable             (Hashable(..))
 
+import           Data.Aeson.AutoType.Type
 import           Data.Aeson.AutoType.Extract
 import qualified Data.Graph          as Graph
 

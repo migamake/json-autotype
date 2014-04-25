@@ -4,6 +4,7 @@ module Data.Aeson.AutoType.Extract(valueSize, typeSize, valueTypeSize,
                                    Type(..), emptyType,
                                    extractType, unifyTypes) where
 
+import           Control.Exception  (assert)
 import           Data.Aeson.AutoType.Type
 import           Control.Lens.TH
 import qualified Data.ByteString.Lazy.Char8 as BSL
@@ -69,12 +70,15 @@ unifyTypes (TObj d)     (TObj  e)                     = TObj newDict
 unifyTypes (TArray u)   (TArray v)                    = TArray $ u `unifyTypes` v
 unifyTypes t            s                             = typeAsSet t `unifyUnion` typeAsSet s
 
-unifyUnion u v = union $ uSimple `Set.union`
-                         vSimple `Set.union`
-                         oset
+unifyUnion u v = assertions $
+                   union $ uSimple `Set.union`
+                           vSimple `Set.union`
+                           oset
   where
     (uSimple, uCompound) = Set.partition isSimple u
     (vSimple, vCompound) = Set.partition isSimple v
+    assertions = assert (Set.null $ Set.filter (not . isArray) uArr) .
+                 assert (Set.null $ Set.filter (not . isArray) vArr) 
     (uObj, uArr) = Set.partition isObject uCompound
     (vObj, vArr) = Set.partition isObject vCompound
     oset    = Set.fromList $ if null objects

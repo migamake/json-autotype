@@ -23,10 +23,11 @@ import           Data.Tuple.Utils          (fst3)
 import           Control.Monad.State.Class
 import           Control.Monad.State.Strict(State, runState)
 import           Data.Hashable             (Hashable(..))
+import qualified Data.Graph          as Graph
 
 import           Data.Aeson.AutoType.Type
 import           Data.Aeson.AutoType.Extract
-import qualified Data.Graph          as Graph
+import           Data.Aeson.AutoType.Util
 
 data DeclState = DeclState { _decls   :: [Text]
                            , _counter :: Int
@@ -66,9 +67,12 @@ newDecl identifier kvs = do attrs <- forM kvs $ \(k, v) -> do
   where
     fieldDecls attrList = Text.intercalate ",\n" $ map fieldDecl attrList
     fieldDecl  :: (Text, Text) -> Text
-    fieldDecl (name, fType) = Text.concat ["    ", normalizeFieldName name, " :: ", fType]
+    fieldDecl (name, fType) = Text.concat ["    ", normalizeFieldName identifier name, " :: ", fType]
 
-normalizeFieldName = escapeKeywords . uncapitalize . normalizeTypeName
+normalizeFieldName identifier = escapeKeywords             .
+                                uncapitalize               .
+                                (normalizeTypeName identifier `Text.append`) .
+                                normalizeTypeName
 
 keywords = Set.fromList ["type", "data", "module"]
 
@@ -212,9 +216,6 @@ allLabels = flip go []
     go other      ls = ls
 
 -- * Finding candidates for extra unifications
-instance Hashable a => Hashable (Set a) where
-  hashWithSalt = Set.foldr (flip hashWithSalt)
-
 -- | For a given splitted types, it returns candidates for extra
 -- unifications.
 unificationCandidates = Map.elems             .

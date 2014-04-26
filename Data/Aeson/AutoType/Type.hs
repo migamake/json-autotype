@@ -1,5 +1,4 @@
-{-# LANGUAGE DeriveDataTypeable, TemplateHaskell #-}
-{-# OPTIONS_GHC -F -pgmFderive -optF-F #-}
+{-# LANGUAGE DeriveDataTypeable, TemplateHaskell, FlexibleInstances, MultiParamTypeClasses #-}
 module Data.Aeson.AutoType.Type(typeSize,
                                 Dict(..), keys, get,
                                 Type(..), emptyType,
@@ -19,8 +18,7 @@ import           Data.Set           (Set )
 import           Data.HashMap.Strict(HashMap)
 import           Data.List          (sort, foldl1')
 import           Data.Ord           (Ord(..), comparing)
-import           Data.DeriveTH
-import           Data.Derive.UniplateDirect
+import           Data.Generics.Uniplate
 
 -- | Type alias for HashMap
 type Map = HashMap
@@ -38,11 +36,28 @@ keys = Set.fromList . Hash.keys . unDict
 
 -- * Type
 data Type = TNull | TBool | TNum | TString |
-            TUnion (Set.Set      Type)     |
+            TUnion (Set      Type)         |
             TLabel Text                    |
             TObj   Dict                    |
             TArray Type
   deriving (Show,Eq, Ord, Data, Typeable)
+
+-- These are missing Uniplate instances...
+{-
+instance Biplate (Set a) a where
+  biplate s = (Set.toList s, Set.fromList)
+
+instance Biplate (HashMap k v) v where
+  biplate m = (Hash.elems m, Hash.fromList . zip (Hash.keys m))
+ -}
+
+instance Uniplate Type where
+  uniplate (TUnion s) = (Set.toList s, TUnion .        Set.fromList                     )
+  uniplate (TObj   d) = (Hash.elems m, TObj   . Dict . Hash.fromList . zip (Hash.keys m))
+    where
+      m = unDict d
+  uniplate (TArray t) = ([t],          TArray . head  )
+  uniplate s          = ([],           const s        )
 
 -- | Empty type
 emptyType :: Type

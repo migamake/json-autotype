@@ -2,7 +2,9 @@
 module Data.Aeson.AutoType.Type(typeSize,
                                 Dict(..), keys, get,
                                 Type(..), emptyType,
-                                isSimple, isArray, isObject, typeAsSet) where
+                                isSimple, isArray, isObject, typeAsSet,
+                                hasNonTopTObj,
+                                hasTObj) where
 
 import           Control.Lens.TH
 import qualified Data.ByteString.Lazy.Char8 as BSL
@@ -95,4 +97,14 @@ isUnion _          = False
 -- | Is the top-level constructor a TArray?
 isArray (TArray _) = True
 isArray _          = False
+
+hasNonTopTObj (TObj o) = any hasTObj $ Hash.elems $ unDict o
+hasNonTopTObj other    = False
+
+hasTObj (TObj   _) = True
+hasTObj (TArray a) = hasTObj a
+hasTObj (TUnion u) = any u
+  where
+    any = Set.foldr ((||) . hasTObj) False
+hasTObj _          = False
 

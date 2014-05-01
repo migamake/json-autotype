@@ -1,5 +1,5 @@
 This repository contains some test JSON examples in test/*.json
-that is downloaded from Twitter API and other sources.
+that is downloaded from Twitter API and http://www.jquery4u.com/json/.
 Naturally these are covered by other licenses.
 
 Code copyright (c) 2014, Michal J. Gajda

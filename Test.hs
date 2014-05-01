@@ -1,6 +1,7 @@
 {-# LANGUAGE TemplateHaskell, ScopedTypeVariables, OverloadedStrings #-}
 module Main where
 
+import           System.Environment        (getArgs)
 import           Control.Arrow             ((&&&))
 import           Control.Lens.TH
 import           Control.Lens
@@ -42,20 +43,22 @@ header = Text.unlines ["{-# LANGUAGE TemplateHaskell #-}"
                       ,""]
 
 
-main = do bs <- BSL.readFile "test/test.json"
-          let Just v = decode bs
-          let t = extractType v
-          let splitted = splitTypeByLabel "TopLevel" t
-          Text.putStrLn header
-          let result = displaySplitTypes splitted
-          --Text.putStrLn result
-          assertM $ not $ any hasNonTopTObj $ Map.elems splitted
-          putStr "--"
-          --print $ map fst $ toposort splitted
-          let uCands = unificationCandidates splitted
-          forM_ uCands $ \cs -> do
-            putStr "-- "
-            Text.putStrLn $ "=" `Text.intercalate` cs
-          let unified = unifyCandidates uCands splitted
-          Text.putStrLn $ displaySplitTypes unified
+main = do filenames <- getArgs
+          forM filenames $ \filename ->
+            do bs <- BSL.readFile filename
+               let Just v = decode bs
+               let t = extractType v
+               let splitted = splitTypeByLabel "TopLevel" t
+               Text.putStrLn header
+               let result = displaySplitTypes splitted
+               --Text.putStrLn result
+               assertM $ not $ any hasNonTopTObj $ Map.elems splitted
+               --putStr "--"
+               --print $ map fst $ toposort splitted
+               let uCands = unificationCandidates splitted
+               forM_ uCands $ \cs -> do
+                 putStr "-- "
+                 Text.putStrLn $ "=" `Text.intercalate` cs
+               let unified = unifyCandidates uCands splitted
+               Text.putStrLn $ displaySplitTypes unified
 

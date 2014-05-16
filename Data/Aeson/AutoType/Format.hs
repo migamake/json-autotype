@@ -22,7 +22,7 @@ import           Data.Set                  (Set )
 import           Data.List                 (sort, foldl1')
 import           Data.Ord                  (Ord(..), comparing)
 import           Data.Char                 (isAlpha)
-import           Data.Tuple.Utils          (fst3)
+--import           Data.Tuple.Utils          (fst3)
 import           Control.Monad.State.Class
 import           Control.Monad.State.Strict(State, runState)
 import           Data.Hashable             (Hashable(..))
@@ -31,6 +31,8 @@ import qualified Data.Graph          as Graph
 import           Data.Aeson.AutoType.Type
 import           Data.Aeson.AutoType.Extract
 import           Data.Aeson.AutoType.Util
+
+fst3 (a, _b, _c) = a
 
 data DeclState = DeclState { _decls   :: [Text]
                            , _counter :: Int

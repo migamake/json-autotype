@@ -1,11 +1,13 @@
 {-# LANGUAGE TemplateHaskell, ScopedTypeVariables, OverloadedStrings #-}
 module Main where
 
+import           System.IO                 (withFile, stdout, IOMode(WriteMode), Handle)
+import           System.FilePath           (FilePath, splitExtension)
 import           System.Environment        (getArgs)
 import           Control.Arrow             ((&&&))
 import           Control.Lens.TH
 import           Control.Lens
-import           Control.Monad             (forM, forM_)
+import           Control.Monad             (forM, forM_, when)
 import           Control.Exception(assert)
 import qualified Data.ByteString.Lazy.Char8 as BSL
 import qualified Data.HashMap.Strict        as Map
@@ -20,7 +22,6 @@ import           Data.Set                  (Set )
 import           Data.List                 (sort, foldl1')
 import           Data.Ord                  (Ord(..), comparing)
 import           Data.Char                 (isAlpha)
-import           Data.Tuple.Utils          (fst3)
 import           Control.Monad.State.Class
 import           Control.Monad.State.Strict(State, runState)
 import           Data.Hashable             (Hashable(..))
@@ -30,11 +31,15 @@ import           Data.Aeson.AutoType.Type
 import           Data.Aeson.AutoType.Extract
 import           Data.Aeson.AutoType.Util
 import           Data.Aeson.AutoType.Format
+import           HFlags
+
+--import           Data.Tuple.Utils          (fst3)
+fst3 (a, _, _) = a
 
 assertM v = assert v $ return ()
 
-header = Text.unlines ["{-# LANGUAGE TemplateHaskell #-}"
-                      ,"module JSONTypes where"
+header moduleName = Text.unlines ["{-# LANGUAGE TemplateHaskell #-}"
+                      ,Text.concat ["module ", moduleName, " where"]
                       ,""
                       ,"import           Data.Text (Text)"
                       ,"import           Data.Aeson(decode, Value(..), FromJSON(..),"
@@ -42,23 +47,38 @@ header = Text.unlines ["{-# LANGUAGE TemplateHaskell #-}"
                       ,"import           Data.Aeson.TH"
                       ,""]
 
+-- * Command line flags
+defineFlag "suggest"     True                         "Suggest candidates for unification"
+defineFlag "a:autounify" True                         "Automatically unify suggested candidates"
+defineFlag "o:output"    ("JSONTypes.hs" :: FilePath) "Write output to the given file"
 
-main = do filenames <- getArgs
-          forM filenames $ \filename ->
-            do bs <- BSL.readFile filename
-               let Just v = decode bs
-               let t = extractType v
-               let splitted = splitTypeByLabel "TopLevel" t
-               Text.putStrLn header
-               let result = displaySplitTypes splitted
-               --Text.putStrLn result
-               assertM $ not $ any hasNonTopTObj $ Map.elems splitted
-               --putStr "--"
-               --print $ map fst $ toposort splitted
-               let uCands = unificationCandidates splitted
-               forM_ uCands $ \cs -> do
-                 putStr "-- "
-                 Text.putStrLn $ "=" `Text.intercalate` cs
-               let unified = unifyCandidates uCands splitted
-               Text.putStrLn $ displaySplitTypes unified
+-- | Generic function for opening file if the filename is not empty nor "-",
+--   or using given handle otherwise (probably stdout, stderr, or stdin).
+-- TODO: Should it become utility function?
+withFileOrHandle :: FilePath -> IOMode -> Handle -> (Handle -> IO r) -> IO r
+withFileOrHandle ""   ioMode handle action =                      action handle
+withFileOrHandle "-"  ioMode handle action =                      action handle
+withFileOrHandle name ioMode _      action = withFile name ioMode action 
+
+main = do $initHFlags "json-autotype -- automatic type and parser generation from JSON"
+          filenames <- getArgs
+          let (moduleName, extension) = splitExtension flags_output
+          assertM $ extension == ".hs"
+          -- TODO: should integrate all inputs into single type set!!!
+          withFileOrHandle flags_output WriteMode stdout $ \hOut ->
+            forM filenames $ \filename ->
+              do bs <- BSL.readFile filename
+                 let Just v = decode bs
+                 let t = extractType v
+                 let splitted = splitTypeByLabel "TopLevel" t
+                 Text.hPutStrLn hOut $ header $ Text.pack moduleName
+                 assertM $ not $ any hasNonTopTObj $ Map.elems splitted
+                 let uCands = unificationCandidates splitted
+                 when flags_suggest $ forM_ uCands $ \cs -> do
+                                        putStr "-- "
+                                        Text.putStrLn $ "=" `Text.intercalate` cs
+                 let unified = if flags_autounify
+                                 then unifyCandidates uCands splitted
+                                 else splitted
+                 Text.hPutStrLn hOut $ displaySplitTypes unified
 

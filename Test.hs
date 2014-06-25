@@ -1,7 +1,8 @@
 {-# LANGUAGE TemplateHaskell, ScopedTypeVariables, OverloadedStrings #-}
+{-# OPTIONS_GHC -fno-warn-orphans #-}
 module Main where
 
-import           System.IO                 (withFile, stdout, IOMode(WriteMode), Handle)
+import           System.IO                 (withFile, stderr, stdout, IOMode(WriteMode), Handle)
 import           System.FilePath           (FilePath, splitExtension)
 import           System.Environment        (getArgs)
 import           Control.Arrow             ((&&&))
@@ -48,9 +49,10 @@ header moduleName = Text.unlines ["{-# LANGUAGE TemplateHaskell #-}"
                       ,""]
 
 -- * Command line flags
-defineFlag "suggest"     True                         "Suggest candidates for unification"
-defineFlag "a:autounify" True                         "Automatically unify suggested candidates"
-defineFlag "o:output"    ("JSONTypes.hs" :: FilePath) "Write output to the given file"
+defineFlag "filename"  ("JSONTypes.hs" :: FilePath) "Write output to the given file"
+defineFlag "suggest"   True                         "Suggest candidates for unification"
+defineFlag "autounify" True                         "Automatically unify suggested candidates"
+defineFlag "fakeFlag"  True                         "Ignore this flag - it doesn't exist!!!"
 
 -- | Generic function for opening file if the filename is not empty nor "-",
 --   or using given handle otherwise (probably stdout, stderr, or stdin).
@@ -62,15 +64,17 @@ withFileOrHandle name ioMode _      action = withFile name ioMode action
 
 main = do $initHFlags "json-autotype -- automatic type and parser generation from JSON"
           filenames <- getArgs
-          let (moduleName, extension) = splitExtension flags_output
+          let (moduleName, extension) = splitExtension flags_filename
           assertM $ extension == ".hs"
           -- TODO: should integrate all inputs into single type set!!!
-          withFileOrHandle flags_output WriteMode stdout $ \hOut ->
+          withFileOrHandle flags_filename WriteMode stdout $ \hOut ->
             forM filenames $ \filename ->
               do bs <- BSL.readFile filename
-                 let Just v = decode bs
-                 let t = extractType v
+                 Text.hPutStrLn stderr $ Text.pack $ show moduleName
+                 let Just v   = decode bs
+                 let t        = extractType v
                  let splitted = splitTypeByLabel "TopLevel" t
+                 Text.hPutStrLn hOut $ Text.pack moduleName
                  Text.hPutStrLn hOut $ header $ Text.pack moduleName
                  assertM $ not $ any hasNonTopTObj $ Map.elems splitted
                  let uCands = unificationCandidates splitted

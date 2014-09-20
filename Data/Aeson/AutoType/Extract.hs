@@ -1,4 +1,3 @@
-{-# LANGUAGE DeriveDataTypeable #-}
 module Data.Aeson.AutoType.Extract(valueSize, typeSize, valueTypeSize,
                                    valueDepth, Dict(..),
                                    Type(..), emptyType,
@@ -45,6 +44,7 @@ valueDepth (String _) = 1
 valueDepth (Array  a) = (1+) . V.foldl' max 0 $ V.map valueDepth a
 valueDepth (Object o) = (1+) . maximum . (0:) . map valueDepth . Hash.elems $ o
 
+extractType :: Value -> Type
 extractType (Object o)                   = TObj $ Dict $ Hash.map extractType o
 extractType  Null                        = TNull
 extractType (Bool   b)                   = TBool
@@ -53,9 +53,11 @@ extractType (String s)                   = TString
 extractType (Array  a) | V.null a        = TArray emptyType
 extractType (Array  a)                   = V.foldl1' unifyTypes $ V.map extractType a
 
+simplifyUnion :: Type -> Type
 simplifyUnion (TUnion s) | Set.size s == 1 = head $ Set.toList s
 simplifyUnion t                            = t
 
+unifyTypes :: Type -> Type -> Type
 unifyTypes TBool        TBool                         = TBool
 unifyTypes TNum         TNum                          = TNum
 unifyTypes TString      TString                       = TString
@@ -70,6 +72,7 @@ unifyTypes (TObj d)     (TObj  e)                     = TObj newDict
 unifyTypes (TArray u)   (TArray v)                    = TArray $ u `unifyTypes` v
 unifyTypes t            s                             = typeAsSet t `unifyUnion` typeAsSet s
 
+unifyUnion :: Set Type -> Set Type -> Type
 unifyUnion u v = assertions $
                    union $ uSimple `Set.union`
                            vSimple `Set.union`

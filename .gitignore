@@ -13,3 +13,9 @@ customerform.hs
 facebook.hs
 interop.hs
 productsdb.hs
+flickr.hs
+googlemaps.hs
+iPhoneMenu.hs
+jenkins.hs
+twitterapi.hs
+youtube.hs

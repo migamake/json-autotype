@@ -1,4 +1,4 @@
-{-# LANGUAGE DeriveDataTypeable, TemplateHaskell, FlexibleInstances, MultiParamTypeClasses #-}
+{-# LANGUAGE DeriveDataTypeable, FlexibleInstances, MultiParamTypeClasses #-}
 module Data.Aeson.AutoType.Type(typeSize,
                                 Dict(..), keys, get,
                                 Type(..), emptyType,
@@ -83,6 +83,7 @@ typeSize (TUnion u) = (1+) . maximum . (0:) . map typeSize . Set.toList $ u
 typeAsSet t@(TUnion s) = s
 typeAsSet t            = Set.singleton t
 
+hasTObj, hasNonTopTObj, isArray, isUnion, isSimple, isObject :: Type -> Bool
 -- | Is the top-level constructor a TObj?
 isObject (TObj _) = True
 isObject _        = False

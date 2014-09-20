@@ -74,6 +74,7 @@ main = do filenames <- $initHFlags "json-autotype -- automatic type and parser g
             forM filenames $ \filename ->
               do bs <- BSL.readFile filename
                  Text.hPutStrLn stderr $ "Processing " `Text.append` Text.pack (show moduleName)
+                 print (decode bs :: Maybe Value)
                  let Just v   = decode bs
                  let t        = extractType v
                  let splitted = splitTypeByLabel "TopLevel" t

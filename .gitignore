@@ -7,5 +7,9 @@
 Test
 dist/
 JSONTypes.hs
-Test
 JSONTypes
+colors.hs
+customerform.hs
+facebook.hs
+interop.hs
+productsdb.hs

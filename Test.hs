@@ -39,8 +39,12 @@ fst3 (a, _, _) = a
 
 assertM v = assert v $ return ()
 
+capitalize :: Text -> Text
+capitalize input = Text.toUpper (Text.take 1 input)
+                   `Text.append` Text.drop 1 input
+
 header moduleName = Text.unlines ["{-# LANGUAGE TemplateHaskell #-}"
-                      ,Text.concat ["module ", moduleName, " where"]
+                      ,Text.concat ["module ", capitalize moduleName, " where"]
                       ,""
                       ,"import           Data.Text (Text)"
                       ,"import           Data.Aeson(decode, Value(..), FromJSON(..),"
@@ -62,19 +66,17 @@ withFileOrHandle ""   ioMode handle action =                      action handle
 withFileOrHandle "-"  ioMode handle action =                      action handle
 withFileOrHandle name ioMode _      action = withFile name ioMode action 
 
-main = do $initHFlags "json-autotype -- automatic type and parser generation from JSON"
-          filenames <- getArgs
+main = do filenames <- $initHFlags "json-autotype -- automatic type and parser generation from JSON"
           let (moduleName, extension) = splitExtension flags_filename
           assertM $ extension == ".hs"
           -- TODO: should integrate all inputs into single type set!!!
           withFileOrHandle flags_filename WriteMode stdout $ \hOut ->
             forM filenames $ \filename ->
               do bs <- BSL.readFile filename
-                 Text.hPutStrLn stderr $ Text.pack $ show moduleName
+                 Text.hPutStrLn stderr $ "Processing " `Text.append` Text.pack (show moduleName)
                  let Just v   = decode bs
                  let t        = extractType v
                  let splitted = splitTypeByLabel "TopLevel" t
-                 Text.hPutStrLn hOut $ Text.pack moduleName
                  Text.hPutStrLn hOut $ header $ Text.pack moduleName
                  assertM $ not $ any hasNonTopTObj $ Map.elems splitted
                  let uCands = unificationCandidates splitted

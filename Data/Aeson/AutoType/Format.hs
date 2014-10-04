@@ -92,7 +92,7 @@ formatType'  TNum                             = return "Int"
 formatType'  TBool                            = return "Bool"
 formatType' (TLabel l)                        = return $ normalizeTypeName l
 formatType' (TUnion u) | uu <- u `Set.difference` emptySetLikes,
-                         Set.size uu == 1     = do fmt <- formatType' $ head $ Set.toList u
+                         Set.size uu == 1     = do fmt <- formatType' $ head $ Set.toList uu
                                                    return $ "Maybe " `Text.append` fmt
 formatType' (TUnion u)                        = do tys <- forM (Set.toList u) formatType'
                                                    return $ Text.concat ["(",
@@ -121,7 +121,7 @@ type TypeTree    = Map Text [Type]
 type TypeTreeM a = State TypeTree a
 
 addType :: Text -> Type -> TypeTreeM ()
-addType label typ = modify (Map.insertWith (++) label [typ])
+addType label typ = modify $ Map.insertWith (++) label [typ]
 
 splitTypeByLabel' :: Text -> Type -> TypeTreeM Type
 splitTypeByLabel' l  TString   = return TString

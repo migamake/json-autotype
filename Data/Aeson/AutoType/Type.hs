@@ -1,6 +1,6 @@
 {-# LANGUAGE DeriveDataTypeable, FlexibleInstances, MultiParamTypeClasses #-}
 module Data.Aeson.AutoType.Type(typeSize,
-                                Dict(..), keys, get,
+                                Dict(..), keys, get, withDict,
                                 Type(..), emptyType,
                                 isSimple, isArray, isObject, typeAsSet,
                                 hasNonTopTObj,
@@ -27,10 +27,16 @@ type Map = HashMap
 
 -- * Dictionary of types indexed by names.
 newtype Dict = Dict { unDict :: Map Text Type }
-  deriving (Show, Eq, Data, Typeable)
+  deriving (Eq, Data, Typeable)
+
+instance Show Dict where
+  show = show . sort . Hash.toList . unDict
 
 instance Ord Dict where
   compare = comparing $ sort . Hash.toList . unDict
+
+-- | Make operation on a map to an operation on a Dict.
+f `withDict` (Dict m) = Dict $ f m
 
 -- | Take all keys from dictionary.
 keys :: Dict -> Set Text

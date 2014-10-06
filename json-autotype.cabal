@@ -2,13 +2,14 @@
 name:                json-autotype
 version:             0.2.0.0
 synopsis:            Automatic type declaration for JSON input data
--- description:         
+description:         Automatic generation of Aeson's FromJSON instances
+                     from a set of example .json files.
 homepage:            http://github.com/mgajda/aeson-autotype
 license:             BSD3
 license-file:        LICENSE
 author:              Michal J. Gajda
 maintainer:          mjgajda@gmail.com
--- copyright:           
+copyright:           Copyright by Michal J. Gajda '2014
 category:            Web
 build-type:          Simple
 extra-source-files:  README.md changelog

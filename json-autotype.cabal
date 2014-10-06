@@ -2,9 +2,25 @@
 name:                json-autotype
 version:             0.2.0.0
 synopsis:            Automatic type declaration for JSON input data
-description:         Automatic generation of Aeson's FromJSON instances
-                     from a set of example .json files.
-homepage:            http://github.com/mgajda/aeson-autotype
+description:         Generates datatype declarations with Aeson's "FromJSON" instances
+                     from a set of example ".json" files.
+                     .
+                     To get started you need to install the package,
+                     and run "json-autotype" binary on an input ".json" file.
+                     That will generate a new Aeson-based JSON parser.
+                     .
+                     "$ json-autotype input.json -o JSONTypes.hs"
+                     .
+                     Feel free to tweak the by changing types of the fields
+                      - any field type that is instance of "FromJSON" should work.
+                     .
+                     You may immediately test the parser by calling it as a script:
+                     .
+                     "$ runghc JSONTypes.hs input.json"
+                     .
+                     See introduction on  <https://github.com/mgajda/json-autotype>
+                     for details.
+homepage:            https://github.com/mgajda/json-autotype
 license:             BSD3
 license-file:        LICENSE
 author:              Michal J. Gajda
@@ -14,6 +30,7 @@ category:            Web
 build-type:          Simple
 extra-source-files:  README.md changelog
 cabal-version:       >=1.10
+bug-reports:         https://github.com/mgajda/json-autotype/issues
 
 executable json-autotype
   main-is:             GenerateJSONParser.hs

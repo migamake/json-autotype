@@ -95,18 +95,21 @@ formatType' (TUnion u) | uu <- u `Set.difference` emptySetLikes,
                          Set.size uu == 1     = do fmt <- formatType' $ head $ Set.toList uu
                                                    return $ "Maybe " `Text.append` fmt
 formatType' (TUnion u)                        = do tys <- forM (Set.toList u) formatType'
-                                                   return $ Text.concat ["(",
-                                                                         "\n|" `Text.intercalate` tys,
-                                                                         ")"]
+                                                   return $ mkUnion tys
+  where
+    mkUnion []       = emptyTypeRepr
+    mkUnion nonEmpty = foldr1 mkEither nonEmpty
+      where mkEither a b = Text.concat ["Either (", a, ") (", b, ")"]
 formatType' (TArray a)                        = do inner <- formatType' a
                                                    return $ Text.concat ["[", inner, "]"]
 formatType' (TObj   o)                        = do ident <- genericIdentifier
                                                    newDecl ident d
   where
     d = Map.toList $ unDict o 
-formatType'  e | e `Set.member` emptySetLikes = return "Maybe Text"
+formatType'  e | e `Set.member` emptySetLikes = return emptyTypeRepr
 formatType'  t                                = return $ "ERROR: Don't know how to handle: " `Text.append` tShow t
 
+emptyTypeRepr = "Maybe Text" -- default...
 
 formatType = runDecl . formatType'
 

@@ -66,6 +66,11 @@ withFileOrHandle ""   ioMode handle action =                      action handle
 withFileOrHandle "-"  ioMode handle action =                      action handle
 withFileOrHandle name ioMode _      action = withFile name ioMode action 
 
+-- Tracing is switched off:
+myTrace :: String -> IO ()
+myTrace _msg = return ()
+--myTrace = putStrLn 
+
 main = do filenames <- $initHFlags "json-autotype -- automatic type and parser generation from JSON"
           let (moduleName, extension) = splitExtension flags_filename
           assertM $ extension == ".hs"
@@ -74,22 +79,22 @@ main = do filenames <- $initHFlags "json-autotype -- automatic type and parser g
             forM filenames $ \filename ->
               do bs <- BSL.readFile filename
                  Text.hPutStrLn stderr $ "Processing " `Text.append` Text.pack (show moduleName)
-                 print (decode bs :: Maybe Value)
+                 myTrace ("Decoded JSON: " ++ show (decode bs :: Maybe Value))
                  let Just v   = decode bs
                  let t        = extractType v
-                 putStrLn $ "type: " ++ show t
+                 myTrace $ "type: " ++ show t
                  let splitted = splitTypeByLabel "TopLevel" t
-                 putStrLn $ "splitted: " ++ show splitted
+                 myTrace $ "splitted: " ++ show splitted
                  Text.hPutStrLn hOut $ header $ Text.pack moduleName
                  assertM $ not $ any hasNonTopTObj $ Map.elems splitted
                  let uCands = unificationCandidates splitted
-                 putStrLn $ "candidates: " ++ show uCands
+                 myTrace $ "candidates: " ++ show uCands
                  when flags_suggest $ forM_ uCands $ \cs -> do
                                         putStr "-- "
                                         Text.putStrLn $ "=" `Text.intercalate` cs
                  let unified = if flags_autounify
                                  then unifyCandidates uCands splitted
                                  else splitted
-                 putStrLn $ "unified: " ++ show unified
+                 myTrace $ "unified: " ++ show unified
                  Text.hPutStrLn hOut $ displaySplitTypes unified
 

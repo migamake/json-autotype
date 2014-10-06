@@ -16,8 +16,8 @@ build-type:          Simple
 -- extra-source-files:  
 cabal-version:       >=1.10
 
-executable aeson-autotype
-  main-is:             Test.hs
+executable json-autotype
+  main-is:             GenerateJSONParser.hs
   other-modules:       Data.Aeson.AutoType.Type
                        Data.Aeson.AutoType.Util
                        Data.Aeson.AutoType.Extract

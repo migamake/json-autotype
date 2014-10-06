@@ -77,15 +77,19 @@ main = do filenames <- $initHFlags "json-autotype -- automatic type and parser g
                  print (decode bs :: Maybe Value)
                  let Just v   = decode bs
                  let t        = extractType v
+                 putStrLn $ "type: " ++ show t
                  let splitted = splitTypeByLabel "TopLevel" t
+                 putStrLn $ "splitted: " ++ show splitted
                  Text.hPutStrLn hOut $ header $ Text.pack moduleName
                  assertM $ not $ any hasNonTopTObj $ Map.elems splitted
                  let uCands = unificationCandidates splitted
+                 putStrLn $ "candidates: " ++ show uCands
                  when flags_suggest $ forM_ uCands $ \cs -> do
                                         putStr "-- "
                                         Text.putStrLn $ "=" `Text.intercalate` cs
                  let unified = if flags_autounify
                                  then unifyCandidates uCands splitted
                                  else splitted
+                 putStrLn $ "unified: " ++ show unified
                  Text.hPutStrLn hOut $ displaySplitTypes unified
 

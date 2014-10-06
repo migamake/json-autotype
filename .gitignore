@@ -4,7 +4,7 @@
 *.o
 *.p_hi
 *.p_o
-Test
+GenerateJSONParser
 dist/
 JSONTypes.hs
 JSONTypes

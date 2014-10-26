@@ -2,7 +2,7 @@
 {-# OPTIONS_GHC -fno-warn-orphans #-}
 module Main where
 
-import           System.IO                 (withFile, stderr, stdout, IOMode(WriteMode), Handle)
+import           System.IO                 (withFile, stdin, stderr, stdout, IOMode(..), Handle)
 import           System.FilePath           (FilePath, splitExtension)
 import           System.Environment        (getArgs)
 import           Control.Arrow             ((&&&))
@@ -32,6 +32,7 @@ import           Data.Aeson.AutoType.Type
 import           Data.Aeson.AutoType.Extract
 import           Data.Aeson.AutoType.Util
 import           Data.Aeson.AutoType.Format
+import           CLI
 import           HFlags
 
 --import           Data.Tuple.Utils          (fst3)
@@ -53,18 +54,10 @@ header moduleName = Text.unlines ["{-# LANGUAGE TemplateHaskell #-}"
                       ,""]
 
 -- * Command line flags
-defineFlag "filename"  ("JSONTypes.hs" :: FilePath) "Write output to the given file"
-defineFlag "suggest"   True                         "Suggest candidates for unification"
-defineFlag "autounify" True                         "Automatically unify suggested candidates"
-defineFlag "fakeFlag"  True                         "Ignore this flag - it doesn't exist!!!"
-
--- | Generic function for opening file if the filename is not empty nor "-",
---   or using given handle otherwise (probably stdout, stderr, or stdin).
--- TODO: Should it become utility function?
-withFileOrHandle :: FilePath -> IOMode -> Handle -> (Handle -> IO r) -> IO r
-withFileOrHandle ""   ioMode handle action =                      action handle
-withFileOrHandle "-"  ioMode handle action =                      action handle
-withFileOrHandle name ioMode _      action = withFile name ioMode action 
+defineFlag "filename"  (defaultOutputFilename :: FilePath) "Write output to the given file"
+defineFlag "suggest"   True                                "Suggest candidates for unification"
+defineFlag "autounify" True                                "Automatically unify suggested candidates"
+defineFlag "fakeFlag"  True                                "Ignore this flag - it doesn't exist!!!"
 
 -- Tracing is switched off:
 myTrace :: String -> IO ()
@@ -72,29 +65,33 @@ myTrace _msg = return ()
 --myTrace = putStrLn 
 
 main = do filenames <- $initHFlags "json-autotype -- automatic type and parser generation from JSON"
-          let (moduleName, extension) = splitExtension flags_filename
-          assertM $ extension == ".hs"
+          let (moduleName, extension) = splitExtension $
+                                          if flags_filename == "-"
+                                            then defaultOutputFilename
+                                            else flags_filename
+          assertM (extension == ".hs")
           -- TODO: should integrate all inputs into single type set!!!
           withFileOrHandle flags_filename WriteMode stdout $ \hOut ->
             forM filenames $ \filename ->
-              do bs <- BSL.readFile filename
-                 Text.hPutStrLn stderr $ "Processing " `Text.append` Text.pack (show moduleName)
-                 myTrace ("Decoded JSON: " ++ show (decode bs :: Maybe Value))
-                 let Just v   = decode bs
-                 let t        = extractType v
-                 myTrace $ "type: " ++ show t
-                 let splitted = splitTypeByLabel "TopLevel" t
-                 myTrace $ "splitted: " ++ show splitted
-                 Text.hPutStrLn hOut $ header $ Text.pack moduleName
-                 assertM $ not $ any hasNonTopTObj $ Map.elems splitted
-                 let uCands = unificationCandidates splitted
-                 myTrace $ "candidates: " ++ show uCands
-                 when flags_suggest $ forM_ uCands $ \cs -> do
-                                        putStr "-- "
-                                        Text.putStrLn $ "=" `Text.intercalate` cs
-                 let unified = if flags_autounify
-                                 then unifyCandidates uCands splitted
-                                 else splitted
-                 myTrace $ "unified: " ++ show unified
-                 Text.hPutStrLn hOut $ displaySplitTypes unified
+              withFileOrHandle filename ReadMode stdin $ \hIn ->
+                do bs <- BSL.hGetContents hIn
+                   Text.hPutStrLn stderr $ "Processing " `Text.append` Text.pack (show moduleName)
+                   myTrace ("Decoded JSON: " ++ show (decode bs :: Maybe Value))
+                   let Just v   = decode bs
+                   let t        = extractType v
+                   myTrace $ "type: " ++ show t
+                   let splitted = splitTypeByLabel "TopLevel" t
+                   myTrace $ "splitted: " ++ show splitted
+                   Text.hPutStrLn hOut $ header $ Text.pack moduleName
+                   assertM $ not $ any hasNonTopTObj $ Map.elems splitted
+                   let uCands = unificationCandidates splitted
+                   myTrace $ "candidates: " ++ show uCands
+                   when flags_suggest $ forM_ uCands $ \cs -> do
+                                          putStr "-- "
+                                          Text.putStrLn $ "=" `Text.intercalate` cs
+                   let unified = if flags_autounify
+                                   then unifyCandidates uCands splitted
+                                   else splitted
+                   myTrace $ "unified: " ++ show unified
+                   Text.hPutStrLn hOut $ displaySplitTypes unified
 

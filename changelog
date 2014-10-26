@@ -1,5 +1,8 @@
 -*-Changelog-*-
 
+0.2.1  Oct 2014
+	* Added option to use it as a filter ('-' is accepted input name.)
+
 0.2.0  Oct 2014
 	* First release to Hackage.
 	* Handling of proper unions, and most examples.

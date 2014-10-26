@@ -1,6 +1,6 @@
 -- Build information for the package.
 name:                json-autotype
-version:             0.2.0.0
+version:             0.2.1.0
 synopsis:            Automatic type declaration for JSON input data
 description:         Generates datatype declarations with Aeson's "FromJSON" instances
                      from a set of example ".json" files.
@@ -31,6 +31,11 @@ build-type:          Simple
 extra-source-files:  README.md changelog
 cabal-version:       >=1.10
 bug-reports:         https://github.com/mgajda/json-autotype/issues
+tested-with:         GHC==7.8.2
+
+source-repository head
+  type:     git
+  location: https://github.com/mgajda/json-autotype.git
 
 executable json-autotype
   main-is:             GenerateJSONParser.hs

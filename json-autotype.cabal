@@ -1,6 +1,6 @@
 -- Build information for the package.
 name:                json-autotype
-version:             0.2.1.0
+version:             0.2.1.1
 synopsis:            Automatic type declaration for JSON input data
 description:         Generates datatype declarations with Aeson's "FromJSON" instances
                      from a set of example ".json" files.
@@ -43,6 +43,7 @@ executable json-autotype
                        Data.Aeson.AutoType.Util
                        Data.Aeson.AutoType.Extract
                        Data.Aeson.AutoType.Format
+                       CLI
   other-extensions:    TemplateHaskell,
                        ScopedTypeVariables,
                        OverloadedStrings,

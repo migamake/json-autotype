@@ -43,7 +43,7 @@ executable json-autotype
                        Data.Aeson.AutoType.Util
                        Data.Aeson.AutoType.Extract
                        Data.Aeson.AutoType.Format
-                       CLI
+--                       CLI
   other-extensions:    TemplateHaskell,
                        ScopedTypeVariables,
                        OverloadedStrings,

@@ -22,9 +22,36 @@ before_install:
  - export PATH=/opt/ghc/$GHCVER/bin:$PATH
 
 install:
- - travis_retry cabal-1.18 install --only-dependencies
- - cabal-1.18 install --enable-tests
+ - travis_retry cabal-1.18 install --only-dependencies --force-reinstalls
+
+#script:
+# - bash testit.sh
+# - echo "All done."
 
 script:
+ # -v2 provides useful information for debugging
+ - cabal configure --enable-tests --enable-benchmarks -v2
+
+ # this builds all libraries and executables
+ # (including tests/benchmarks)
+ - cabal build
+
+ - cabal test
+
  - bash testit.sh
- - echo "All done."
+ - echo "Unit tests successful!"
+
+ - cabal check
+
+ # tests that a source-distribution can be generated
+ - cabal sdist
+
+ # check that the generated source-distribution can be built & installed
+ - export SRC_TGZ=$(cabal info . | awk '{print $2 ".tar.gz";exit}') ;
+   cd dist/;
+   if [ -f "$SRC_TGZ" ]; then
+      cabal install "$SRC_TGZ";
+   else
+      echo "expected '$SRC_TGZ' not found";
+      exit 1;
+   fi

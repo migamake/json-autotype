@@ -82,10 +82,11 @@ typeSize TString    = 1
 typeSize (TObj   o) = (1+) . sum     . map typeSize . Hash.elems . unDict $ o
 typeSize (TArray a) = 1 + typeSize a
 typeSize (TUnion u) = (1+) . maximum . (0:) . map typeSize . Set.toList $ u
+typeSize (TLabel _) = error "Don't know how to compute typeSize of TLabel."
 
 typeAsSet :: Type -> Set Type
-typeAsSet t@(TUnion s) = s
-typeAsSet t            = Set.singleton t
+typeAsSet (TUnion s) = s
+typeAsSet t          = Set.singleton t
 
 hasTObj, hasNonTopTObj, isArray, isUnion, isSimple, isObject :: Type -> Bool
 -- | Is the top-level constructor a TObj?

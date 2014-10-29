@@ -5,14 +5,11 @@ module Data.Aeson.AutoType.Extract(valueSize, typeSize, valueTypeSize,
 
 import           Control.Exception  (assert)
 import           Data.Aeson.AutoType.Type
---import           Control.Lens.TH
---import qualified Data.ByteString.Lazy.Char8 as BSL
 import qualified Data.HashMap.Strict as Hash
 import qualified Data.Set            as Set
 import qualified Data.Vector         as V
-import           Data.Typeable      (Typeable)
+--import           Data.Typeable      (Typeable)
 import           Data.Aeson
---import           Data.Aeson.Types
 import           Data.Text          (Text)
 import           Data.Set           (Set )
 import           Data.List          (foldl1')

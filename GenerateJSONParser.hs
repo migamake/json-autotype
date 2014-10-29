@@ -4,14 +4,11 @@ module Main where
 
 import           System.IO                 (stdin, stderr, stdout, IOMode(..))
 import           System.FilePath           (splitExtension)
---import           Control.Lens.TH
---import           Control.Lens
 import           Control.Monad             (forM_, when)
 import           Control.Exception(assert)
 import qualified Data.ByteString.Lazy.Char8 as BSL
 import qualified Data.HashMap.Strict        as Map
 import           Data.Aeson
---import           Data.Aeson.Types
 import qualified Data.Text                  as Text
 import qualified Data.Text.IO               as Text
 import           Data.Text                 (Text)
@@ -22,7 +19,6 @@ import           Data.Aeson.AutoType.Format
 import           CLI
 import           HFlags
 
---import           Data.Tuple.Utils          (fst3)
 fst3 ::  (t, t1, t2) -> t
 fst3 (a, _, _) = a
 

@@ -7,30 +7,26 @@ module Data.Aeson.AutoType.Format(
 import           Control.Arrow             ((&&&))
 import           Control.Lens.TH
 import           Control.Lens
-import           Control.Monad             (forM, forM_)
+import           Control.Monad             (forM)
 import           Control.Exception(assert)
-import qualified Data.ByteString.Lazy.Char8 as BSL
+--import qualified Data.ByteString.Lazy.Char8 as BSL
 import qualified Data.HashMap.Strict        as Map
 import qualified Data.Set                   as Set
-import qualified Data.Vector                as V
-import           Data.Aeson
-import           Data.Aeson.Types
+--import qualified Data.Vector                as V
+--import           Data.Aeson
+--import           Data.Aeson.Types
 import qualified Data.Text                  as Text
-import qualified Data.Text.IO               as Text
 import           Data.Text                 (Text)
 import           Data.Set                  (Set )
-import           Data.List                 (sort, foldl1')
-import           Data.Ord                  (Ord(..), comparing)
+import           Data.List                 (foldl1')
 import           Data.Char                 (isAlpha)
---import           Data.Tuple.Utils          (fst3)
 import           Control.Monad.State.Class
 import           Control.Monad.State.Strict(State, runState)
-import           Data.Hashable             (Hashable(..))
 import qualified Data.Graph          as Graph
 
 import           Data.Aeson.AutoType.Type
 import           Data.Aeson.AutoType.Extract
-import           Data.Aeson.AutoType.Util
+import           Data.Aeson.AutoType.Util  ()
 
 fst3 ::  (t, t1, t2) -> t
 fst3 (a, _b, _c) = a
@@ -67,7 +63,7 @@ genericIdentifier = do
 -- * Naive type printing.
 newDecl :: Text -> [(Text, Type)] -> DeclM Text
 newDecl identifier kvs = do attrs <- forM kvs $ \(k, v) -> do
-                              formatted <- formatType' v
+                              formatted <- formatType v
                               return (k, formatted)
                             let decl = wrapDecl identifier $ fieldDecls attrs
                             decls %%= (\ds -> ((), decl:ds))
@@ -93,34 +89,31 @@ escapeKeywords k                           = k
 emptySetLikes ::  Set Type
 emptySetLikes = Set.fromList [TNull, TArray $ TUnion $ Set.fromList []]
 
-formatType' :: Type -> DeclM Text
-formatType'  TString                          = return "Text"
-formatType'  TNum                             = return "Int"
-formatType'  TBool                            = return "Bool"
-formatType' (TLabel l)                        = return $ normalizeTypeName l
-formatType' (TUnion u) | uu <- u `Set.difference` emptySetLikes,
-                         Set.size uu == 1     = do fmt <- formatType' $ head $ Set.toList uu
-                                                   return $ "Maybe " `Text.append` fmt
-formatType' (TUnion u)                        = do tys <- forM (Set.toList u) formatType'
-                                                   return $ mkUnion tys
+formatType :: Type -> DeclM Text
+formatType  TString                          =    return "Text"
+formatType  TNum                             =    return "Int"
+formatType  TBool                            =    return "Bool"
+formatType (TLabel l)                        =    return $ normalizeTypeName l
+formatType (TUnion u) | uu <- u `Set.difference` emptySetLikes,
+                        Set.size uu == 1     = do fmt <- formatType $ head $ Set.toList uu
+                                                  return $ "Maybe " `Text.append` fmt
+formatType (TUnion u)                        = do tys <- forM (Set.toList u) formatType
+                                                  return $ mkUnion tys
   where
     mkUnion []       = emptyTypeRepr
     mkUnion nonEmpty = foldr1 mkEither nonEmpty
       where mkEither a b = Text.concat ["Either (", a, ") (", b, ")"]
-formatType' (TArray a)                        = do inner <- formatType' a
-                                                   return $ Text.concat ["[", inner, "]"]
-formatType' (TObj   o)                        = do ident <- genericIdentifier
-                                                   newDecl ident d
+formatType (TArray a)                        = do inner <- formatType a
+                                                  return $ Text.concat ["[", inner, "]"]
+formatType (TObj   o)                        = do ident <- genericIdentifier
+                                                  newDecl ident d
   where
     d = Map.toList $ unDict o 
-formatType'  e | e `Set.member` emptySetLikes = return emptyTypeRepr
-formatType'  t                                = return $ "ERROR: Don't know how to handle: " `Text.append` tShow t
+formatType  e | e `Set.member` emptySetLikes = return emptyTypeRepr
+formatType  t                                = return $ "ERROR: Don't know how to handle: " `Text.append` tShow t
 
 emptyTypeRepr :: Text
 emptyTypeRepr = "Maybe Text" -- default...
-
-formatType ::  Type -> Text
-formatType = runDecl . formatType'
 
 runDecl ::  DeclM a -> Text
 runDecl decl = Text.unlines $ finalState ^. decls
@@ -167,7 +160,7 @@ formatObjectType ::  Text -> Type -> DeclM Text
 formatObjectType identifier (TObj o) = newDecl identifier d
   where
     d = Map.toList $ unDict o
-formatObjectType _          other    = formatType' other
+formatObjectType _          other    = formatType other
 
 displaySplitTypes ::  Map Text Type -> Text
 displaySplitTypes dict = runDecl declarations

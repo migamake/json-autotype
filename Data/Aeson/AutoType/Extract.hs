@@ -5,20 +5,17 @@ module Data.Aeson.AutoType.Extract(valueSize, typeSize, valueTypeSize,
 
 import           Control.Exception  (assert)
 import           Data.Aeson.AutoType.Type
-import           Control.Lens.TH
-import qualified Data.ByteString.Lazy.Char8 as BSL
+--import           Control.Lens.TH
+--import qualified Data.ByteString.Lazy.Char8 as BSL
 import qualified Data.HashMap.Strict as Hash
 import qualified Data.Set            as Set
 import qualified Data.Vector         as V
-import           Data.Data          (Data(..))
-import           Data.Typeable      (Typeable(..))
+import           Data.Typeable      (Typeable)
 import           Data.Aeson
-import           Data.Aeson.Types
+--import           Data.Aeson.Types
 import           Data.Text          (Text)
 import           Data.Set           (Set )
-import           Data.HashMap.Strict(HashMap)
-import           Data.List          (sort, foldl1')
-import           Data.Ord           (Ord(..), comparing)
+import           Data.List          (foldl1')
 
 valueSize :: Value -> Int
 valueSize  Null      = 1
@@ -47,9 +44,9 @@ valueDepth (Object o) = (1+) . maximum . (0:) . map valueDepth . Hash.elems $ o
 extractType :: Value -> Type
 extractType (Object o)                   = TObj $ Dict $ Hash.map extractType o
 extractType  Null                        = TNull
-extractType (Bool   b)                   = TBool
-extractType (Number n)                   = TNum
-extractType (String s)                   = TString
+extractType (Bool   _)                   = TBool
+extractType (Number _)                   = TNum
+extractType (String _)                   = TString
 extractType (Array  a) | V.null a        = TArray emptyType
 extractType (Array  a)                   = V.foldl1' unifyTypes $ V.map extractType a
 
@@ -87,11 +84,12 @@ unifyUnion u v = assertions $
     oset    = Set.fromList $ if null objects
                                then []
                                else [foldl1' unifyTypes objects]
-    aset    = Set.fromList $ if null arrays
-                               then []
-                               else [foldl1' unifyTypes arrays]
     objects = Set.toList $ uObj `Set.union` vObj
-    arrays  = Set.toList $ uArr `Set.union` vArr
+    {-aset    = Set.fromList $ if null arrays
+                               then []
+                               else [foldl1' unifyTypes arrays]-}
+    --arrays  = Set.toList $ uArr `Set.union` vArr
 
+union ::  Set Type -> Type
 union = simplifyUnion . TUnion
 

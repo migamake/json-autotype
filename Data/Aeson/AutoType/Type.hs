@@ -6,20 +6,15 @@ module Data.Aeson.AutoType.Type(typeSize,
                                 hasNonTopTObj,
                                 hasTObj) where
 
-import           Control.Lens.TH
-import qualified Data.ByteString.Lazy.Char8 as BSL
 import qualified Data.HashMap.Strict as Hash
 import qualified Data.Set            as Set
-import qualified Data.Vector         as V
 import           Data.Data          (Data(..))
-import           Data.Typeable      (Typeable(..))
-import           Data.Aeson
-import           Data.Aeson.Types
+import           Data.Typeable      (Typeable)
 import           Data.Text          (Text)
 import           Data.Set           (Set )
 import           Data.HashMap.Strict(HashMap)
-import           Data.List          (sort, foldl1')
-import           Data.Ord           (Ord(..), comparing)
+import           Data.List          (sort)
+import           Data.Ord           (comparing)
 import           Data.Generics.Uniplate
 
 -- | Type alias for HashMap
@@ -36,6 +31,7 @@ instance Ord Dict where
   compare = comparing $ sort . Hash.toList . unDict
 
 -- | Make operation on a map to an operation on a Dict.
+withDict :: (Map Text Type -> Map Text Type) -> Dict -> Dict
 f `withDict` (Dict m) = Dict $ f m
 
 -- | Take all keys from dictionary.
@@ -78,6 +74,7 @@ get key = Hash.lookupDefault emptyType key . unDict
 -- $derive makeUniplateDirect ''Type
 
 -- | Size of the `Type` term.
+typeSize :: Type -> Int
 typeSize TNull      = 1
 typeSize TBool      = 1
 typeSize TNum       = 1
@@ -86,6 +83,7 @@ typeSize (TObj   o) = (1+) . sum     . map typeSize . Hash.elems . unDict $ o
 typeSize (TArray a) = 1 + typeSize a
 typeSize (TUnion u) = (1+) . maximum . (0:) . map typeSize . Set.toList $ u
 
+typeAsSet :: Type -> Set Type
 typeAsSet t@(TUnion s) = s
 typeAsSet t            = Set.singleton t
 
@@ -106,12 +104,12 @@ isArray (TArray _) = True
 isArray _          = False
 
 hasNonTopTObj (TObj o) = any hasTObj $ Hash.elems $ unDict o
-hasNonTopTObj other    = False
+hasNonTopTObj _        = False
 
 hasTObj (TObj   _) = True
 hasTObj (TArray a) = hasTObj a
-hasTObj (TUnion u) = any u
+hasTObj (TUnion u) = setAny u
   where
-    any = Set.foldr ((||) . hasTObj) False
+    setAny = Set.foldr ((||) . hasTObj) False
 hasTObj _          = False
 

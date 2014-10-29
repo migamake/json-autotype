@@ -32,6 +32,7 @@ import           Data.Aeson.AutoType.Type
 import           Data.Aeson.AutoType.Extract
 import           Data.Aeson.AutoType.Util
 
+fst3 ::  (t, t1, t2) -> t
 fst3 (a, _b, _c) = a
 
 data DeclState = DeclState { _decls   :: [Text]
@@ -51,12 +52,14 @@ stepM = counter %%= (\i -> (i, i+1))
 tShow :: (Show a) => a -> Text
 tShow = Text.pack . show 
 
+wrapDecl ::  Text -> Text -> Text
 wrapDecl identifier contents = Text.unlines [header, contents, "  } deriving (Show,Eq)"
                                             ,"\nderiveJSON defaultOptions ''" `Text.append` identifier]
   where
     header = Text.concat ["data ", identifier, " = ", identifier, " { "]
 
 -- | Makes a generic identifier name.
+genericIdentifier :: DeclM Text
 genericIdentifier = do
   i <- stepM
   return $! "Obj" `Text.append` tShow i
@@ -74,16 +77,20 @@ newDecl identifier kvs = do attrs <- forM kvs $ \(k, v) -> do
     fieldDecl  :: (Text, Text) -> Text
     fieldDecl (name, fType) = Text.concat ["    ", normalizeFieldName identifier name, " :: ", fType]
 
+normalizeFieldName ::  Text -> Text -> Text
 normalizeFieldName identifier = escapeKeywords             .
                                 uncapitalize               .
                                 (normalizeTypeName identifier `Text.append`) .
                                 normalizeTypeName
 
+keywords ::  Set Text
 keywords = Set.fromList ["type", "data", "module"]
 
+escapeKeywords ::  Text -> Text
 escapeKeywords k | k `Set.member` keywords = k `Text.append` "_"
 escapeKeywords k                           = k
 
+emptySetLikes ::  Set Type
 emptySetLikes = Set.fromList [TNull, TArray $ TUnion $ Set.fromList []]
 
 formatType' :: Type -> DeclM Text
@@ -109,10 +116,13 @@ formatType' (TObj   o)                        = do ident <- genericIdentifier
 formatType'  e | e `Set.member` emptySetLikes = return emptyTypeRepr
 formatType'  t                                = return $ "ERROR: Don't know how to handle: " `Text.append` tShow t
 
+emptyTypeRepr :: Text
 emptyTypeRepr = "Maybe Text" -- default...
 
+formatType ::  Type -> Text
 formatType = runDecl . formatType'
 
+runDecl ::  DeclM a -> Text
 runDecl decl = Text.unlines $ finalState ^. decls
   where
     initialState    = DeclState [] 1
@@ -127,11 +137,11 @@ addType :: Text -> Type -> TypeTreeM ()
 addType label typ = modify $ Map.insertWith (++) label [typ]
 
 splitTypeByLabel' :: Text -> Type -> TypeTreeM Type
-splitTypeByLabel' l  TString   = return TString
-splitTypeByLabel' l  TNum      = return TNum
-splitTypeByLabel' l  TBool     = return TBool
-splitTypeByLabel' l  TNull     = return TNull
-splitTypeByLabel' l (TLabel r) = assert False $ return $ TLabel r -- unnecessary?
+splitTypeByLabel' _  TString   = return TString
+splitTypeByLabel' _  TNum      = return TNum
+splitTypeByLabel' _  TBool     = return TBool
+splitTypeByLabel' _  TNull     = return TNull
+splitTypeByLabel' _ (TLabel r) = assert False $ return $ TLabel r -- unnecessary?
 splitTypeByLabel' l (TUnion u) = do m <- mapM (splitTypeByLabel' l) $ Set.toList u
                                     return $! TUnion $! Set.fromList m
 splitTypeByLabel' l (TArray a) = do m <- splitTypeByLabel' (l `Text.append` "Elt") a
@@ -153,14 +163,16 @@ splitTypeByLabel topLabel t = Map.map (foldl1' unifyTypes) finalState
     initialState    = Map.empty
     (_, finalState) = runState job initialState
 
+formatObjectType ::  Text -> Type -> DeclM Text
 formatObjectType identifier (TObj o) = newDecl identifier d
   where
     d = Map.toList $ unDict o
-formatObjectType identifier other    = formatType' other
+formatObjectType _          other    = formatType' other
 
-displaySplitTypes dict = runDecl decls
+displaySplitTypes ::  Map Text Type -> Text
+displaySplitTypes dict = runDecl declarations
   where
-    decls =
+    declarations =
       forM (toposort dict) $ \(name, typ) -> do
         let name' = normalizeTypeName name
         formatObjectType name' typ
@@ -197,11 +209,12 @@ allLabels = flip go []
     go (TArray t) ls = go t ls
     go (TUnion u) ls = Set.foldr go ls          u
     go (TObj   o) ls = Map.foldr go ls $ unDict o
-    go other      ls = ls
+    go _other     ls = ls
 
 -- * Finding candidates for extra unifications
 -- | For a given splitted types, it returns candidates for extra
 -- unifications.
+unificationCandidates :: Map.HashMap t Type -> [[t]]
 unificationCandidates = Map.elems             .
                         Map.filter candidates .
                         Map.fromListWith (++) .
@@ -209,7 +222,7 @@ unificationCandidates = Map.elems             .
                         Map.toList
   where
     candidates [ ] = False
-    candidates [a] = False
+    candidates [_] = False
     candidates _   = True
     entry (k, TObj o) = (Set.fromList $ Map.keys $ unDict o, [k])
     entry (_, other ) = error $ "Unexpected type: " ++ show other
@@ -223,11 +236,13 @@ unifyCandidates candidates splitted = Map.map (remapLabels labelMapping) $ repla
                             map (splitted Map.!) cset
     replace      :: [Text] -> Map Text Type -> Map Text Type
     replace  cset@(c:_) s = Map.insert c (unifiedType cset) (foldr Map.delete s cset)
+    replace  []         _ = error "Empty cset in replace"
     replacements :: Map Text Type -> Map Text Type
     replacements        s = foldr replace s candidates
     labelMapping :: Map Text Text
     labelMapping          = Map.fromList $ concatMap mapEntry candidates
     mapEntry cset@(c:_)   = [(x, c) | x <- cset]
+    mapEntry []           = error "Empty cset in mapEntry"
 
 -- | Remaps type labels according to a `Map`.
 remapLabels :: Map Text Text -> Type -> Type
@@ -235,5 +250,5 @@ remapLabels ls (TObj   o) = TObj   $ Dict $ Map.map (remapLabels ls) $ unDict o
 remapLabels ls (TArray t) = TArray $                 remapLabels ls  t
 remapLabels ls (TUnion u) = TUnion $        Set.map (remapLabels ls) u
 remapLabels ls (TLabel l) = TLabel $ Map.lookupDefault l l ls
-remapLabels ls other      = other
+remapLabels _  other      = other
 

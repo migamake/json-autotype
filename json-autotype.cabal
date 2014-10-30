@@ -28,7 +28,7 @@ maintainer:          mjgajda@gmail.com
 copyright:           Copyright by Michal J. Gajda '2014
 category:            Web
 build-type:          Simple
-extra-source-files:  README.md changelog
+extra-source-files:  README.md changelog.md
 cabal-version:       >=1.10
 bug-reports:         https://github.com/mgajda/json-autotype/issues
 tested-with:         GHC==7.8.2

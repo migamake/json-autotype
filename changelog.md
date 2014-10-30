@@ -1,7 +1,7 @@
 Changelog
 =========
 
-    0.2.2  Oct 2014
+    0.2.1.3  Oct 2014
 
         * Cleaned up package.
         * Changelog in markdown format.

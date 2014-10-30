@@ -23,6 +23,7 @@ description:         Generates datatype declarations with Aeson's "FromJSON" ins
 homepage:            https://github.com/mgajda/json-autotype
 license:             BSD3
 license-file:        LICENSE
+stability:           beta
 author:              Michal J. Gajda
 maintainer:          mjgajda@gmail.com
 copyright:           Copyright by Michal J. Gajda '2014

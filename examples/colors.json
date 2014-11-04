@@ -1,0 +1,15 @@
+{
+    "colorsArray":[{
+            "colorName":"red",
+            "hexValue":"#f00"
+        },
+        {
+            "colorName":"green",
+            "hexValue":"#0f0"
+        },
+        {
+            "colorName":"blue",
+            "hexValue":"#00f"
+        }
+    ]
+}

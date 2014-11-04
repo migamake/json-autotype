@@ -1,0 +1,14 @@
+{
+    "parameter":[{
+            "parameterName":"apiVersion",
+            "parameterValue":1
+        },
+        {
+            "parameterName":"failOnWarnings",
+            "parameterValue":false
+        },
+        {
+            "parameterName":"caller",
+            "parameterValue":"site API"
+        }]
+}

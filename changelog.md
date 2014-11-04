@@ -1,6 +1,10 @@
 Changelog
 =========
 
+    0.2.1.4  Oct 2014
+
+        * Added examples to the package distribution.
+
     0.2.1.3  Oct 2014
 
         * Cleaned up package.

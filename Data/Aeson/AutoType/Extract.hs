@@ -1,3 +1,4 @@
+-- | Extraction and unification of AutoType's @Type@ from Aeson @Value@.
 module Data.Aeson.AutoType.Extract(valueSize, typeSize, valueTypeSize,
                                    valueDepth, Dict(..),
                                    Type(..), emptyType,

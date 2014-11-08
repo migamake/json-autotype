@@ -2,8 +2,10 @@
 {-# OPTIONS_GHC -fno-warn-orphans #-}
 module Main where
 
+import           Control.Applicative
+import           Data.Maybe
 import           System.Exit
-import           System.IO                 (stdin, stderr, stdout, IOMode(..), hPutStrLn)
+import           System.IO                 (stdin, stderr, stdout, IOMode(..))
 import           System.FilePath           (splitExtension)
 import           Control.Monad             (forM_, when)
 import           Control.Exception(assert)
@@ -78,49 +80,58 @@ fatal    :: Text -> IO ()
 fatal msg = do report msg
                exitFailure
 
+extractTypeFromJSONFile :: FilePath -> IO (Maybe Type)
+extractTypeFromJSONFile inputFilename =
+      withFileOrHandle inputFilename ReadMode stdin $ \hIn ->
+        -- First we decode JSON input into Aeson's Value type
+        do bs <- BSL.hGetContents hIn
+           Text.hPutStrLn stderr $ "Processing " `Text.append` Text.pack (show inputFilename)
+           myTrace ("Decoded JSON: " ++ show (decode bs :: Maybe Value))
+           case decode bs of
+             Nothing -> do report $ "Cannot decode JSON input from " `Text.append` Text.pack (show inputFilename)
+                           return Nothing
+             Just v  -> do -- If decoding JSON was successful...
+               -- We extract type structure from the JSON value.
+               let t        = extractType v
+               myTrace $ "type: " ++ show t
+               return $ Just t
+
 -- | Take a set of JSON input filenames, Haskell output filename, and generate module parsing these JSON files.
 generateHaskellFromJSONs :: [FilePath] -> FilePath -> IO ()
 generateHaskellFromJSONs inputFilenames outputFilename = do
   assertM (extension == ".hs")
   withFileOrHandle outputFilename WriteMode stdout $ \hOut ->
-    forM_ inputFilenames $ \inputFilename ->
-      withFileOrHandle inputFilename ReadMode stdin $ \hIn ->
-        -- First we decode JSON input into Aeson's Value type
-        do bs <- BSL.hGetContents hIn
-           Text.hPutStrLn stderr $ "Processing " `Text.append` Text.pack (show moduleName)
-           myTrace ("Decoded JSON: " ++ show (decode bs :: Maybe Value))
-           case decode bs of
-             Nothing -> report $ "Cannot decode JSON input from " `Text.append` Text.pack (show inputFilename)
-             Just v  -> do -- If decoding JSON was successful...
-               -- We start by writing module header
-               Text.hPutStrLn hOut $ header $ Text.pack moduleName
-               -- We extract type structure from the JSON value.
-               let t        = extractType v
-               myTrace $ "type: " ++ show t
-               -- We split different dictionary labels to become different type trees (and thus different declarations.)
-               let splitted = splitTypeByLabel "TopLevel" t
-               myTrace $ "splitted: " ++ show splitted
-               assertM $ not $ any hasNonTopTObj $ Map.elems splitted
-               -- We compute which type labels are candidates for unification
-               let uCands = unificationCandidates splitted
-               myTrace $ "candidates: " ++ show uCands
-               when flags_suggest $ forM_ uCands $ \cs -> do
-                                      putStr "-- "
-                                      Text.putStrLn $ "=" `Text.intercalate` cs
-               -- We unify the all candidates or only those that have been given as command-line flags.
-               let unified = if flags_autounify
-                               then unifyCandidates uCands splitted
-                               else splitted
-               myTrace $ "unified: " ++ show unified
-               -- We write types as Haskell type declarations to output handle
-               Text.hPutStrLn hOut $ displaySplitTypes unified
-               Text.hPutStrLn hOut   epilogue
+    forM_ inputFilenames $ \inputFilename -> do
+      -- Read type from each file
+      typeForEachFile  <- catMaybes <$> mapM extractTypeFromJSONFile inputFilenames
+      -- Unify all input types
+      let finalType = foldr1 unifyTypes typeForEachFile
+      -- We split different dictionary labels to become different type trees (and thus different declarations.)
+      let splitted = splitTypeByLabel "TopLevel" finalType
+      myTrace $ "splitted: " ++ show splitted
+      assertM $ not $ any hasNonTopTObj $ Map.elems splitted
+      -- We compute which type labels are candidates for unification
+      let uCands = unificationCandidates splitted
+      myTrace $ "candidates: " ++ show uCands
+      when flags_suggest $ forM_ uCands $ \cs -> do
+                             putStr "-- "
+                             Text.putStrLn $ "=" `Text.intercalate` cs
+      -- We unify the all candidates or only those that have been given as command-line flags.
+      let unified = if flags_autounify
+                      then unifyCandidates uCands splitted
+                      else splitted
+      myTrace $ "unified: " ++ show unified
+      -- We start by writing module header
+      Text.hPutStrLn hOut $ header $ Text.pack moduleName
+      -- We write types as Haskell type declarations to output handle
+      Text.hPutStrLn hOut $ displaySplitTypes unified
+      Text.hPutStrLn hOut   epilogue
   where
     (moduleName, extension) = splitExtension $
                                 if     outputFilename == "-"
                                   then defaultOutputFilename
                                   else outputFilename
-generateJSON _               outputFilename = error "Generating common type from multiple input files is not implemented yet!"
+--generateHaskellFromJSONs _ _ = error "Generating common type from multiple input files is not implemented yet!"
 
 main :: IO ()
 main = do filenames <- $initHFlags "json-autotype -- automatic type and parser generation from JSON"

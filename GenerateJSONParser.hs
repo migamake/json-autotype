@@ -8,6 +8,7 @@ import           Data.Maybe
 import           System.Exit
 import           System.IO                 (stdin, stderr, stdout, IOMode(..))
 import           System.FilePath           (splitExtension)
+import           System.Process            (system)
 import           Control.Monad             (forM_, when)
 import qualified Data.ByteString.Lazy.Char8 as BSL
 import qualified Data.HashMap.Strict        as Map
@@ -32,6 +33,7 @@ fst3 (a, _, _) = a
 defineFlag "outputFilename"  defaultOutputFilename "Write output to the given file"
 defineFlag "suggest"         True                  "Suggest candidates for unification"
 defineFlag "autounify"       True                  "Automatically unify suggested candidates"
+defineFlag "test"            False                 "Try to run generated parser after"
 defineFlag "debug"           False                 "Set this flag to see more debugging info"
 defineFlag "fakeFlag"        True                  "Ignore this flag - it doesn't exist!!!"
 
@@ -68,29 +70,30 @@ extractTypeFromJSONFile inputFilename =
 
 -- | Take a set of JSON input filenames, Haskell output filename, and generate module parsing these JSON files.
 generateHaskellFromJSONs :: [FilePath] -> FilePath -> IO ()
-generateHaskellFromJSONs inputFilenames outputFilename =
-    forM_ inputFilenames $ \inputFilename -> do
-      -- Read type from each file
-      typeForEachFile  <- catMaybes <$> mapM extractTypeFromJSONFile inputFilenames
-      -- Unify all input types
-      let finalType = foldr1 unifyTypes typeForEachFile
-      -- We split different dictionary labels to become different type trees (and thus different declarations.)
-      let splitted = splitTypeByLabel "TopLevel" finalType
-      myTrace $ "SPLITTED: " ++ pretty splitted
-      assertM $ not $ any hasNonTopTObj $ Map.elems splitted
-      -- We compute which type labels are candidates for unification
-      let uCands = unificationCandidates splitted
-      myTrace $ "CANDIDATES:\n" ++ pretty uCands
-      when flags_suggest $ forM_ uCands $ \cs -> do
-                             putStr "-- "
-                             Text.putStrLn $ "=" `Text.intercalate` cs
-      -- We unify the all candidates or only those that have been given as command-line flags.
-      let unified = if flags_autounify
-                      then unifyCandidates uCands splitted
-                      else splitted
-      myTrace $ "UNIFIED:\n" ++ pretty unified
-      -- We start by writing module header
-      writeHaskellModule outputFilename unified
+generateHaskellFromJSONs inputFilenames outputFilename = do
+  -- Read type from each file
+  typeForEachFile  <- catMaybes <$> mapM extractTypeFromJSONFile inputFilenames
+  -- Unify all input types
+  let finalType = foldr1 unifyTypes typeForEachFile
+  -- We split different dictionary labels to become different type trees (and thus different declarations.)
+  let splitted = splitTypeByLabel "TopLevel" finalType
+  myTrace $ "SPLITTED: " ++ pretty splitted
+  assertM $ not $ any hasNonTopTObj $ Map.elems splitted
+  -- We compute which type labels are candidates for unification
+  let uCands = unificationCandidates splitted
+  myTrace $ "CANDIDATES:\n" ++ pretty uCands
+  when flags_suggest $ forM_ uCands $ \cs -> do
+                         putStr "-- "
+                         Text.putStrLn $ "=" `Text.intercalate` cs
+  -- We unify the all candidates or only those that have been given as command-line flags.
+  let unified = if flags_autounify
+                  then unifyCandidates uCands splitted
+                  else splitted
+  myTrace $ "UNIFIED:\n" ++ pretty unified
+  -- We start by writing module header
+  writeHaskellModule outputFilename unified
+  when flags_test $
+    exitWith =<< system (unwords $ ["runghc", outputFilename] ++ inputFilenames)
 
 main :: IO ()
 main = do filenames <- $initHFlags "json-autotype -- automatic type and parser generation from JSON"

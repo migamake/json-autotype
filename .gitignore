@@ -6,6 +6,9 @@
 *.p_o
 GenerateJSONParser
 dist/
+tags
+TAGS
+.tags*
 JSONTypes.hs
 JSONTypes
 colors.hs

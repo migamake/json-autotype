@@ -34,31 +34,56 @@ capitalize input = Text.toUpper (Text.take 1 input)
 
 header :: Text -> Text
 header moduleName = Text.unlines [
-   "{-# LANGUAGE TemplateHaskell #-}"
+   "{-# LANGUAGE TemplateHaskell, ScopedTypeVariables #-}"
   ,Text.concat ["module ", capitalize moduleName, " where"]
   ,""
+  ,"import           System.Exit        (exitFailure, exitSuccess)"
+  ,"import           System.IO          (stderr, hPutStrLn)"
+  ,"import qualified Data.ByteString.Lazy.Char8 as BSL"
   ,"import           System.Environment (getArgs)"
   ,"import           Control.Monad      (forM_)"
-  ,"import           Data.ByteString.Lazy.Char8 as BSL"
   ,"import           Data.Text (Text)"
   ,"import           Data.Aeson(decode, Value(..), FromJSON(..),"
   ,"                            (.:), (.:?), (.!=))"
-  ,"import           Data.Aeson.TH"
+  ,"import           Data.Aeson.TH" 
   ,""]
 
 epilogue :: Text
 epilogue          = Text.unlines
   [""
   ,"parse :: FilePath -> IO TopLevel"
-  ,"parse filename = do result <- decode `fmap` BSL.readFile filename"
-  ,"                    case result of"
-  ,"                      Nothing -> fail $ \"Cannot parse JSON from file: \" ++ filename"
+  ,"parse filename = do input <- BSL.readFile filename"
+  ,"                    case decode input of"
+  ,"                      Nothing -> fatal $ case (decode input :: Maybe Value) of"
+  ,"                                           Nothing -> \"Invalid JSON file: \"     ++ filename"
+  ,"                                           Just v  -> \"Mismatched JSON value: \" ++ show v"
   ,"                      Just r  -> return r"
+  ,"  where"
+  ,"    fatal :: String -> IO a"
+  ,"    fatal msg = do hPutStrLn stderr msg"
+  ,"                   exitFailure"
   ,""
   ,"main :: IO ()"
   ,"main = do filenames <- getArgs"
   ,"          forM_ filenames (\\f -> parse f >>= print)"
+  ,"          exitSuccess"
   ,""]
+
+-- Write a Haskell module to an output file, or stdout if `-` filename is given.
+writeHaskellModule :: FilePath -> Map.HashMap Text Type -> IO ()
+writeHaskellModule outputFilename types =
+    withFileOrHandle outputFilename WriteMode stdout $ \hOut -> do
+      assertM (extension == ".hs")
+      Text.hPutStrLn hOut $ header $ Text.pack moduleName
+      -- We write types as Haskell type declarations to output handle
+      Text.hPutStrLn hOut $ displaySplitTypes types
+      Text.hPutStrLn hOut   epilogue
+  where
+    (moduleName, extension) = splitExtension $
+                                if     outputFilename == "-"
+                                  then defaultOutputFilename
+                                  else outputFilename
+
 
 -- * Command line flags
 defineFlag "outputFilename"  (defaultOutputFilename :: FilePath) "Write output to the given file"
@@ -68,8 +93,8 @@ defineFlag "fakeFlag"        True                                "Ignore this fl
 
 -- Tracing is switched off:
 myTrace :: String -> IO ()
-myTrace _msg = return ()
---myTrace = putStrLn 
+--myTrace _msg = return ()
+myTrace = putStrLn 
 
 -- | Report an error to error output.
 report   :: Text -> IO ()
@@ -98,9 +123,7 @@ extractTypeFromJSONFile inputFilename =
 
 -- | Take a set of JSON input filenames, Haskell output filename, and generate module parsing these JSON files.
 generateHaskellFromJSONs :: [FilePath] -> FilePath -> IO ()
-generateHaskellFromJSONs inputFilenames outputFilename = do
-  assertM (extension == ".hs")
-  withFileOrHandle outputFilename WriteMode stdout $ \hOut ->
+generateHaskellFromJSONs inputFilenames outputFilename =
     forM_ inputFilenames $ \inputFilename -> do
       -- Read type from each file
       typeForEachFile  <- catMaybes <$> mapM extractTypeFromJSONFile inputFilenames
@@ -122,16 +145,7 @@ generateHaskellFromJSONs inputFilenames outputFilename = do
                       else splitted
       myTrace $ "unified: " ++ show unified
       -- We start by writing module header
-      Text.hPutStrLn hOut $ header $ Text.pack moduleName
-      -- We write types as Haskell type declarations to output handle
-      Text.hPutStrLn hOut $ displaySplitTypes unified
-      Text.hPutStrLn hOut   epilogue
-  where
-    (moduleName, extension) = splitExtension $
-                                if     outputFilename == "-"
-                                  then defaultOutputFilename
-                                  else outputFilename
---generateHaskellFromJSONs _ _ = error "Generating common type from multiple input files is not implemented yet!"
+      writeHaskellModule outputFilename unified
 
 main :: IO ()
 main = do filenames <- $initHFlags "json-autotype -- automatic type and parser generation from JSON"

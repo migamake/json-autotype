@@ -41,10 +41,10 @@ source-repository head
 executable json-autotype
   main-is:             GenerateJSONParser.hs
   other-modules:       Data.Aeson.AutoType.Type
-                       Data.Aeson.AutoType.Util
                        Data.Aeson.AutoType.Extract
                        Data.Aeson.AutoType.Format
-                       CLI
+                       -- internal module
+                       Data.Aeson.AutoType.Util
   other-extensions:    TemplateHaskell,
                        ScopedTypeVariables,
                        OverloadedStrings,
@@ -58,6 +58,9 @@ executable json-autotype
                        containers           >=0.3  && <0.6,
                        vector               >=0.9  && <0.11,
                        aeson                >=0.7  && <0.9,
+                       pretty               >=1.1  && <1.3,
+                       GenericPretty        >=1.2  && <1.3,
+                       scientific           >=0.3  && <0.5,
                        text                 >=1.1  && <1.3,
                        hashable             >=1.2  && <1.3,
                        uniplate             >=1.6  && <1.7,

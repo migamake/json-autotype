@@ -74,10 +74,10 @@ newDecl identifier kvs = do attrs <- forM kvs $ \(k, v) -> do
     fieldDecl (name, fType) = Text.concat ["    ", normalizeFieldName identifier name, " :: ", fType]
 
 normalizeFieldName ::  Text -> Text -> Text
-normalizeFieldName identifier = escapeKeywords             .
-                                uncapitalize               .
-                                (normalizeTypeName identifier `Text.append`) .
-                                normalizeTypeName
+normalizeFieldName _identifier = escapeKeywords             .
+                                 uncapitalize               .
+                                 --(normalizeTypeName identifier `Text.append`) .
+                                 normalizeTypeName
 
 keywords ::  Set Text
 keywords = Set.fromList ["type", "data", "module"]
@@ -139,15 +139,14 @@ splitTypeByLabel' l (TUnion u) = do m <- mapM (splitTypeByLabel' l) $ Set.toList
                                     return $! TUnion $! Set.fromList m
 splitTypeByLabel' l (TArray a) = do m <- splitTypeByLabel' (l `Text.append` "Elt") a
                                     return $! TArray m
-splitTypeByLabel' l (TObj   o) = do kvs <- forM d $ \(k, v) -> do
+splitTypeByLabel' l (TObj   o) = do kvs <- forM (Map.toList $ unDict o) $ \(k, v) -> do
                                        component <- splitTypeByLabel' k v
                                        return (k, component)
                                     addType l (TObj $ Dict $ Map.fromList kvs)
                                     return $! TLabel l
-  where
-    d = Map.toList $ unDict o 
 --splitTypeByLabel' l  t         = error $ "ERROR: Don't know how to handle: " ++ show t
 
+-- | Splits initial type with a given label, into a mapping of object type names and object type structures.
 splitTypeByLabel :: Text -> Type -> Map Text Type
 splitTypeByLabel topLabel t = Map.map (foldl1' unifyTypes) finalState
   where
@@ -229,13 +228,13 @@ unifyCandidates candidates splitted = Map.map (remapLabels labelMapping) $ repla
                             map (splitted Map.!) cset
     replace      :: [Text] -> Map Text Type -> Map Text Type
     replace  cset@(c:_) s = Map.insert c (unifiedType cset) (foldr Map.delete s cset)
-    replace  []         _ = error "Empty cset in replace"
+    replace  []         _ = error "Empty candidate set in replace"
     replacements :: Map Text Type -> Map Text Type
     replacements        s = foldr replace s candidates
     labelMapping :: Map Text Text
     labelMapping          = Map.fromList $ concatMap mapEntry candidates
     mapEntry cset@(c:_)   = [(x, c) | x <- cset]
-    mapEntry []           = error "Empty cset in mapEntry"
+    mapEntry []           = error "Empty candidate set in mapEntry"
 
 -- | Remaps type labels according to a `Map`.
 remapLabels :: Map Text Text -> Type -> Type

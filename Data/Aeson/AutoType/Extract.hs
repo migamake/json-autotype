@@ -46,11 +46,7 @@ extractType (Bool   _)                   = TBool
 extractType (Number _)                   = TNum
 extractType (String _)                   = TString
 extractType (Array  a) | V.null a        = TArray emptyType
-extractType (Array  a)                   = V.foldl1' unifyTypes $ V.map extractType a
-
-simplifyUnion :: Type -> Type
-simplifyUnion (TUnion s) | Set.size s == 1 = head $ Set.toList s
-simplifyUnion t                            = t
+extractType (Array  a)                   = TArray $ V.foldl1' unifyTypes $ V.map extractType a
 
 unifyTypes :: Type -> Type -> Type
 unifyTypes TBool        TBool                         = TBool
@@ -67,16 +63,21 @@ unifyTypes (TObj d)     (TObj  e)                     = TObj newDict
 unifyTypes (TArray u)   (TArray v)                    = TArray $ u `unifyTypes` v
 unifyTypes t            s                             = typeAsSet t `unifyUnion` typeAsSet s
 
+-- | Unify sets of types (sets are union types of alternatives).
 unifyUnion :: Set Type -> Set Type -> Type
 unifyUnion u v = assertions $
                    union $ uSimple `Set.union`
                            vSimple `Set.union`
                            oset
   where
+    -- We partition our types for easier unification into simple and compound
     (uSimple, uCompound) = Set.partition isSimple u
     (vSimple, vCompound) = Set.partition isSimple v
     assertions = assert (Set.null $ Set.filter (not . isArray) uArr) .
-                 assert (Set.null $ Set.filter (not . isArray) vArr) 
+                 assert (Set.null $ Set.filter (not . isArray) vArr)
+    -- then we partition compound typs into objects and arrays.
+    -- Note that there should be no TUnion here, since we are inside a TUnion already.
+    -- (That is reduced by @union@ smart costructor as superfluous.)
     (uObj, uArr) = Set.partition isObject uCompound
     (vObj, vArr) = Set.partition isObject vCompound
     oset    = Set.fromList $ if null objects
@@ -88,6 +89,16 @@ unifyUnion u v = assertions $
                                else [foldl1' unifyTypes arrays]-}
     --arrays  = Set.toList $ uArr `Set.union` vArr
 
+-- | Smart constructor for union types.
 union ::  Set Type -> Type
 union = simplifyUnion . TUnion
 
+-- | Simplify TUnion's so there is no TUnion directly inside TUnion.
+-- If there is only one element of the set, then return this single
+-- element as a type.
+simplifyUnion :: Type -> Type
+simplifyUnion (TUnion s) | Set.size s == 1 = head $ Set.toList s
+simplifyUnion (TUnion s)                   = TUnion $ Set.unions $ map elements $ Set.toList s
+  where
+    elements (TUnion elems) = elems
+    elements s              = Set.singleton s

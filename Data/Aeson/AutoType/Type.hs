@@ -1,4 +1,6 @@
-{-# LANGUAGE DeriveDataTypeable, FlexibleInstances, MultiParamTypeClasses #-}
+{-# LANGUAGE DeriveDataTypeable, DeriveGeneric #-}
+{-# LANGUAGE FlexibleInstances, MultiParamTypeClasses #-}
+{-# LANGUAGE ViewPatterns, OverloadedStrings #-}
 module Data.Aeson.AutoType.Type(typeSize,
                                 Dict(..), keys, get, withDict,
                                 Type(..), emptyType,
@@ -16,13 +18,22 @@ import           Data.HashMap.Strict(HashMap)
 import           Data.List          (sort)
 import           Data.Ord           (comparing)
 import           Data.Generics.Uniplate
+import           Text.PrettyPrint
+import           Text.PrettyPrint.GenericPretty
+import qualified Data.Text           as Text
+
+import           Data.Aeson.AutoType.Pretty
 
 -- | Type alias for HashMap
 type Map = HashMap
 
 -- * Dictionary of types indexed by names.
 newtype Dict = Dict { unDict :: Map Text Type }
-  deriving (Eq, Data, Typeable)
+  deriving (Eq, Data, Typeable, Generic)
+
+instance Out Dict where
+  doc       = doc       . unDict
+  docPrec p = docPrec p . unDict
 
 instance Show Dict where
   show = show . sort . Hash.toList . unDict
@@ -44,7 +55,9 @@ data Type = TNull | TBool | TNum | TString |
             TLabel Text                    |
             TObj   Dict                    |
             TArray Type
-  deriving (Show,Eq, Ord, Data, Typeable)
+  deriving (Show,Eq, Ord, Data, Typeable, Generic)
+
+instance Out Type
 
 -- These are missing Uniplate instances...
 {-

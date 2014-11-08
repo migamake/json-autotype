@@ -3,6 +3,7 @@ Changelog
     0.2.2.0  Oct 2014
 
         * GenerateJSONParser may now take multiple input samples to produce single parser.
+        * Fixed automated testing for all example files.
 
     0.2.1.4  Oct 2014
 

@@ -1,6 +1,6 @@
 -- Build information for the package.
 name:                json-autotype
-version:             0.2.1.4
+version:             0.2.2.0
 synopsis:            Automatic type declaration for JSON input data
 description:         Generates datatype declarations with Aeson's "FromJSON" instances
                      from a set of example ".json" files.

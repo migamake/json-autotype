@@ -1,4 +1,5 @@
-{-# LANGUAGE TemplateHaskell, ScopedTypeVariables, OverloadedStrings #-}
+{-# LANGUAGE TemplateHaskell, ScopedTypeVariables #-}
+{-# LANGUAGE ViewPatterns, OverloadedStrings #-}
 module Data.Aeson.AutoType.Format(
   displaySplitTypes, splitTypeByLabel, unificationCandidates,
   unifyCandidates
@@ -19,7 +20,7 @@ import qualified Data.Text                  as Text
 import           Data.Text                 (Text)
 import           Data.Set                  (Set )
 import           Data.List                 (foldl1')
-import           Data.Char                 (isAlpha)
+import           Data.Char                 (isAlpha, isDigit)
 import           Control.Monad.State.Class
 import           Control.Monad.State.Strict(State, runState)
 import qualified Data.Graph          as Graph
@@ -132,7 +133,7 @@ normalizeFieldName identifier = escapeKeywords             .
                                 normalizeTypeName
 
 keywords ::  Set Text
-keywords = Set.fromList ["type", "data", "module"]
+keywords = Set.fromList ["type", "data", "module", "class", "where", "let", "do"]
 
 escapeKeywords ::  Text -> Text
 escapeKeywords k | k `Set.member` keywords = k `Text.append` "_"
@@ -223,10 +224,16 @@ displaySplitTypes dict = runDecl declarations
 
 normalizeTypeName :: Text -> Text
 normalizeTypeName = escapeKeywords           .
+                    escapeFirstNonAlpha      .
                     Text.concat              .
                     map capitalize           .
                     filter (not . Text.null) .
-                    Text.split (not . isAlpha)
+                    Text.split (not . acceptableInVariable)
+  where
+    acceptableInVariable c = isAlpha c || isDigit c
+    escapeFirstNonAlpha cs                  | Text.null cs =                   cs
+    escapeFirstNonAlpha cs@(Text.head -> c) | isAlpha   c  =                   cs
+    escapeFirstNonAlpha cs                                 = "_" `Text.append` cs
 
 capitalize :: Text -> Text
 capitalize word = Text.toUpper first `Text.append` rest

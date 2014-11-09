@@ -43,6 +43,8 @@ executable json-autotype
   other-modules:       Data.Aeson.AutoType.Type
                        Data.Aeson.AutoType.Extract
                        Data.Aeson.AutoType.Format
+                       Data.Aeson.AutoType.Pretty
+                       Data.Aeson.AutoType.CodeGen
                        -- internal module
                        Data.Aeson.AutoType.Util
   other-extensions:    TemplateHaskell,

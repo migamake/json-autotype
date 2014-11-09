@@ -1,6 +1,11 @@
 Changelog
 =========
-    0.2.2.0  Oct 2014
+    0.2.3.0  Nov 2014
+
+        * Explicit JSON parser generation to avoid conflicts between Haskell keywords and field names.
+        * Renaming of Haskell field names with a prefix of object name (data type.)
+
+    0.2.2.0  Nov 2014
 
         * GenerateJSONParser may now take multiple input samples to produce single parser.
         * Fixed automated testing for all example files.

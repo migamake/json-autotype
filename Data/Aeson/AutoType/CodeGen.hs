@@ -27,16 +27,19 @@ capitalize input = Text.toUpper (Text.take 1 input)
 header :: Text -> Text
 header moduleName = Text.unlines [
    "{-# LANGUAGE TemplateHaskell, ScopedTypeVariables #-}"
+  ,"{-# LANGUAGE RecordWildCards, OverloadedStrings #-}"
+  ,""
   ,Text.concat ["module ", capitalize moduleName, " where"]
   ,""
   ,"import           System.Exit        (exitFailure, exitSuccess)"
   ,"import           System.IO          (stderr, hPutStrLn)"
   ,"import qualified Data.ByteString.Lazy.Char8 as BSL"
   ,"import           System.Environment (getArgs)"
-  ,"import           Control.Monad      (forM_)"
+  ,"import           Control.Monad      (forM_, mzero)"
+  ,"import           Control.Applicative"
+  ,"import           Data.Aeson(decode, Value(..), FromJSON(..), ToJSON(..),"
+  ,"                            (.:), (.:?), (.!=), (.=), object)"
   ,"import           Data.Text (Text)"
-  ,"import           Data.Aeson(decode, Value(..), FromJSON(..),"
-  ,"                            (.:), (.:?), (.!=))"
   ,"import           Data.Aeson.TH" 
   ,""]
 

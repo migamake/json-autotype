@@ -49,10 +49,53 @@ tShow :: (Show a) => a -> Text
 tShow = Text.pack . show 
 
 wrapDecl ::  Text -> Text -> Text
-wrapDecl identifier contents = Text.unlines [header, contents, "  } deriving (Show,Eq)"
-                                            ,"\nderiveJSON defaultOptions ''" `Text.append` identifier]
+wrapDecl identifier contents = Text.unlines [header, contents, "  } deriving (Show,Eq)"]
+                                            --,"\nderiveJSON defaultOptions ''" `Text.append` identifier]
   where
     header = Text.concat ["data ", identifier, " = ", identifier, " { "]
+
+-- | Explanatory type alias for making declarations
+-- First element of the pair is original JSON identifier,
+-- second element of the pair is the mapped identifier name in Haskell.
+type MappedKey = (Text, Text)
+
+-- | Make ToJSON declaration, given identifier (object name in Haskell) and mapping of its keys
+-- from JSON to Haskell identifiers *in the same order* as in *data type declaration*.
+makeFromJSON ::  Text -> [MappedKey] -> Text
+makeFromJSON identifier contents =
+  Text.unlines [
+      Text.unwords ["instance FromJSON", identifier, "where"]
+    , Text.unwords ["  parseJSON (Object v) =", identifier, inner]
+    , "  parseJSON _          = mzero" ]
+  where
+    inner  = if Text.null inner'
+               then ""
+               else "<$>" `Text.append` inner'
+    inner' = Text.intercalate " <*> " $
+               map (takeValue . fst) contents
+    takeValue jsonId = Text.concat ["v .: \"", jsonId, "\""]
+-- Contents example for wrapFromJSON:
+-- " <$>
+--"                           v .: "hexValue"  <*>
+--"                           v .: "colorName\""
+
+-- | Make ToJSON declaration, given identifier (object name in Haskell) and mapping of its keys
+-- from JSON to Haskell identifiers in the same order as in declaration
+makeToJSON :: Text -> [MappedKey] -> Text
+makeToJSON identifier contents =
+    Text.unlines [
+        Text.concat ["instance ToJSON ", identifier, " where"],
+        Text.concat ["  toJSON (", identifier, " {..}) = object [", inner, "]"]
+      ]
+  where
+    inner = ", " `Text.intercalate`
+              map putValue contents
+    putValue (jsonId, haskellId) = Text.unwords [escapeText jsonId, ".=", haskellId]
+    escapeText = Text.pack . show . Text.unpack
+-- Contents example for wrapToJSON
+--"hexValue"  .= hexValue
+--                                        ,"colorName" .= colorName]
+
 
 -- | Makes a generic identifier name.
 genericIdentifier :: DeclM Text
@@ -60,24 +103,33 @@ genericIdentifier = do
   i <- stepM
   return $! "Obj" `Text.append` tShow i
 
--- * Naive type printing.
+-- * Printing a single type declaration
 newDecl :: Text -> [(Text, Type)] -> DeclM Text
 newDecl identifier kvs = do attrs <- forM kvs $ \(k, v) -> do
                               formatted <- formatType v
-                              return (k, formatted)
-                            let decl = wrapDecl identifier $ fieldDecls attrs
+                              return (k, normalizeFieldName identifier k, formatted)
+                            let fieldMapping = map (\(jn, hn, _) -> (jn, hn)) attrs
+                            let decl = Text.unlines [wrapDecl     identifier $ fieldDecls attrs
+                                                    ,""
+                                                    ,makeFromJSON identifier fieldMapping
+                                                    ,""
+                                                    ,makeToJSON   identifier fieldMapping]
                             decls %%= (\ds -> ((), decl:ds))
                             return identifier
   where
     fieldDecls attrList = Text.intercalate ",\n" $ map fieldDecl attrList
-    fieldDecl  :: (Text, Text) -> Text
-    fieldDecl (name, fType) = Text.concat ["    ", normalizeFieldName identifier name, " :: ", fType]
+    fieldDecl :: (Text, Text, Text) -> Text
+    fieldDecl (_jsonName, haskellName, fType) = Text.concat [
+                                                  "    ", haskellName, " :: ", fType]
 
+-- | Convert a JSON key name given by second argument,
+-- from within a dictionary keyed with first argument,
+-- into a name of Haskell record field (hopefully distinct from other such selectors.)
 normalizeFieldName ::  Text -> Text -> Text
-normalizeFieldName _identifier = escapeKeywords             .
-                                 uncapitalize               .
-                                 --(normalizeTypeName identifier `Text.append`) .
-                                 normalizeTypeName
+normalizeFieldName identifier = escapeKeywords             .
+                                uncapitalize               .
+                                (normalizeTypeName identifier `Text.append`) .
+                                normalizeTypeName
 
 keywords ::  Set Text
 keywords = Set.fromList ["type", "data", "module"]

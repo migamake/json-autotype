@@ -37,6 +37,7 @@ header moduleName = Text.unlines [
   ,"import           System.Environment (getArgs)"
   ,"import           Control.Monad      (forM_, mzero)"
   ,"import           Control.Applicative"
+  ,"import           Data.Aeson.AutoType.Alternative"
   ,"import           Data.Aeson(decode, Value(..), FromJSON(..), ToJSON(..),"
   ,"                            (.:), (.:?), (.!=), (.=), object)"
   ,"import           Data.Text (Text)"

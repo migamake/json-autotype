@@ -1,5 +1,10 @@
 Changelog
 =========
+    0.2.4.0  Nov 2014
+
+        * To assure proper treatment of unions,
+          I make them with Data.Aeson.AutoType.Alternative type instead of Either.
+
     0.2.3.0  Nov 2014
 
         * Explicit JSON parser generation to avoid conflicts between Haskell keywords and field names.

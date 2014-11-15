@@ -1,7 +1,8 @@
-{-# LANGUAGE ViewPatterns, TypeOperators #-}
+{-# LANGUAGE TypeOperators #-}
 module Data.Aeson.AutoType.Alternative(
     (:|:)(..)
   , toEither, fromEither
+  , alt
   ) where
 
 import Data.Aeson
@@ -19,6 +20,10 @@ toEither (AltRight b) = Right b
 fromEither :: Either a b -> a :|: b
 fromEither (Left  a) = AltLeft  a
 fromEither (Right b) = AltRight b
+
+alt :: (a -> c) -> (b -> c) -> a :|: b -> c
+alt f _ (AltLeft  a) = f a
+alt _ g (AltRight b) = g b
 
 instance (ToJSON a, ToJSON b) => ToJSON (a :|: b) where
     toJSON (AltLeft  a) = toJSON a

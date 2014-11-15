@@ -26,8 +26,11 @@ capitalize input = Text.toUpper (Text.take 1 input)
 
 header :: Text -> Text
 header moduleName = Text.unlines [
-   "{-# LANGUAGE TemplateHaskell, ScopedTypeVariables #-}"
-  ,"{-# LANGUAGE RecordWildCards, OverloadedStrings #-}"
+   "{-# LANGUAGE TemplateHaskell     #-}"
+  ,"{-# LANGUAGE ScopedTypeVariables #-}"
+  ,"{-# LANGUAGE RecordWildCards     #-}"
+  ,"{-# LANGUAGE OverloadedStrings   #-}"
+  ,"{-# LANGUAGE TypeOperators       #-}"
   ,""
   ,Text.concat ["module ", capitalize moduleName, " where"]
   ,""

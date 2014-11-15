@@ -155,7 +155,7 @@ formatType (TUnion u)                        = do tys <- forM (Set.toList u) for
   where
     mkUnion []       = emptyTypeRepr
     mkUnion nonEmpty = foldr1 mkEither nonEmpty
-      where mkEither a b = Text.concat ["Alt (", a, ") (", b, ")"]
+      where mkEither a b = Text.concat [a, " :|: ", b]
 formatType (TArray a)                        = do inner <- formatType a
                                                   return $ Text.concat ["[", inner, "]"]
 formatType (TObj   o)                        = do ident <- genericIdentifier

@@ -1,5 +1,9 @@
 Changelog
 =========
+    0.2.5.0  Nov 2014
+
+        * Nicer union type syntax in Data.Aeson.AutoTpe.Alternative.
+
     0.2.4.0  Nov 2014
 
         * To assure proper treatment of unions,

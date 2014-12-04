@@ -1,3 +1,6 @@
+.~lock.*
+.*.swp
+*.bak
 *.dyn_hi
 *.dyn_o
 *.hi

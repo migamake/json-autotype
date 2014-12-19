@@ -1,21 +1,18 @@
 Automatic typing JSON
 =====================
 
-Story about practical web-service development using type theory.
+I want to tell a story about practical web-service development using type theory.
 
-JSON is a subset of JavaScript, and thus the most convenient data
-interchange format for Web 2.0 applications. Structured Web APIs which are
-mostly exposed as in JSON messages can often produce huge
-readouts that need to be integrated into more complex applications,
-not only simple mash-ups.
+JSON is a subset of JavaScript, and convenient data format for Web 2.0
+applications. Structured Web APIs often use JSON messages to transmit
+large answer sets that may be leveraged when building both mash-ups,
+and complex web services.
 
-Since Haskell excels in precise description of complex secure systems,
+Since Haskell excels in precise description of such complex systems,
 it enjoys relatively large set of parsing, validation, and web libraries.
 
-JSON-Autotype was born out of the need to facilitate automatic creation of
-large Web API interfaces in Haskell, and uses union typing
-in the directions pointed by need to represent ad-hoc type discovery.
+JSON-Autotype facilitates automatic creation of Web API interfaces
+in Haskell, and uses union typing for ad-hoc type discovery.
 
-During the seminar I will introduce problem by examples, and provide
-solutions to most frequent problems of type-based interface discovery
-and interaction validation.
+I plan to introduce problem by examples, and discuss most frequent problems
+of type-based interface ,,discovery''.

@@ -1,8 +1,12 @@
 Changelog
 =========
+    0.2.5.2  Dec 2014
+
+        * Updated metainfo, relaxed upper bounds for GHC 7.10.
+
     0.2.5.0  Nov 2014
 
-        * Nicer union type syntax in Data.Aeson.AutoTpe.Alternative.
+        * Nicer union type syntax in Data.Aeson.AutoType.Alternative.
 
     0.2.4.0  Nov 2014
 

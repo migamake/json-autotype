@@ -1,6 +1,6 @@
 -- Build information for the package.
 name:                json-autotype
-version:             0.2.5.2
+version:             0.2.5.3
 synopsis:            Automatic type declaration for JSON input data
 description:         Generates datatype declarations with Aeson's "FromJSON" instances
                      from a set of example ".json" files.
@@ -58,14 +58,14 @@ library
                        Data.Aeson.AutoType.Util
   build-depends:       base                 >=4.3  && <4.9,
                        GenericPretty        >=1.2  && <1.3,
-                       MissingH             >=1.2  && <1.3,
+                       MissingH             >=1.2  && <1.4,
                        aeson                >=0.7  && <0.9,
                        bytestring           >=0.9  && <0.11,
                        containers           >=0.3  && <0.6,
                        filepath             >=1.3  && <1.4,
                        hashable             >=1.2  && <1.3,
                        hflags               >=0.4  && <0.5,
-                       lens                 >=4.1  && <4.5,
+                       lens                 >=4.1  && <4.7,
                        mtl                  >=2.1  && <2.2,
                        pretty               >=1.1  && <1.3,
                        process              >=1.2  && <1.4,
@@ -89,19 +89,19 @@ executable json-autotype
                        RecordWildCards
   build-depends:       base                 >=4.3  && <4.9,
                        GenericPretty        >=1.2  && <1.3,
-                       MissingH             >=1.2  && <1.3,
+                       MissingH             >=1.2  && <1.4,
                        aeson                >=0.7  && <0.9,
                        bytestring           >=0.9  && <0.11,
                        containers           >=0.3  && <0.6,
                        filepath             >=1.3  && <1.4,
                        hashable             >=1.2  && <1.3,
                        hflags               >=0.4  && <0.5,
-                       lens                 >=4.1  && <4.5,
+                       lens                 >=4.1  && <4.7,
                        mtl                  >=2.1  && <2.2,
                        pretty               >=1.1  && <1.3,
                        process              >=1.2  && <1.4,
                        scientific           >=0.3  && <0.5,
-                       text                 >=1.1  && <1.3,
+                       text                 >=1.1  && <1.4,
                        uniplate             >=1.6  && <1.7,
                        unordered-containers >=0.2  && <0.3,
                        vector               >=0.9  && <0.11

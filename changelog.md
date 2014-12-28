@@ -1,5 +1,9 @@
 Changelog
 =========
+    0.2.5.3  Dec 2014
+
+        * Relaxed upper bounds again.
+
     0.2.5.2  Dec 2014
 
         * Updated metainfo, relaxed upper bounds for GHC 7.10.

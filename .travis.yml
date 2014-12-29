@@ -15,7 +15,6 @@ before_install:
  - travis_retry sudo apt-get update
  - travis_retry sudo apt-get install cabal-install-1.18 ghc-$GHCVER
  - export PATH=/opt/ghc/$GHCVER/bin:$PATH
- - ghc-pkg init
 
 install:
  - travis_retry cabal-1.18 install --only-dependencies --force-reinstalls

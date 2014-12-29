@@ -1,5 +1,8 @@
-{-# LANGUAGE TemplateHaskell, ScopedTypeVariables #-}
-{-# LANGUAGE ViewPatterns, OverloadedStrings #-}
+{-# LANGUAGE TemplateHaskell     #-}
+{-# LANGuaGE ScopedTypeVariables #-}
+{-# LANGUAGE ViewPatterns        #-}
+{-# LANGUAGE OverloadedStrings   #-}
+{-# LANGuaGE DeriveGeneric       #-}
 module Data.Aeson.AutoType.Format(
   displaySplitTypes, splitTypeByLabel, unificationCandidates,
   unifyCandidates
@@ -10,12 +13,8 @@ import           Control.Lens.TH
 import           Control.Lens
 import           Control.Monad             (forM)
 import           Control.Exception(assert)
---import qualified Data.ByteString.Lazy.Char8 as BSL
 import qualified Data.HashMap.Strict        as Map
 import qualified Data.Set                   as Set
---import qualified Data.Vector                as V
---import           Data.Aeson
---import           Data.Aeson.Types
 import qualified Data.Text                  as Text
 import           Data.Text                 (Text)
 import           Data.Set                  (Set )
@@ -24,6 +23,7 @@ import           Data.Char                 (isAlpha, isDigit)
 import           Control.Monad.State.Class
 import           Control.Monad.State.Strict(State, runState)
 import qualified Data.Graph          as Graph
+import           GHC.Generics              (Generic)
 
 import           Data.Aeson.AutoType.Type
 import           Data.Aeson.AutoType.Extract
@@ -35,7 +35,7 @@ fst3 (a, _b, _c) = a
 data DeclState = DeclState { _decls   :: [Text]
                            , _counter :: Int
                            }
-  deriving (Eq, Show, Ord)
+  deriving (Eq, Show, Ord, Generic)
 
 makeLenses ''DeclState
 

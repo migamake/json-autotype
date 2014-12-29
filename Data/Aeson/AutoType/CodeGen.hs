@@ -46,6 +46,7 @@ header moduleName = Text.unlines [
   ,"                            (.:), (.:?), (.!=), (.=), object)"
   ,"import           Data.Text (Text)"
   ,"import           Data.Aeson.TH" 
+  ,"import           GHC.Generics" 
   ,""]
 
 epilogue :: Text

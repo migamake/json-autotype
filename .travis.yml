@@ -4,7 +4,6 @@ matrix:
   allow_failures:
     - env: GHCVER=head
     - env: GHCVER=7.4.2
-    - env: GHCVER=7.10.0
 
 env:
  - GHCVER=head

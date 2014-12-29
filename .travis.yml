@@ -6,7 +6,7 @@ matrix:
     - env: GHCVER=7.10.1 CABALVER=1.22
 
 env:
- - GHCVER=head   CABALVER=1.22
+ - GHCVER=head   CABALVER=head
  - GHCVER=7.10.1 CABALVER=1.22
  - GHCVER=7.8.3  CABALVER=1.18
  - GHCVER=7.6.3  CABALVER=1.18
@@ -16,6 +16,9 @@ before_install:
  - travis_retry sudo apt-get update
  - travis_retry sudo apt-get install cabal-install-$CABALVER ghc-$GHCVER
  - export PATH=/opt/ghc/$GHCVER/bin:$PATH
+ - echo "Check version again"
+ - ghc   --version
+ - cabal --version
 
 install:
  - travis_retry cabal-$CABALVER install --only-dependencies --force-reinstalls

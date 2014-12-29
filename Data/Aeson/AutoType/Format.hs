@@ -50,7 +50,7 @@ tShow :: (Show a) => a -> Text
 tShow = Text.pack . show 
 
 wrapDecl ::  Text -> Text -> Text
-wrapDecl identifier contents = Text.unlines [header, contents, "  } deriving (Show,Eq)"]
+wrapDecl identifier contents = Text.unlines [header, contents, "  } deriving (Show,Eq,Generic)"]
                                             --,"\nderiveJSON defaultOptions ''" `Text.append` identifier]
   where
     header = Text.concat ["data ", identifier, " = ", identifier, " { "]

@@ -31,6 +31,7 @@ header moduleName = Text.unlines [
   ,"{-# LANGUAGE RecordWildCards     #-}"
   ,"{-# LANGUAGE OverloadedStrings   #-}"
   ,"{-# LANGUAGE TypeOperators       #-}"
+  ,"{-# LANGUAGE DeriveGeneric       #-}"
   ,""
   ,Text.concat ["module ", capitalize moduleName, " where"]
   ,""

@@ -1,5 +1,9 @@
 Changelog
 =========
+    0.2.5.4  Dec 2014
+
+        * Relaxed upper bounds for new lens.
+
     0.2.5.3  Dec 2014
 
         * Relaxed upper bounds again.

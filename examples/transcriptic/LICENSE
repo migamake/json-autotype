@@ -1,0 +1,7 @@
+This is example from http://transcriptic.com.
+
+I deem it is fair use, since they want their protocol formats to be produced.
+
+This specific use case is rather using Haskell to generate correct JSON,
+given assumed structure of example outputs.
+

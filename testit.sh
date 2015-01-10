@@ -5,7 +5,7 @@ SRC=${EXE}.hs
 
 # TODO: add ParseJSON.hs
 ghc --make ${SRC} -o ${EXE} && \
-for i in test/*.json examples/*.json; do
+for i in `find test/ examples/ -iname '*.json'`; do
   basename $i
   echo ./${EXE} $i
   OUT=`basename $i .json`.hs

@@ -1,0 +1,44 @@
+{
+  "refs": {
+    "my_plate": { "id": "ct1553vwp7p46", "store": { "where": "cold_20" } }
+  },
+  "instructions": [
+    {
+      "op": "incubate",
+      "object": "my_plate",
+      "where": "warm_37",
+      "shaking": true,
+      "duration": "60:minute"
+    }, {
+      "op": "absorbance",
+      "object": "my_plate",
+      "wells": ["A1"],
+      "wavelength": "600:nanometer",
+      "dataref": "1"
+    }, {
+      "op": "incubate",
+      "object": "my_plate",
+      "where": "warm_37",
+      "shaking": true,
+      "duration": "60:minute"
+    }, {
+      "op": "absorbance",
+      "object": "my_plate",
+      "wells": ["A1"],
+      "wavelength": "600:nanometer",
+      "dataref": "2"
+    }, {
+      "op": "incubate",
+      "object": "my_plate",
+      "where": "warm_37",
+      "shaking": true,
+      "duration": "60:minute"
+    }, {
+      "op": "absorbance",
+      "object": "my_plate",
+      "wells": ["A1"],
+      "wavelength": "600:nanometer",
+      "dataref": "3"
+    }
+  ]
+}

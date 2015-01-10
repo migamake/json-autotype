@@ -1,0 +1,9 @@
+{
+  "type": "synthesis",
+  "sequence": {
+    "name": "pri1-F",
+    "sequence": "acgtagtcgagtctgagtcagcgtacgtag"
+  },
+  "purity": "desalt",
+  "scale": "20:nanomole"
+}

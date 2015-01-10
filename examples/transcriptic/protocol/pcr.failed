@@ -1,0 +1,50 @@
+{
+  "refs": {
+    "input_plate": { "id": "ct15jdnddeaj", "store": { "where": "cold_20" } },
+    "pcr_plate": { "new": "96-pcr", "store": { "where": "cold_20" } }
+  },
+  "instructions": [
+    { "op": "uncover", "object": "input_plate" },
+    {
+      "op": "pipette",
+      "groups": [{
+        "transfer": [{
+          "from": "input_plate/A1",
+          "to": "pcr_plate/A1",
+          "volume": "4:microliter"
+        }]
+      }]
+    },
+    { "op": "cover", "object": "input_plate", "lid": "standard" },
+    { "op": "seal", "object": "pcr_plate" },
+    {
+      "op": "thermocycle",
+      "object": "pcr_plate",
+      "groups": [{
+        "cycles": 1,
+        "steps": [{
+          "duration": "30:second",
+          "temperature": "98:celsius"
+        }]
+      }, {
+        "cycles": 35,
+        "steps": [{
+          "duration": "10:second",
+          "temperature": "98:celsius"
+        }, {
+          "duration": "55:second",
+          "temperature": "72:celsius"
+        }]
+      }, {
+        "cycles": 1,
+        "steps": [{
+          "duration": "420:second",
+          "temperature": "72:celsius"
+        }, {
+          "duration": "600:second",
+          "temperature": "12:celsius"
+        }]
+      }]
+    }
+  ]
+}

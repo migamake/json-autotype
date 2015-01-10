@@ -74,6 +74,9 @@ generateHaskellFromJSONs inputFilenames outputFilename = do
   -- Read type from each file
   typeForEachFile  <- catMaybes <$> mapM extractTypeFromJSONFile inputFilenames
   -- Unify all input types
+  when (null typeForEachFile) $ do
+    report "No valid JSON input file..."
+    exitFailure
   let finalType = foldr1 unifyTypes typeForEachFile
   -- We split different dictionary labels to become different type trees (and thus different declarations.)
   let splitted = splitTypeByLabel "TopLevel" finalType

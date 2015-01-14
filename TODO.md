@@ -7,9 +7,12 @@ FEATURES TO ADD IN THE FUTURE:
     * OCaml code
     * Java
 3. Try to validate/reconstruct schemas of the documents in JSON database like MongoDB.
-4. Add plugins for user type detection
-5. Detect more types:
-    * date
-    * datetime
+4. Add plugins for user type detection:
+    * Date/datetimes
+    * URLs
     * int vs double
-6. Subtyping relation
+5. Subtyping relation
+6. Algebraic sum encoding:
+    * transcriptic.com example ("op")
+7. Try integration as GHC preprocessor
+8. Try integration with Cabal build system.

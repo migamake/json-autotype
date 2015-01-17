@@ -7,19 +7,20 @@ FEATURES TO ADD IN THE FUTURE:
         - http://json-schema.org/
     * OCaml code
     * Java
-3. Try to validate/reconstruct schemas of the documents in JSON database like MongoDB.
-4. Add plugins for user type detection:
+3. Import type from JSON schema?
+4. Try to validate/reconstruct schemas of the documents in JSON database like MongoDB.
+5. Add plugins for user type detection:
     * Date/datetimes
     * URLs
     * int vs double
-5. Subtyping relation
-6. Algebraic sum encoding:
+6. Subtyping relation
+7. Algebraic sum encoding:
     * transcriptic.com example ("op")
-7. Try integration:
+8. Try integration:
     * as GHC preprocessor
     * with Cabal build system.
-8. Submodules: allow addressing different files as submodules of the other files.
-9. Giving parameters as config file, instead of CLI options.
+9. Submodules: allow addressing different files as submodules of the other files.
+10. Giving parameters as config file, instead of CLI options.
 
 TESTING:
 ========

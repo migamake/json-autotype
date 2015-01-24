@@ -1,5 +1,6 @@
-module Data.Aeson.Plugin.Interface.SubType (
-    SubTypePlugin (..)
+module Data.Aeson.AutoType.Plugin.Subtype (
+    SubtypePlugin (..)
+  , SubtypeDesc   (..)
   ) where
 
 import Data.Aeson.AutoType.Type
@@ -9,13 +10,13 @@ import Data.Dynamic
 -- | Hmm... this should be existential type?
 type TypeDesc = String
 
-data SubTypePlugin = SubTypePlugin {
-    detect :: [Value]  -> Maybe SubTypeDesc -- | Check whether a set of values belongs to this type family
-  , unify  :: SubTypeDesc -> SubTypeDesc -> Either SubTypeDesc Type
+data SubtypePlugin = SubtypePlugin {
+    detect :: [Value]  -> Maybe SubtypeDesc -- | Check whether a set of values belongs to this type family
+  , unify  :: SubtypeDesc -> SubtypeDesc -> Either SubtypeDesc Type
   }
 
 -- | Description of a subtype
-data SubTypeDesc = SubTypeDesc {
+data SubtypeDesc = SubtypeDesc {
     subtypeName  :: String           -- | Code that is different for different type families
   , subtypeClass :: Type
   , reference    :: String -> String -- | Show type reference with a given name prefix

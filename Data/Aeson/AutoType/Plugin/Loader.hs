@@ -1,12 +1,12 @@
 {-# LANGUAGE ScopedTypeVariables #-}
 -- | Module implementing loading generic plugins using Hint.
-module LoadPlugin(
+module Data.Aeson.AutoType.Plugin.Loader (
     importPlugins
   , main
   ) where
 
-import           System.IO     (hPutStrLn, stderr)
-import           System.Exit   (exitFailure)
+import           System.IO     ( hPutStrLn, stderr )
+import           System.Exit   ( exitFailure )
 import           Data.Typeable
 import           Control.Arrow ((&&&))
 import           Control.Monad

@@ -1,5 +1,9 @@
 Changelog
 =========
+    0.2.5.8  Mar 2015
+
+        * Updated tests and build config.
+
     0.2.5.7  Mar 2015
 
         * Fixed documentation anchors, and unit test classification for failures.

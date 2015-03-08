@@ -26,7 +26,7 @@ license-file:        LICENSE
 stability:           beta
 author:              Michal J. Gajda
 maintainer:          mjgajda@gmail.com
-copyright:           Copyright by Michal J. Gajda '2014
+copyright:           Copyright by Michal J. Gajda '2014-'2015
 category:            Web
 build-type:          Simple
 extra-source-files:  README.md changelog.md

@@ -21,6 +21,7 @@ FEATURES TO ADD IN THE FUTURE:
     * with Cabal build system.
 9. Submodules: allow addressing different files as submodules of the other files.
 10. Giving parameters as config file, instead of CLI options.
+11. Check that module name is valid Haskell module name and show appropriate error message.
 
 TESTING:
 ========

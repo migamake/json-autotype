@@ -29,10 +29,17 @@ fatal msg = do
 
 -- | Imports a set of plugin modules with the same "interface" value,
 -- and returns values exported as their interfaces.
+--
+-- Arguments:
+--  * argument name exported from each module as an interface,
+--  * list of plugin modules (given as either module paths or file paths).
+--
+-- Result:
+--  * Result is a list of exported objects in the order of module names.
 importPlugins ::   Typeable a =>
-                   String     -> -- ^ name exported from each module as an interface
-                  [String]    -> -- ^ list of plugin modules (given as either module paths or file paths)
-                   IO [a]        -- ^ Result is a list of exported objects in the order of module names
+                    String    ->
+                   [FilePath] ->
+                    IO [a]
 importPlugins interfaceName pluginModules = do
     result <- Hint.runInterpreter $ do
       Hint.loadModules pluginModules

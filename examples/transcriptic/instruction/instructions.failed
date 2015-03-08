@@ -1,0 +1,27 @@
+{
+  "refs": {
+    "my_plate": {
+      "id": "ct196xqjkcn2b",
+      "store": { "where": "ambient" }
+    }
+  },
+  "instructions": [
+    { "op": "pipette",
+      "groups": [
+        { "transfer": [
+            { "from": "my_plate/A1",
+              "to": "my_plate/A2",
+              "volume": "20:microliter"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "op": "spin",
+      "object": "tube3",
+      "duration": "30:second",
+      "speed": "6000:rpm"
+    }
+  ]
+}

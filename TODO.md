@@ -16,13 +16,18 @@ FEATURES TO ADD IN THE FUTURE:
 6. Subtyping relation
 7. Algebraic sum encoding:
     * transcriptic.com example ("op")
-8. Try integration:
+    * JSON schema example ("type")
+8. Mapping of names that are not valid Haskell identifiers:
+    * "type"
+    * predefined names
+9. Try integration:
     * as GHC preprocessor
     * with Cabal build system.
-9. Submodules: allow addressing different files as submodules of the other files.
-10. Giving parameters as config file, instead of CLI options.
-11. Check that module name is valid Haskell module name and show appropriate error message.
+10. Submodules: allow addressing different files as submodules of the other files.
+11. Giving parameters as config file, instead of CLI options.
+12. Check that module name is valid Haskell module name and show appropriate error message, possibly treat it to make a good module name.
 
 TESTING:
 ========
 1. Check if fix-point of parse/write/infer types.
+

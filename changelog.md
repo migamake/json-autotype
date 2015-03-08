@@ -3,6 +3,10 @@ Changelog
     0.2.5.5  Mar 2015
 
         * Relaxed upper bounds for lens 4.8.
+    
+   0.2.5.5  Mar 2015
+
+        * (Skipped this version number by mistake.)
 
     0.2.5.4  Dec 2014
 

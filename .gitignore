@@ -1,4 +1,5 @@
 .~lock.*
+*.sublime-workspace
 .*.swp
 *.bak
 *.dyn_hi

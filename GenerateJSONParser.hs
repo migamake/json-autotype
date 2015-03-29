@@ -30,12 +30,12 @@ fst3 ::  (t, t1, t2) -> t
 fst3 (a, _, _) = a
 
 -- * Command line flags
-defineFlag "outputFilename"  defaultOutputFilename "Write output to the given file"
-defineFlag "suggest"         True                  "Suggest candidates for unification"
-defineFlag "autounify"       True                  "Automatically unify suggested candidates"
-defineFlag "test"            False                 "Try to run generated parser after"
-defineFlag "debug"           False                 "Set this flag to see more debugging info"
-defineFlag "fakeFlag"        True                  "Ignore this flag - it doesn't exist!!!"
+defineFlag "o:outputFilename"  defaultOutputFilename "Write output to the given file"
+defineFlag "suggest"           True                  "Suggest candidates for unification"
+defineFlag "autounify"         True                  "Automatically unify suggested candidates"
+defineFlag "t:test"            False                 "Try to run generated parser after"
+defineFlag "d:debug"           False                 "Set this flag to see more debugging info"
+defineFlag "fakeFlag"          True                  "Ignore this flag - it doesn't exist!!! It is workaround to library problem."
 
 -- Tracing is switched off:
 myTrace :: String -> IO ()

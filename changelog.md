@@ -1,5 +1,9 @@
 Changelog
 =========
+    0.2.5.11  Mar 2015
+
+        * Add short versions of command line flags: -o, -d, and -t.
+
     0.2.5.10  Mar 2015
 
         * Bump up lens dependency.

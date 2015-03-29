@@ -1,4 +1,6 @@
 {-# LANGUAGE TypeOperators #-}
+-- | This module defines data type (a :|: b) that behaves all like @Either@,
+-- except that has no tag in JSON representation as used by @FromJSON@ and @ToJSON@.
 module Data.Aeson.AutoType.Alternative(
     (:|:)(..)
   , toEither, fromEither
@@ -8,19 +10,25 @@ module Data.Aeson.AutoType.Alternative(
 import Data.Aeson
 import Control.Applicative
 
+-- | Data type (a :|: b) that behaves all like @Either@,
+-- except that has no tag in JSON representation as used by @FromJSON@ and @ToJSON@.
 data a :|: b = AltLeft  a
              | AltRight b
   deriving(Show,Eq,Ord)
 infixr 5 :|:
 
+-- | Convert to @Either@ datatype.
 toEither :: a :|: b -> Either a b
 toEither (AltLeft  a) = Left  a
 toEither (AltRight b) = Right b
 
+-- | Convert from @Either@ datatype.
 fromEither :: Either a b -> a :|: b
 fromEither (Left  a) = AltLeft  a
 fromEither (Right b) = AltRight b
 
+-- | Deconstruct the type with two functions corresponding to constructors.
+-- This is like @either@.
 alt :: (a -> c) -> (b -> c) -> a :|: b -> c
 alt f _ (AltLeft  a) = f a
 alt _ g (AltRight b) = g b

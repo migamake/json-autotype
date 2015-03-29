@@ -1,3 +1,4 @@
+-- | Utility functions that may be ultimately moved to some library.
 module Data.Aeson.AutoType.Util( withFileOrHandle
                                , withFileOrDefaultHandle
                                , assertM ) where
@@ -15,6 +16,9 @@ withFileOrHandle        ""       _         handle action =                      
 withFileOrHandle        "-"      _         handle action =                      action handle
 withFileOrHandle        name     ioMode    _      action = withFile name ioMode action 
 
+-- | Generic function for choosing either file with given name or stdin/stdout as input/output.
+-- It accepts the function that takes the corresponding handle.
+-- Stdin/stdout is selected by "-".
 withFileOrDefaultHandle :: FilePath -> IOMode -> (Handle -> IO r) -> IO r
 withFileOrDefaultHandle "-"      ReadMode         action = action stdin
 withFileOrDefaultHandle "-"      WriteMode        action = action stdout
@@ -23,10 +27,9 @@ withFileOrDefaultHandle "-"      otherMode        _      = error $ "Incompatible
                                                                 ++ ") for `-` in withFileOrDefaultHandle." 
 withFileOrDefaultHandle filename ioMode           action = withFile filename ioMode action
 
-
+-- | Check assertion within any monad.
 assertM ::  Monad m => Bool -> m ()
 assertM v = assert v $ return ()
-
 
 -- Missing instances
 instance Hashable a => Hashable (Set.Set a) where

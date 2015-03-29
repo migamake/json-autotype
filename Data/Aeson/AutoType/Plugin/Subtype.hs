@@ -1,3 +1,4 @@
+-- | API to which @SubtypePlugin@s should conform.
 module Data.Aeson.AutoType.Plugin.Subtype (
     SubtypePlugin (..)
   , SubtypeDesc   (..)
@@ -10,8 +11,9 @@ import Data.Dynamic
 -- | Hmm... this should be existential type?
 type TypeDesc = String
 
+-- | Operations that @SubtypPlugin@ must implement.
 data SubtypePlugin = SubtypePlugin {
-    detect :: [Value]  -> Maybe SubtypeDesc -- | Check whether a set of values belongs to this type family
+    detect :: [Value]     -> Maybe SubtypeDesc -- | Check whether a set of values belongs to this type family
   , unify  :: SubtypeDesc -> SubtypeDesc -> Either SubtypeDesc Type
   }
 

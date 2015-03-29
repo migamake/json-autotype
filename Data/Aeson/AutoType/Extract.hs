@@ -15,6 +15,10 @@ import           Data.Text          (Text)
 import           Data.Set           (Set )
 import           Data.List          (foldl1')
 
+-- | Compute total number of nodes (and leaves) within the value tree.
+-- Each simple JavaScript type (including String) is counted as of size 1,
+-- whereas both Array or object types are counted as 1+sum of the sizes
+-- of their member values.
 valueSize :: Value -> Int
 valueSize  Null      = 1
 valueSize (Bool   _) = 1
@@ -23,6 +27,12 @@ valueSize (String _) = 1
 valueSize (Array  a) = V.foldl' (+) 1 $ V.map valueSize a
 valueSize (Object o) = (1+) . sum . map valueSize . Hash.elems $ o
 
+-- | Compute total size of the type of the @Value@.
+-- For:
+-- * simple types it is always 1, 
+-- * for arrays it is just 1+_maximum_ size of the (single) element type,
+-- * for objects it is _sum_ of the sizes of fields (since each field type
+--   is assumed to be different.)
 valueTypeSize :: Value -> Int
 valueTypeSize  Null      = 1
 valueTypeSize (Bool   _) = 1
@@ -31,6 +41,10 @@ valueTypeSize (String _) = 1
 valueTypeSize (Array  a) = (1+) . V.foldl' max 0 $ V.map valueTypeSize a
 valueTypeSize (Object o) = (1+) . sum . map valueTypeSize . Hash.elems $ o
 
+-- | Compute total depth of the value.
+-- For:
+-- * simple types it is 1
+-- * for either Array or Object, it is 1 + maximum of depths of their members
 valueDepth :: Value -> Int
 valueDepth  Null      = 1
 valueDepth (Bool   _) = 1
@@ -39,6 +53,8 @@ valueDepth (String _) = 1
 valueDepth (Array  a) = (1+) . V.foldl' max 0 $ V.map valueDepth a
 valueDepth (Object o) = (1+) . maximum . (0:) . map valueDepth . Hash.elems $ o
 
+-- | Extract @Type@ from the JSON @Value@.
+-- Unifying types of array elements, if necessary.
 extractType :: Value -> Type
 extractType (Object o)                   = TObj $ Dict $ Hash.map extractType o
 extractType  Null                        = TNull
@@ -48,6 +64,8 @@ extractType (String _)                   = TString
 extractType (Array  a) | V.null a        = TArray emptyType
 extractType (Array  a)                   = TArray $ V.foldl1' unifyTypes $ V.map extractType a
 
+-- | Standard unification procedure on @Type@s,
+-- with inclusion of @Type@ unions.
 unifyTypes :: Type -> Type -> Type
 unifyTypes TBool        TBool                         = TBool
 unifyTypes TNum         TNum                          = TNum

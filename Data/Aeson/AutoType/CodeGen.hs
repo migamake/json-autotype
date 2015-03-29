@@ -70,7 +70,7 @@ epilogue          = Text.unlines
   ,"          exitSuccess"
   ,""]
 
--- Write a Haskell module to an output file, or stdout if `-` filename is given.
+-- | Write a Haskell module to an output file, or stdout if `-` filename is given.
 writeHaskellModule :: FilePath -> Map.HashMap Text Type -> IO ()
 writeHaskellModule outputFilename types =
     withFileOrHandle outputFilename WriteMode stdout $ \hOut -> do

@@ -13,6 +13,7 @@ import           Data.Maybe
 import           System.Exit
 import           System.IO                 (stdin, stderr, stdout, IOMode(..))
 import           System.FilePath           (splitExtension, (<.>))
+import           System.Directory          (removeFile)
 import           System.Process            (system)
 import           Control.Monad             (forM_, forM, when)
 import qualified Data.ByteString.Lazy.Char8 as BSL
@@ -83,6 +84,7 @@ defineFlag "suggest"            True                  "Suggest candidates for un
 defineFlag "autounify"          True                  "Automatically unify suggested candidates"
 defineFlag "t:test"             False                 "Try to run generated parser after"
 defineFlag "d:debug"            False                 "Set this flag to see more debugging info"
+defineFlag "keep"               False                 "Keep also the successful tests"
 defineFlag "fakeFlag"           True                  "Ignore this flag - it doesn't exist!!! It is workaround to library problem."
 
 -- Tracing is switched off:
@@ -148,8 +150,10 @@ generateTestJSONs = do
       -- We start by writing module header
       writeHaskellModule outputFilename unified
       if flags_test
-        then 
-          (==ExitSuccess) <$> system (unwords $ ["runghc", outputFilename] ++ inputFilenames)
+        then do
+          r <- (==ExitSuccess) <$> system (unwords $ ["runghc", outputFilename] ++ inputFilenames)
+          when r $ mapM_ removeFile [inputFilename, outputFilename]
+          return r
         else
           return True
     putStrLn $ "Successfully generated "      ++ show (length results) ++

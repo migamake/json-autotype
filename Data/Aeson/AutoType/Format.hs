@@ -86,9 +86,11 @@ makeToJSON :: Text -> [MappedKey] -> Text
 makeToJSON identifier contents =
     Text.unlines [
         Text.concat ["instance ToJSON ", identifier, " where"],
-        Text.concat ["  toJSON (", identifier, " {..}) = object [", inner, "]"]
+        Text.concat ["  toJSON (", identifier, " {", wildcard, "}) = object [", inner, "]"]
       ]
   where
+    wildcard | length contents == 0 = ""
+             | otherwise            = ".."
     inner = ", " `Text.intercalate`
               map putValue contents
     putValue (jsonId, haskellId) = Text.unwords [escapeText jsonId, ".=", haskellId]

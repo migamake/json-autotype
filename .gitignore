@@ -26,3 +26,5 @@ iPhoneMenu.hs
 jenkins.hs
 twitterapi.hs
 youtube.hs
+Test*.json
+Test*.hs

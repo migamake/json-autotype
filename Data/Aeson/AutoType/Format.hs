@@ -3,6 +3,7 @@
 {-# LANGUAGE ViewPatterns        #-}
 {-# LANGUAGE OverloadedStrings   #-}
 {-# LANGuaGE DeriveGeneric       #-}
+{-# LANGuaGE FlexibleContexts    #-}
 module Data.Aeson.AutoType.Format(
   displaySplitTypes, splitTypeByLabel, unificationCandidates,
   unifyCandidates
@@ -29,6 +30,8 @@ import           Data.Aeson.AutoType.Type
 import           Data.Aeson.AutoType.Extract
 import           Data.Aeson.AutoType.Util  ()
 
+import           Debug.Trace -- DEBUG
+
 fst3 ::  (t, t1, t2) -> t
 fst3 (a, _b, _c) = a
 
@@ -49,6 +52,11 @@ stepM = counter %%= (\i -> (i, i+1))
 tShow :: (Show a) => a -> Text
 tShow = Text.pack . show 
 
+-- | Wrap a type alias.
+wrapAlias :: Text -> Text -> Text
+wrapAlias identifier contents = Text.unwords ["type", identifier, "=", contents]
+
+-- | Wrap a data type declaration
 wrapDecl ::  Text -> Text -> Text
 wrapDecl identifier contents = Text.unlines [header, contents, "  } deriving (Show,Eq,Generic)"]
                                             --,"\nderiveJSON defaultOptions ''" `Text.append` identifier]
@@ -66,14 +74,13 @@ makeFromJSON ::  Text -> [MappedKey] -> Text
 makeFromJSON identifier contents =
   Text.unlines [
       Text.unwords ["instance FromJSON", identifier, "where"]
-    , Text.unwords ["  parseJSON (Object v) =", identifier, inner]
+    , Text.unwords ["  parseJSON (Object v) =", makeParser identifier contents]
     , "  parseJSON _          = mzero" ]
   where
-    inner  = if Text.null inner'
-               then ""
-               else "<$>" `Text.append` inner'
-    inner' = Text.intercalate " <*> " $
-               map (takeValue . fst) contents
+    makeParser identifier [] = "return "  `Text.append` identifier
+    makeParser identifier _  = identifier `Text.append` inner
+    inner                    = " <*> " `Text.intercalate`
+                                  map (takeValue . fst) contents
     takeValue jsonId = Text.concat ["v .: \"", jsonId, "\""]
 -- Contents example for wrapFromJSON:
 -- " <$>
@@ -106,7 +113,7 @@ genericIdentifier = do
   i <- stepM
   return $! "Obj" `Text.append` tShow i
 
--- * Printing a single type declaration
+-- * Printing a single data type declaration
 newDecl :: Text -> [(Text, Type)] -> DeclM Text
 newDecl identifier kvs = do attrs <- forM kvs $ \(k, v) -> do
                               formatted <- formatType v
@@ -117,13 +124,21 @@ newDecl identifier kvs = do attrs <- forM kvs $ \(k, v) -> do
                                                     ,makeFromJSON identifier fieldMapping
                                                     ,""
                                                     ,makeToJSON   identifier fieldMapping]
-                            decls %%= (\ds -> ((), decl:ds))
+                            addDecl decl
                             return identifier
   where
     fieldDecls attrList = Text.intercalate ",\n" $ map fieldDecl attrList
     fieldDecl :: (Text, Text, Text) -> Text
     fieldDecl (_jsonName, haskellName, fType) = Text.concat [
                                                   "    ", haskellName, " :: ", fType]
+
+addDecl decl = decls %%= (\ds -> ((), decl:ds))
+
+-- | Add new type alias for Array type
+newAlias :: Text -> Type -> DeclM Text
+newAlias identifier content = do formatted <- formatType content
+                                 addDecl $ Text.unlines [wrapAlias identifier formatted]
+                                 return identifier
 
 -- | Convert a JSON key name given by second argument,
 -- from within a dictionary keyed with first argument,
@@ -199,30 +214,28 @@ splitTypeByLabel' l (TObj   o) = do kvs <- forM (Map.toList $ unDict o) $ \(k, v
                                        return (k, component)
                                     addType l (TObj $ Dict $ Map.fromList kvs)
                                     return $! TLabel l
---splitTypeByLabel' l  t         = error $ "ERROR: Don't know how to handle: " ++ show t
 
 -- | Splits initial type with a given label, into a mapping of object type names and object type structures.
 splitTypeByLabel :: Text -> Type -> Map Text Type
 splitTypeByLabel topLabel t = Map.map (foldl1' unifyTypes) finalState
   where
-    job = splitTypeByLabel' topLabel t
-          --   addType topLabel r
+    finalize (TLabel l) = assert (l == topLabel) $ return ()
+    finalize  topLevel  = addType topLabel topLevel
     initialState    = Map.empty
-    (_, finalState) = runState job initialState
+    (_, finalState) = runState (splitTypeByLabel' topLabel t >>= finalize) initialState
 
 formatObjectType ::  Text -> Type -> DeclM Text
-formatObjectType identifier (TObj o) = newDecl identifier d
+formatObjectType identifier (TObj o) = newDecl  identifier d
   where
     d = Map.toList $ unDict o
-formatObjectType _          other    = formatType other
+formatObjectType identifier  other   = newAlias identifier other
 
 displaySplitTypes ::  Map Text Type -> Text
-displaySplitTypes dict = runDecl declarations
+displaySplitTypes dict = trace ("displaySplitTypes: " ++ show (toposort dict)) $ runDecl declarations
   where
     declarations =
-      forM (toposort dict) $ \(name, typ) -> do
-        let name' = normalizeTypeName name
-        formatObjectType name' typ
+      forM (toposort dict) $ \(name, typ) ->
+        formatObjectType (normalizeTypeName name) typ
 
 normalizeTypeName :: Text -> Text
 normalizeTypeName = escapeKeywords           .
@@ -271,14 +284,16 @@ unificationCandidates :: Map.HashMap t Type -> [[t]]
 unificationCandidates = Map.elems             .
                         Map.filter candidates .
                         Map.fromListWith (++) .
-                        map entry             .
+                        concatMap entry       .
                         Map.toList
   where
+    -- | Candidate entry has to have at least two candidates, so that unification makes sense
     candidates [ ] = False
     candidates [_] = False
     candidates _   = True
-    entry (k, TObj o) = (Set.fromList $ Map.keys $ unDict o, [k])
-    entry (_, other ) = error $ "Unexpected type: " ++ show other
+    -- | Make a candidate entry for each object type, which points from its keys to its label.
+    entry (k, TObj o)                 = [(Set.fromList $ Map.keys $ unDict o, [k])]
+    entry  _                          = [] -- ignore array elements and toplevel type if it is Array
 
 -- | Unifies candidates on a give input list.
 unifyCandidates :: [[Text]] -> Map Text Type -> Map Text Type

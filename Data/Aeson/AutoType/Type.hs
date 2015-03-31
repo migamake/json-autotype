@@ -52,9 +52,9 @@ keys = Set.fromList . Hash.keys . unDict
 -- * Type
 data Type = TNull | TBool | TNum | TString |
             TUnion (Set      Type)         |
-            TLabel Text                    |
-            TObj   Dict                    |
-            TArray Type
+            TLabel  Text                   |
+            TObj    Dict                   |
+            TArray  Type
   deriving (Show,Eq, Ord, Data, Typeable, Generic)
 
 instance Out Type
@@ -94,7 +94,7 @@ typeSize TNum       = 1
 typeSize TString    = 1
 typeSize (TObj   o) = (1+) . sum     . map typeSize . Hash.elems . unDict $ o
 typeSize (TArray a) = 1 + typeSize a
-typeSize (TUnion u) = (1+) . maximum . (0:) . map typeSize . Set.toList $ u
+typeSize (TUnion u) = (1+) . sum . (0:) . map typeSize . Set.toList $ u
 typeSize (TLabel _) = error "Don't know how to compute typeSize of TLabel."
 
 typeAsSet :: Type -> Set Type

@@ -1,19 +1,22 @@
 -- | Extraction and unification of AutoType's @Type@ from Aeson @Value@.
-module Data.Aeson.AutoType.Extract(valueSize, typeSize, valueTypeSize,
+module Data.Aeson.AutoType.Extract(valueSize, valueTypeSize,
                                    valueDepth, Dict(..),
                                    Type(..), emptyType,
-                                   extractType, unifyTypes) where
+                                   extractType, unifyTypes,
+                                   typeCheck) where
 
-import           Control.Exception  (assert)
+import           Control.Exception               (assert)
 import           Data.Aeson.AutoType.Type
-import qualified Data.HashMap.Strict as Hash
-import qualified Data.Set            as Set
-import qualified Data.Vector         as V
---import           Data.Typeable      (Typeable)
+import qualified Data.HashMap.Strict      as Map
+import           Data.HashMap.Strict             (HashMap)
+import qualified Data.Set                 as Set
+import qualified Data.Vector              as V
 import           Data.Aeson
-import           Data.Text          (Text)
-import           Data.Set           (Set )
-import           Data.List          (foldl1')
+import           Data.Text                       (Text)
+import           Data.Set                        (Set )
+import           Data.List                       (foldl1')
+
+import           Debug.Trace
 
 -- | Compute total number of nodes (and leaves) within the value tree.
 -- Each simple JavaScript type (including String) is counted as of size 1,
@@ -25,7 +28,7 @@ valueSize (Bool   _) = 1
 valueSize (Number _) = 1
 valueSize (String _) = 1
 valueSize (Array  a) = V.foldl' (+) 1 $ V.map valueSize a
-valueSize (Object o) = (1+) . sum . map valueSize . Hash.elems $ o
+valueSize (Object o) = (1+) . sum . map valueSize . Map.elems $ o
 
 -- | Compute total size of the type of the @Value@.
 -- For:
@@ -39,7 +42,7 @@ valueTypeSize (Bool   _) = 1
 valueTypeSize (Number _) = 1
 valueTypeSize (String _) = 1
 valueTypeSize (Array  a) = (1+) . V.foldl' max 0 $ V.map valueTypeSize a
-valueTypeSize (Object o) = (1+) . sum . map valueTypeSize . Hash.elems $ o
+valueTypeSize (Object o) = (1+) . sum . map valueTypeSize . Map.elems $ o
 
 -- | Compute total depth of the value.
 -- For:
@@ -51,42 +54,65 @@ valueDepth (Bool   _) = 1
 valueDepth (Number _) = 1
 valueDepth (String _) = 1
 valueDepth (Array  a) = (1+) . V.foldl' max 0 $ V.map valueDepth a
-valueDepth (Object o) = (1+) . maximum . (0:) . map valueDepth . Hash.elems $ o
+valueDepth (Object o) = (1+) . maximum . (0:) . map valueDepth . Map.elems $ o
 
 -- | Extract @Type@ from the JSON @Value@.
 -- Unifying types of array elements, if necessary.
-extractType :: Value -> Type
-extractType (Object o)                   = TObj $ Dict $ Hash.map extractType o
+extractType                             :: Value -> Type
+extractType (Object o)                   = TObj $ Dict $ Map.map extractType o
 extractType  Null                        = TNull
 extractType (Bool   _)                   = TBool
 extractType (Number _)                   = TNum
 extractType (String _)                   = TString
-extractType (Array  a) | V.null a        = TArray emptyType
-extractType (Array  a)                   = TArray $ V.foldl1' unifyTypes $ V.map extractType a
+extractType (Array  a) | V.null a        = TArray   emptyType
+extractType (Array  a)                   = TArray $ V.foldl1' unifyTypes $ traceShow $ V.map extractType a
+  where
+    traceShow a = trace (show a) a
+
+-- | Type check the value with the derived type.
+typeCheck :: Value -> Type -> Bool
+typeCheck  Null          TNull            = True
+typeCheck  v            (TUnion  u)       = typeCheck v `any` u
+typeCheck (Bool   _)     TBool            = True
+typeCheck (Number _)     TNum             = True
+typeCheck (String _)     TString          = True
+typeCheck (Array  elts) (TArray  eltType) = (`typeCheck` eltType) `all` elts
+typeCheck (Object d)    (TObj    e      ) = all typeCheckKey keysOfBoth
+  where
+    typeCheckKey k = getValue k d `typeCheck` get k e
+    getValue   :: Text -> HashMap Text Value -> Value
+    getValue    = Map.lookupDefault Null
+    keysOfBoth :: [Text]
+    keysOfBoth  =  Set.toList $ Set.fromList (Map.keys d) `Set.union` keys e
+typeCheck         _     (TLabel  _      ) = error "Cannot typecheck labels without environment!"
+typeCheck         a      b                = trace msg $ False
+  where
+    msg = "Mismatch: " ++ show a ++ " :: " ++ show b
+
+d `allKeys` e = Set.toList (keys d `Set.union` keys e)
 
 -- | Standard unification procedure on @Type@s,
 -- with inclusion of @Type@ unions.
 unifyTypes :: Type -> Type -> Type
-unifyTypes TBool        TBool                         = TBool
-unifyTypes TNum         TNum                          = TNum
-unifyTypes TString      TString                       = TString
-unifyTypes TNull        TNull                         = TNull
-unifyTypes (TObj d)     (TObj  e)                     = TObj newDict 
+unifyTypes  TBool        TBool                        = TBool
+unifyTypes  TNum         TNum                         = TNum
+unifyTypes  TString      TString                      = TString
+unifyTypes  TNull        TNull                        = TNull
+unifyTypes (TObj   d)   (TObj   e)                    = TObj newDict 
   where
     newDict :: Dict
-    newDict = Dict $ Hash.fromList [(k, get k d `unifyTypes`
-                                        get k e) | k <- allKeys ]
-    allKeys :: [Text]
-    allKeys = Set.toList (keys d `Set.union` keys e)
+    newDict = Dict $ Map.fromList [(k, get k d `unifyTypes`
+                                        get k e) | k <- allKeys d e ]
 unifyTypes (TArray u)   (TArray v)                    = TArray $ u `unifyTypes` v
 unifyTypes t            s                             = typeAsSet t `unifyUnion` typeAsSet s
 
 -- | Unify sets of types (sets are union types of alternatives).
 unifyUnion :: Set Type -> Set Type -> Type
 unifyUnion u v = assertions $
-                   union $ uSimple `Set.union`
-                           vSimple `Set.union`
-                           oset
+                   union $ uSimple        `Set.union`
+                           vSimple        `Set.union`
+                           unifiedObjects `Set.union`
+                           Set.singleton unifiedArray
   where
     -- We partition our types for easier unification into simple and compound
     (uSimple, uCompound) = Set.partition isSimple u
@@ -96,16 +122,19 @@ unifyUnion u v = assertions $
     -- then we partition compound typs into objects and arrays.
     -- Note that there should be no TUnion here, since we are inside a TUnion already.
     -- (That is reduced by @union@ smart costructor as superfluous.)
-    (uObj, uArr) = Set.partition isObject uCompound
-    (vObj, vArr) = Set.partition isObject vCompound
-    oset    = Set.fromList $ if null objects
-                               then []
-                               else [foldl1' unifyTypes objects]
+    (uObj, uArr)   = Set.partition isObject uCompound
+    (vObj, vArr)   = Set.partition isObject vCompound
+    unifiedObjects = Set.fromList $ if null objects
+                                       then []
+                                       else [foldl1' unifyTypes objects]
     objects = Set.toList $ uObj `Set.union` vObj
-    {-aset    = Set.fromList $ if null arrays
-                               then []
-                               else [foldl1' unifyTypes arrays]-}
-    --arrays  = Set.toList $ uArr `Set.union` vArr
+    arrayElts :: [Type]
+    arrayElts  = map (\(TArray ty) -> ty) $
+                   Set.toList $
+                     uArr `Set.union` vArr
+    unifiedArray = TArray $ if null arrayElts
+                               then emptyType
+                               else foldl1' unifyTypes arrayElts
 
 -- | Smart constructor for union types.
 union ::  Set Type -> Type

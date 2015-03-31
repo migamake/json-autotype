@@ -35,42 +35,8 @@ import           Data.Aeson.AutoType.Extract
 import           Data.Aeson.AutoType.Format
 import           Data.Aeson.AutoType.CodeGen
 import           Data.Aeson.AutoType.Util
+import           Data.Aeson.AutoType.Test
 import           HFlags
-
-
-instance Arbitrary Text where
-  arbitrary = Text.pack  <$> sized (`vectorOf` alphabetic)
-    where
-      alphabetic = choose ('a', 'z')
-
-instance (Arbitrary a) => Arbitrary (V.Vector a) where
-  arbitrary = V.fromList <$> arbitrary
-
-instance (Arbitrary v) => Arbitrary (Map.HashMap Text v) where
-  arbitrary = makeMap <$> arbitrary
-    where
-      makeMap  = Map.fromList . nubBy ((==) `on` fst) . sortOn fst
-
-instance Arbitrary Scientific where
-  arbitrary = scientific <$> arbitrary <*> arbitrary
-
--- TODO: top value has to be complex: Object or Array
-instance Arbitrary Value where
-  arbitrary = sized arb
-    where
-      arb n | n < 0 = error "Negative size!"
-      arb 0         = return Null
-      arb 1         = oneof                          simpleGens
-      arb i         = oneof $ complexGens (i - 1) ++ simpleGens
-      simpleGens    = [Number <$> arbitrary
-                      ,Bool   <$> arbitrary
-                      ,String <$> arbitrary]
-
-complexGens i = [Object . Map.fromList <$> resize i arbitrary,
-                 Array                 <$> resize i arbitrary]
-
-arbitraryTopValue :: Gen Value
-arbitraryTopValue = sized $ oneof . complexGens
 
 fst3 ::  (t, t1, t2) -> t
 fst3 (a, _, _) = a

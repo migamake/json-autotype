@@ -77,8 +77,8 @@ makeFromJSON identifier contents =
     , Text.unwords ["  parseJSON (Object v) =", makeParser identifier contents]
     , "  parseJSON _          = mzero" ]
   where
-    makeParser identifier [] = "return "  `Text.append` identifier
-    makeParser identifier _  = identifier `Text.append` inner
+    makeParser identifier [] = Text.unwords ["return ", identifier]
+    makeParser identifier _  = Text.unwords [identifier, "<$>", inner]
     inner                    = " <*> " `Text.intercalate`
                                   map (takeValue . fst) contents
     takeValue jsonId = Text.concat ["v .: \"", jsonId, "\""]

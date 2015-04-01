@@ -3,6 +3,7 @@ Changelog
     0.2.5.12  Apr 2015
 
         * Added typechecking before and after type unification.
+        * Added shrink for more informative QuickCheck testing.
 
     0.2.5.11  Mar 2015
 

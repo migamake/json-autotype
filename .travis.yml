@@ -4,11 +4,16 @@ matrix:
   allow_failures:
     - env: GHCVER=head   CABALVER=head
     - env: GHCVER=7.10.1 CABALVER=1.22
+    - env: GHCVER=7.8.3  CABALVER=1.18
+    - env: GHCVER=7.6.3  CABALVER=1.18
+    - env: GHCVER=7.4.2  CABALVER=1.18
 
 env:
  - GHCVER=head   CABALVER=head
  - GHCVER=7.10.1 CABALVER=1.22
  - GHCVER=7.8.3  CABALVER=1.18
+ - GHCVER=7.6.3  CABALVER=1.18
+ - GHCVER=7.4.2  CABALVER=1.18
 
 before_install:
  - sudo add-apt-repository -y ppa:hvr/ghc

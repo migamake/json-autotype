@@ -1,10 +1,16 @@
-{-# LANGUAGE TemplateHaskell, ScopedTypeVariables, OverloadedStrings #-}
-{-# LANGUAGE DeriveGeneric, StandaloneDeriving, ViewPatterns #-}
+{-# LANGUAGE TemplateHaskell      #-}
+{-# LANGUAGE ScopedTypeVariables  #-}
+{-# LANGUAGE OverloadedStrings    #-}
+{-# LANGUAGE DeriveGeneric        #-}
+{-# LANGUAGE StandaloneDeriving   #-}
+{-# LANGUAGE ViewPatterns         #-}
 {-# OPTIONS_GHC -fno-warn-orphans #-}
 module Main where
 
 import           Control.Applicative
+import           Control.Monad
 import           Data.Maybe
+import           Data.List                 (partition)
 import           System.Exit
 import           System.IO                 (stdin, stderr, stdout, IOMode(..))
 import           System.FilePath           (splitExtension)
@@ -35,6 +41,7 @@ defineFlag "suggest"           True                  "Suggest candidates for uni
 defineFlag "autounify"         True                  "Automatically unify suggested candidates"
 defineFlag "t:test"            False                 "Try to run generated parser after"
 defineFlag "d:debug"           False                 "Set this flag to see more debugging info"
+defineFlag "y:typecheck"       True                  "Set this flag to typecheck after unification"
 defineFlag "fakeFlag"          True                  "Ignore this flag - it doesn't exist!!! It is workaround to library problem."
 
 -- Tracing is switched off:
@@ -52,7 +59,7 @@ fatal    :: Text -> IO ()
 fatal msg = do report msg
                exitFailure
 
-extractTypeFromJSONFile :: FilePath -> IO (Maybe Type)
+extractTypeFromJSONFile :: FilePath -> IO (Maybe (FilePath, Type, Value))
 extractTypeFromJSONFile inputFilename =
       withFileOrHandle inputFilename ReadMode stdin $ \hIn ->
         -- First we decode JSON input into Aeson's Value type
@@ -64,20 +71,38 @@ extractTypeFromJSONFile inputFilename =
                            return Nothing
              Just v  -> do -- If decoding JSON was successful...
                -- We extract type structure from the JSON value.
-               let t        = extractType v
+               let t :: Type = extractType v
                myTrace $ "Type: " ++ pretty t
-               return $ Just t
+               (v `typeCheck` t) `unless` fatal "TypeCheck failed!"
+               return $ Just (inputFilename, t, v)
+
+-- | Type checking all input files with given type,
+-- and return a list of filenames for files that passed the check.
+typeChecking :: Type -> [FilePath] -> [Value] -> IO [FilePath]
+typeChecking ty filenames values = do
+    when (not $ null failures ) $ report $ Text.unwords $ "Failed to typecheck: ":(Text.pack `map` failures)
+    when (      null successes) $ fatal    "No files passed the typecheck."
+    return successes
+  where
+    checkedFiles = zip filenames $ map (`typeCheck` ty) values
+    (map fst -> successes,
+     map fst -> failures) = partition snd checkedFiles
 
 -- | Take a set of JSON input filenames, Haskell output filename, and generate module parsing these JSON files.
 generateHaskellFromJSONs :: [FilePath] -> FilePath -> IO ()
 generateHaskellFromJSONs inputFilenames outputFilename = do
   -- Read type from each file
-  typeForEachFile  <- catMaybes <$> mapM extractTypeFromJSONFile inputFilenames
+  (filenames,
+   typeForEachFile,
+   valueForEachFile) <- (unzip3 . catMaybes) <$> mapM extractTypeFromJSONFile inputFilenames
   -- Unify all input types
   when (null typeForEachFile) $ do
     report "No valid JSON input file..."
     exitFailure
   let finalType = foldr1 unifyTypes typeForEachFile
+  passedTypeCheck <- if flags_typecheck
+                        then typeChecking finalType filenames valueForEachFile
+                        else return                 filenames
   -- We split different dictionary labels to become different type trees (and thus different declarations.)
   let splitted = splitTypeByLabel "TopLevel" finalType
   myTrace $ "SPLITTED: " ++ pretty splitted
@@ -96,7 +121,7 @@ generateHaskellFromJSONs inputFilenames outputFilename = do
   -- We start by writing module header
   writeHaskellModule outputFilename unified
   when flags_test $
-    exitWith =<< system (unwords $ ["runghc", outputFilename] ++ inputFilenames)
+    exitWith =<< system (unwords $ ["runghc", outputFilename] ++ passedTypeCheck)
 
 main :: IO ()
 main = do filenames <- $initHFlags "json-autotype -- automatic type and parser generation from JSON"

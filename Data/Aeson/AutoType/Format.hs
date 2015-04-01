@@ -30,7 +30,8 @@ import           Data.Aeson.AutoType.Type
 import           Data.Aeson.AutoType.Extract
 import           Data.Aeson.AutoType.Util  ()
 
-import           Debug.Trace -- DEBUG
+--import           Debug.Trace -- DEBUG
+trace _ x = x
 
 fst3 ::  (t, t1, t2) -> t
 fst3 (a, _b, _c) = a

@@ -6,6 +6,7 @@ module Data.Aeson.AutoType.Test (
 
 import Data.Aeson
 import Data.Function               (on)
+import Data.Generics.Uniplate.Data
 import Data.List
 import Data.Scientific
 import qualified Data.Text as Text
@@ -44,6 +45,13 @@ instance Arbitrary Value where
       simpleGens    = [Number <$> arbitrary
                       ,Bool   <$> arbitrary
                       ,String <$> arbitrary]
+  shrink = concatMap simpleShrink
+         . universe
+
+simpleShrink :: Value -> [Value]
+simpleShrink (Array  a) = map (Array  .   V.fromList) $ shrink $ V.toList   a
+simpleShrink (Object o) = map (Object . Map.fromList) $ shrink $ Map.toList o
+simpleShrink _          = [] -- Nothing for simple objects
 
 -- | Generators of compound structures: object and array.
 complexGens i = [Object . Map.fromList <$> resize i arbitrary,

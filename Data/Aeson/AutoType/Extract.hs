@@ -73,12 +73,12 @@ extractType (Array  a)                   = TArray $ V.foldl1' unifyTypes $ trace
 -- | Type check the value with the derived type.
 typeCheck :: Value -> Type -> Bool
 typeCheck  Null          TNull            = True
-typeCheck  v            (TUnion  u)       = typeCheck v `any` u
+typeCheck  v            (TUnion  u)       = typeCheck v `any` Set.toList u
 typeCheck (Bool   _)     TBool            = True
 typeCheck (Number _)     TNum             = True
 typeCheck (String _)     TString          = True
-typeCheck (Array  elts) (TArray  eltType) = (`typeCheck` eltType) `all` elts
-typeCheck (Object d)    (TObj    e      ) = all typeCheckKey keysOfBoth
+typeCheck (Array  elts) (TArray  eltType) = (`typeCheck` eltType) `all` V.toList elts
+typeCheck (Object d)    (TObj    e      ) = typeCheckKey `all` keysOfBoth
   where
     typeCheckKey k = getValue k d `typeCheck` get k e
     getValue   :: Text -> HashMap Text Value -> Value
@@ -95,17 +95,17 @@ d `allKeys` e = Set.toList (keys d `Set.union` keys e)
 -- | Standard unification procedure on @Type@s,
 -- with inclusion of @Type@ unions.
 unifyTypes :: Type -> Type -> Type
-unifyTypes  TBool        TBool                        = TBool
-unifyTypes  TNum         TNum                         = TNum
-unifyTypes  TString      TString                      = TString
-unifyTypes  TNull        TNull                        = TNull
-unifyTypes (TObj   d)   (TObj   e)                    = TObj newDict 
+unifyTypes  TBool      TBool     = TBool
+unifyTypes  TNum       TNum      = TNum
+unifyTypes  TString    TString   = TString
+unifyTypes  TNull      TNull     = TNull
+unifyTypes (TObj   d) (TObj   e) = TObj newDict 
   where
     newDict :: Dict
     newDict = Dict $ Map.fromList [(k, get k d `unifyTypes`
                                         get k e) | k <- allKeys d e ]
-unifyTypes (TArray u)   (TArray v)                    = TArray $ u `unifyTypes` v
-unifyTypes t            s                             = typeAsSet t `unifyUnion` typeAsSet s
+unifyTypes (TArray u) (TArray v) = TArray $ u `unifyTypes` v
+unifyTypes t           s         = typeAsSet t `unifyUnion` typeAsSet s
 
 -- | Unify sets of types (sets are union types of alternatives).
 unifyUnion :: Set Type -> Set Type -> Type

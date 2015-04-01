@@ -4,7 +4,7 @@ module Data.Aeson.AutoType.Test (
     arbitraryTopValue
   ) where
 
-import           Data.Applicative                    ((<$>))
+import           Control.Applicative                 ((<$>))
 import           Data.Aeson
 import           Data.Function                       (on)
 import           Data.Generics.Uniplate.Data

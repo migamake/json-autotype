@@ -73,14 +73,16 @@ extractTypeFromJSONFile inputFilename =
                -- We extract type structure from the JSON value.
                let t :: Type = extractType v
                myTrace $ "Type: " ++ pretty t
-               (v `typeCheck` t) `unless` fatal "TypeCheck failed!"
+               (v `typeCheck` t) `unless` fatal ("Typecheck against base type failed for "
+                                                    `Text.append` Text.pack inputFilename)
                return $ Just (inputFilename, t, v)
 
 -- | Type checking all input files with given type,
 -- and return a list of filenames for files that passed the check.
 typeChecking :: Type -> [FilePath] -> [Value] -> IO [FilePath]
 typeChecking ty filenames values = do
-    when (not $ null failures ) $ report $ Text.unwords $ "Failed to typecheck: ":(Text.pack `map` failures)
+    when (not $ null failures ) $ report $ Text.unwords $ "Failed to typecheck with unified type: ":
+                                                          (Text.pack `map` failures)
     when (      null successes) $ fatal    "No files passed the typecheck."
     return successes
   where

@@ -82,7 +82,7 @@ emptyType = TUnion Set.empty
 
 -- | Lookup the Type within the dictionary.
 get :: Text -> Dict -> Type
-get key = Hash.lookupDefault emptyType key . unDict 
+get key = Hash.lookupDefault TNull key . unDict 
 
 -- $derive makeUniplateDirect ''Type
 

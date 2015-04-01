@@ -1,5 +1,9 @@
 Changelog
 =========
+    0.2.5.12  Apr 2015
+
+        * Added typechecking before and after type unification.
+
     0.2.5.11  Mar 2015
 
         * Add short versions of command line flags: -o, -d, and -t.

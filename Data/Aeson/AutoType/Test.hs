@@ -4,17 +4,19 @@ module Data.Aeson.AutoType.Test (
     arbitraryTopValue
   ) where
 
-import Data.Aeson
-import Data.Function               (on)
-import Data.Generics.Uniplate.Data
-import Data.List
-import Data.Scientific
-import qualified Data.Text as Text
-import           Data.Text         (Text)
-import qualified Data.Vector as V
-import qualified Data.HashMap.Strict as Map
-import Test.QuickCheck.Arbitrary
-import Test.QuickCheck
+import           Data.Applicative                    ((<$>))
+import           Data.Aeson
+import           Data.Function                       (on)
+import           Data.Generics.Uniplate.Data
+import           Data.List
+import           Data.Scientific
+import qualified Data.Text                   as Text
+import           Data.Text                           (Text)
+import qualified Data.Vector                 as V
+import qualified Data.HashMap.Strict         as Map
+
+import           Test.QuickCheck.Arbitrary
+import           Test.QuickCheck
 
 instance Arbitrary Text where
   arbitrary = Text.pack  <$> sized (`vectorOf` alphabetic)

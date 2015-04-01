@@ -112,7 +112,9 @@ executable json-autotype
 -- test suites
 executable json-autotype-random-test
   main-is:             GenerateTestJSON.hs
-  other-modules:       Data.Aeson.AutoType.Util
+  other-modules:       Data.Aeson.AutoType.Util,
+                       Data.Aeson.AutoType.Test,
+                       Data.Aeson.AutoType.Type
   other-extensions:    TemplateHaskell,
                        ScopedTypeVariables,
                        OverloadedStrings,

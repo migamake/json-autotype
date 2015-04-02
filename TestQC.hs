@@ -24,7 +24,7 @@ prop_valueTypeSizeAndTypeSize  ::  Value -> Bool
 prop_valueTypeSizeAndTypeSize v = valueTypeSize v >= typeSize (extractType v) -}
 
 main :: IO ()
-main  = verboseCheck prop_typeCheck
+main  = quickCheck   prop_typeCheck
                          {- prop_typeSize,
                           prop_valueAndValueTypeSize,
                           prop_valueTypeSizeAndTypeSize]-}

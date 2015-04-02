@@ -4,6 +4,7 @@ Changelog
 
         * Added typechecking before and after type unification.
         * Added shrink for more informative QuickCheck testing.
+        * Tested mostly using GHC 7.10.
 
     0.2.5.11  Mar 2015
 

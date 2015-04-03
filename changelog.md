@@ -1,5 +1,10 @@
 Changelog
 =========
+    0.2.5.13  Apr 2015
+
+        * Correctly handling lone option, not yet union with optionality.
+          Fixed: #3.
+
     0.2.5.12  Apr 2015
 
         * Added typechecking before and after type unification.

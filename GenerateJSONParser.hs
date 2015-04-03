@@ -32,9 +32,6 @@ import           Data.Aeson.AutoType.CodeGen
 import           Data.Aeson.AutoType.Util
 import           HFlags
 
-fst3 ::  (t, t1, t2) -> t
-fst3 (a, _, _) = a
-
 -- * Command line flags
 defineFlag "o:outputFilename"  defaultOutputFilename "Write output to the given file"
 defineFlag "suggest"           True                  "Suggest candidates for unification"
@@ -44,7 +41,7 @@ defineFlag "d:debug"           False                 "Set this flag to see more 
 defineFlag "y:typecheck"       True                  "Set this flag to typecheck after unification"
 defineFlag "fakeFlag"          True                  "Ignore this flag - it doesn't exist!!! It is workaround to library problem."
 
--- Tracing is switched off:
+-- | Works like @Debug.trace@ when the --debug flag is enabled, and does nothing otherwise.
 myTrace :: String -> IO ()
 myTrace msg = if flags_debug
                 then putStrLn msg
@@ -59,6 +56,9 @@ fatal    :: Text -> IO ()
 fatal msg = do report msg
                exitFailure
 
+-- | Extracts type from JSON file, along with the original @Value@.
+-- In order to facilitate dealing with failures, it returns a triple of
+-- @FilePath@, extracted @Type@, and a JSON @Value@.
 extractTypeFromJSONFile :: FilePath -> IO (Maybe (FilePath, Type, Value))
 extractTypeFromJSONFile inputFilename =
       withFileOrHandle inputFilename ReadMode stdin $ \hIn ->
@@ -125,6 +125,7 @@ generateHaskellFromJSONs inputFilenames outputFilename = do
   when flags_test $
     exitWith =<< system (unwords $ ["runghc", outputFilename] ++ passedTypeCheck)
 
+-- | Initialize flags, and run @generateHaskellFromJSONs@.
 main :: IO ()
 main = do filenames <- $initHFlags "json-autotype -- automatic type and parser generation from JSON"
           -- TODO: should integrate all inputs into single type set!!!

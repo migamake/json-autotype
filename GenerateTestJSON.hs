@@ -38,20 +38,18 @@ import           Data.Aeson.AutoType.Util
 import           Data.Aeson.AutoType.Test
 import           HFlags
 
-fst3 ::  (t, t1, t2) -> t
-fst3 (a, _, _) = a
-
 -- * Command line flags
 defineFlag "z:size"            (10     :: Int)        "Size of generated elements"
 defineFlag "s:stem"            ("Test" :: FilePath)   "Test filename stem"
 defineFlag "c:count"           (100    :: Int)        "Number of test cases to generate."
-defineFlag "o:outputFilename"   defaultOutputFilename "Write output to the given file"
-defineFlag "suggest"            True                  "Suggest candidates for unification"
+--defineFlag "o:outputFilename"   defaultOutputFilename "Write output to the given file"
+flags_suggest = True
+--defineFlag "suggest"            True                  "Suggest candidates for unification"
 defineFlag "autounify"          True                  "Automatically unify suggested candidates"
-defineFlag "t:test"             False                 "Try to run generated parser after"
+defineFlag "t:test"             True                  "Try to run generated parser after"
 defineFlag "d:debug"            False                 "Set this flag to see more debugging info"
 defineFlag "keep"               False                 "Keep also the successful tests"
-defineFlag "fakeFlag"           True                  "Ignore this flag - it doesn't exist!!! It is workaround to library problem."
+defineFlag "fakeFlag"           True                  "Ignore this flag - it doesn't exist!!! It is workaround for a library problem."
 
 -- Tracing is switched off:
 myTrace :: String -> IO ()

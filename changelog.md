@@ -1,5 +1,10 @@
 Changelog
 =========
+    0.3  Apr 2015
+
+        * Passed all smallcheck/quickcheck tests.
+        * Approaching release candidate.
+
     0.2.5.13  Apr 2015
 
         * Correctly handling lone option, not yet union with optionality.

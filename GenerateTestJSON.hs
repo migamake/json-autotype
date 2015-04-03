@@ -156,7 +156,7 @@ generateTestJSONs = do
         writeHaskellModule outputFilename unified
         if flags_test
           then do
-            r <- (==ExitSuccess) <$> system (unwords $ ["runghc", outputFilename] ++ inputFilenames)
+            r <- (==ExitSuccess) <$> system (unwords $ ["runghc", outputFilename, inputFilename])
             when r $ mapM_ removeFile [inputFilename, outputFilename]
             return r
           else

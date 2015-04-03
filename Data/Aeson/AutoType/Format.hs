@@ -159,19 +159,22 @@ escapeKeywords ::  Text -> Text
 escapeKeywords k | k `Set.member` keywords = k `Text.append` "_"
 escapeKeywords k                           = k
 
+-- | Format the type within DeclM monad, that records
+-- the separate declarations on which this one is dependent.
 formatType :: Type -> DeclM Text
-formatType  TString                          =    return "Text"
-formatType  TNum                             =    return "Int"
-formatType  TBool                            =    return "Bool"
-formatType (TLabel l)                        =    return $ normalizeTypeName l
-formatType (TUnion u) | (TNull==) `any` u    = do fmt <- formatType $ head $ Set.toList $ Set.filter (TNull /=) u
-                                                  return $ Text.concat ["Maybe (", fmt, ")"]
-formatType (TUnion u)                        = do tys <- forM (Set.toList u) formatType
-                                                  return $ mkUnion tys
+formatType  TString                          = return "Text"
+formatType  TNum                             = return "Int"
+formatType  TBool                            = return "Bool"
+formatType (TLabel l)                        = return $ normalizeTypeName l
+formatType (TUnion u)                        = wrap <$> case length nonNull of
+                                                          0 -> return emptyTypeRepr
+                                                          1 -> formatType $ head nonNull
+                                                          _ -> Text.intercalate ":|:" <$> mapM formatType nonNull
   where
-    mkUnion []       = emptyTypeRepr
-    mkUnion nonEmpty = foldr1 mkEither nonEmpty
-      where mkEither a b = Text.concat [a, " :|: ", b]
+    nonNull       = Set.toList $ Set.filter (TNull /=) u
+    wrap                                :: Text -> Text
+    wrap   inner  | TNull `Set.member` u = Text.concat ["(Maybe (", inner, "))"]
+                  | otherwise            =                          inner
 formatType (TArray a)                        = do inner <- formatType a
                                                   return $ Text.concat ["[", inner, "]"]
 formatType (TObj   o)                        = do ident <- genericIdentifier
@@ -182,7 +185,7 @@ formatType  e | e `Set.member` emptySetLikes = return emptyTypeRepr
 formatType  t                                = return $ "ERROR: Don't know how to handle: " `Text.append` tShow t
 
 emptyTypeRepr :: Text
-emptyTypeRepr = "Maybe Value" -- default, accepts future extension where we found no data
+emptyTypeRepr = "(Maybe Value)" -- default, accepts future extension where we found no data
 
 runDecl ::  DeclM a -> Text
 runDecl decl = Text.unlines $ finalState ^. decls

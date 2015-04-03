@@ -68,7 +68,7 @@ wrapDecl identifier contents = Text.unlines [header, contents, "  } deriving (Sh
 -- First element of the triple is original JSON identifier,
 -- second element of the triple is the mapped identifier name in Haskell.
 -- third element of the triple shows the type in a formatted way
-type MappedKey = (Text, Text, Text)
+type MappedKey = (Text, Text, Text, Bool)
 
 -- | Make ToJSON declaration, given identifier (object name in Haskell) and mapping of its keys
 -- from JSON to Haskell identifiers *in the same order* as in *data type declaration*.
@@ -83,8 +83,8 @@ makeFromJSON identifier contents =
     makeParser identifier _  = Text.unwords [identifier, "<$>", inner]
     inner                    = " <*> " `Text.intercalate`
                                   map takeValue contents
-    takeValue (jsonId, _, ty) | isNullable ty  = Text.concat ["v .:? \"", jsonId, "\""]
-    takeValue (jsonId, _, _ )                  = Text.concat ["v .:  \"", jsonId, "\""]
+    takeValue (jsonId, _, ty, True ) = Text.concat ["v .:? \"", jsonId, "\""] -- nullable types
+    takeValue (jsonId, _, _ , False) = Text.concat ["v .:  \"", jsonId, "\""]
 -- Contents example for wrapFromJSON:
 -- " <$>
 --"                           v .: "hexValue"  <*>
@@ -103,7 +103,7 @@ makeToJSON identifier contents =
              | otherwise            = ".."
     inner = ", " `Text.intercalate`
               map putValue contents
-    putValue (jsonId, haskellId, _typeText) = Text.unwords [escapeText jsonId, ".=", haskellId]
+    putValue (jsonId, haskellId, _typeText, _nullable) = Text.unwords [escapeText jsonId, ".=", haskellId]
     escapeText = Text.pack . show . Text.unpack
 -- Contents example for wrapToJSON
 --"hexValue"  .= hexValue
@@ -120,22 +120,19 @@ genericIdentifier = do
 newDecl :: Text -> [(Text, Type)] -> DeclM Text
 newDecl identifier kvs = do attrs <- forM kvs $ \(k, v) -> do
                               formatted <- formatType v
-                              return (k, normalizeFieldName identifier k, formatted)
+                              return (k, normalizeFieldName identifier k, formatted, isNullable v)
                             let decl = Text.unlines [wrapDecl     identifier $ fieldDecls attrs
                                                     ,""
-                                                    ,makeFromJSON identifier attrs
+                                                    ,makeFromJSON identifier              attrs
                                                     ,""
-                                                    ,makeToJSON   identifier attrs]
+                                                    ,makeToJSON   identifier              attrs]
                             addDecl decl
                             return identifier
   where
     fieldDecls attrList = Text.intercalate ",\n" $ map fieldDecl attrList
-    fieldDecl :: (Text, Text, Text) -> Text
-    fieldDecl (_jsonName, haskellName, fType) = Text.concat [
-                                                  "    ", haskellName, " :: ", fType]
-
--- | Whether the type is nullable or in other words - represented by Maybe type.
-isNullable = ("Maybe" `Text.isPrefixOf`)
+    fieldDecl :: (Text, Text, Text, Bool) -> Text
+    fieldDecl (_jsonName, haskellName, fType, _nullable) = Text.concat [
+                                                             "    ", haskellName, " :: ", fType]
 
 addDecl decl = decls %%= (\ds -> ((), decl:ds))
 
@@ -160,9 +157,6 @@ keywords = Set.fromList ["type", "data", "module", "class", "where", "let", "do"
 escapeKeywords ::  Text -> Text
 escapeKeywords k | k `Set.member` keywords = k `Text.append` "_"
 escapeKeywords k                           = k
-
-emptySetLikes ::  Set Type
-emptySetLikes = Set.fromList [TNull, TArray $ TUnion $ Set.fromList []]
 
 formatType :: Type -> DeclM Text
 formatType  TString                          =    return "Text"
@@ -189,7 +183,7 @@ formatType  e | e `Set.member` emptySetLikes = return emptyTypeRepr
 formatType  t                                = return $ "ERROR: Don't know how to handle: " `Text.append` tShow t
 
 emptyTypeRepr :: Text
-emptyTypeRepr = "Maybe Text" -- default...
+emptyTypeRepr = "Maybe Value" -- default, accepts future extension where we found no data
 
 runDecl ::  DeclM a -> Text
 runDecl decl = Text.unlines $ finalState ^. decls

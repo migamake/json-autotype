@@ -21,11 +21,13 @@ infixr 5 :|:
 toEither :: a :|: b -> Either a b
 toEither (AltLeft  a) = Left  a
 toEither (AltRight b) = Right b
+{-# INLINE toEither #-}
 
 -- | Convert from @Either@ datatype.
 fromEither :: Either a b -> a :|: b
 fromEither (Left  a) = AltLeft  a
 fromEither (Right b) = AltRight b
+{-# INLINE fromEither #-}
 
 -- | Deconstruct the type with two functions corresponding to constructors.
 -- This is like @either@.

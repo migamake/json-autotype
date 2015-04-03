@@ -1,5 +1,9 @@
-{-# LANGUAGE TemplateHaskell, ScopedTypeVariables, OverloadedStrings #-}
-{-# LANGUAGE DeriveGeneric, StandaloneDeriving, ViewPatterns #-}
+{-# LANGUAGE TemplateHaskell     #-}
+{-# LANGUAGE ScopedTypeVariables #-}
+{-# LANGUAGE OverloadedStrings   #-}
+{-# LANGUAGE DeriveGeneric       #-}
+{-# LANGUAGE StandaloneDeriving  #-}
+{-# LANGUAGE ViewPatterns        #-}
 {-# OPTIONS_GHC -fno-warn-orphans #-}
 
 -- | Instances of @Text.PrettyPrint.Out@ class to visualize

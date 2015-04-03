@@ -10,6 +10,7 @@ import           Data.Aeson.AutoType.Pretty          () -- Generic instance for 
 import           Control.Applicative                 ((<$>), (<*>))
 import           Data.Aeson
 import           Data.Function                       (on)
+import           Data.Hashable                       (Hashable)
 import           Data.Generics.Uniplate.Data
 import           Data.List
 import           Data.Scientific
@@ -36,6 +37,7 @@ instance (Arbitrary v) => Arbitrary (Map.HashMap Text v) where
 
 -- | Helper function for generating Arbitrary and Series instances
 -- for @Data.HashMap.Strict.Map@ from lists of pairs.
+makeMap :: (Ord a, Hashable a) =>[(a, b)] -> Map.HashMap a b
 makeMap  = Map.fromList
          . nubBy  ((==)    `on` fst)
          . sortBy (compare `on` fst)
@@ -58,12 +60,14 @@ instance Arbitrary Value where
   shrink = concatMap simpleShrink
          . universe
 
-simpleShrink :: Value -> [Value]
+-- | Transformation to shrink top level of @Value@, doesn't consider nested sub-@Value@s.
+simpleShrink           :: Value -> [Value]
 simpleShrink (Array  a) = map (Array  .   V.fromList) $ shrink $ V.toList   a
 simpleShrink (Object o) = map (Object . Map.fromList) $ shrink $ Map.toList o
 simpleShrink _          = [] -- Nothing for simple objects
 
--- | Generators of compound structures: object and array.
+-- | Generator for compound @Value@s
+complexGens ::  Int -> [Gen Value]
 complexGens i = [Object . Map.fromList <$> resize i arbitrary,
                  Array                 <$> resize i arbitrary]
 

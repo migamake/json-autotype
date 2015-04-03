@@ -1,6 +1,10 @@
-{-# LANGUAGE DeriveDataTypeable, DeriveGeneric #-}
-{-# LANGUAGE FlexibleInstances, MultiParamTypeClasses #-}
-{-# LANGUAGE ViewPatterns, OverloadedStrings #-}
+{-# LANGUAGE DeriveDataTypeable    #-}
+{-# LANGUAGE DeriveGeneric         #-}
+{-# LANGUAGE FlexibleInstances     #-}
+{-# LANGUAGE MultiParamTypeClasses #-}
+{-# LANGUAGE ViewPatterns          #-}
+{-# LANGUAGE OverloadedStrings     #-}
+-- | Union types describing JSON objects, and operations for querying these types.
 module Data.Aeson.AutoType.Type(typeSize,
                                 Dict(..), keys, get, withDict,
                                 Type(..), emptyType,
@@ -8,7 +12,8 @@ module Data.Aeson.AutoType.Type(typeSize,
                                 hasNonTopTObj,
                                 hasTObj,
                                 isNullable,
-                                emptySetLikes) where
+                                emptySetLikes
+  ) where
 
 import           Prelude             hiding (any)
 import qualified Data.HashMap.Strict as Hash
@@ -28,10 +33,11 @@ import qualified Data.Text           as Text
 
 import           Data.Aeson.AutoType.Pretty
 
+-- * Dictionary types for overloading of usual class instances.
 -- | Type alias for HashMap
 type Map = HashMap
 
--- * Dictionary of types indexed by names.
+-- | Dictionary of types indexed by names.
 newtype Dict = Dict { unDict :: Map Text Type }
   deriving (Eq, Data, Typeable, Generic)
 
@@ -53,7 +59,7 @@ f `withDict` (Dict m) = Dict $ f m
 keys :: Dict -> Set Text
 keys = Set.fromList . Hash.keys . unDict
 
--- * Type
+-- | Union types for JSON values.
 data Type = TNull | TBool | TNum | TString |
             TUnion (Set      Type)         |
             TLabel  Text                   |
@@ -91,7 +97,7 @@ get key = Hash.lookupDefault TNull key . unDict
 -- $derive makeUniplateDirect ''Type
 
 -- | Size of the `Type` term.
-typeSize :: Type -> Int
+typeSize           :: Type -> Int
 typeSize TNull      = 1
 typeSize TBool      = 1
 typeSize TNum       = 1

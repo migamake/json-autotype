@@ -4,6 +4,7 @@
 {-# LANGUAGE OverloadedStrings   #-}
 {-# LANGuaGE DeriveGeneric       #-}
 {-# LANGuaGE FlexibleContexts    #-}
+-- | Formatting type declarations and class instances for inferred types. 
 module Data.Aeson.AutoType.Format(
   displaySplitTypes, splitTypeByLabel, unificationCandidates,
   unifyCandidates
@@ -228,6 +229,7 @@ formatObjectType identifier (TObj o) = newDecl  identifier d
     d = Map.toList $ unDict o
 formatObjectType identifier  other   = newAlias identifier other
 
+-- | Display an environment of types split by name.
 displaySplitTypes ::  Map Text Type -> Text
 displaySplitTypes dict = trace ("displaySplitTypes: " ++ show (toposort dict)) $ runDecl declarations
   where

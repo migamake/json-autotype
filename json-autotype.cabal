@@ -147,7 +147,8 @@ executable json-autotype-random-test
   default-language:    Haskell2010
 
 -- test suite with QuickCheck
-executable json-autotype-qc-test
+test-suite json-autotype-qc-test
+  type:                exitcode-stdio-1.0
   main-is:             TestQC.hs
   other-modules:       Data.Aeson.AutoType.Util,
                        Data.Aeson.AutoType.Test,

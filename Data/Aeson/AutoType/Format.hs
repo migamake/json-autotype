@@ -163,10 +163,8 @@ formatType  TString                          =    return "Text"
 formatType  TNum                             =    return "Int"
 formatType  TBool                            =    return "Bool"
 formatType (TLabel l)                        =    return $ normalizeTypeName l
-formatType (TUnion u) | uu <- u `Set.difference` emptySetLikes,
-                        Set.size uu == 1     = do fmt <- formatType $ head $ Set.toList uu
-                                                  return $ "Maybe " `Text.append` fmt
--- TODO: Use Maybe (...) when nullable?
+formatType (TUnion u) | (TNull==) `any` u    = do fmt <- formatType $ head $ Set.toList $ Set.filter (TNull /=) u
+                                                  return $ Text.concat ["Maybe (", fmt, ")"]
 formatType (TUnion u)                        = do tys <- forM (Set.toList u) formatType
                                                   return $ mkUnion tys
   where

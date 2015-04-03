@@ -28,3 +28,6 @@ twitterapi.hs
 youtube.hs
 Test*.json
 Test*.hs
+TestQC
+GenerateJSONTest
+GenerateJSONParser

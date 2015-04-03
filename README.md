@@ -4,7 +4,7 @@ Takes a JSON format input, and generates automatic Haskell type declarations.
 
 Parser and printer instances are derived using [Aeson](http://hackage.haskell.org/package/aeson).
 
-The program uses union type unification to trim output declarations. The types of same attribute tag and similar attribute set, are automatically unified using recognition by attribute set matching. (This option can be optionally turned off, or a set of unified types may be given explicitly.) `Either` alternatives is used to assure that all `JSON` inputs seen in example input file are handled correctly.
+The program uses union type unification to trim output declarations. The types of same attribute tag and similar attribute set, are automatically unified using recognition by attribute set matching. (This option can be optionally turned off, or a set of unified types may be given explicitly.) `:|:` alternatives (similar to `Either`) are used to assure that all `JSON` inputs seen in example input file are handled correctly.
 
 I should probably write a short paper to explain the methodology.
 
@@ -92,7 +92,7 @@ It will produce quite intuitive result (plus extra parentheses, and class deriva
 
 ```
     data Parameter = Parameter {
-        parameterParameterValue :: Either Bool (Either Int Text),
+        parameterParameterValue :: Bool :|: Int :|: Text,
         parameterParameterName :: Text
       }
 

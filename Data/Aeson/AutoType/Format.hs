@@ -11,6 +11,7 @@ module Data.Aeson.AutoType.Format(
 ) where
 
 import           Control.Arrow             ((&&&))
+import           Control.Applicative       ((<$>), (<*>))
 import           Control.Lens.TH
 import           Control.Lens
 import           Control.Monad             (forM)

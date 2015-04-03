@@ -1,8 +1,11 @@
-{-# LANGUAGE FlexibleInstances #-}
+{-# LANGUAGE FlexibleInstances     #-}
+{-# LANGUAGE MultiParamTypeClasses #-}
 -- | Arbitrary instances for the JSON @Value@.
 module Data.Aeson.AutoType.Test (
     arbitraryTopValue
   ) where
+
+import           Data.Aeson.AutoType.Pretty          () -- Generic instance for Value
 
 import           Control.Applicative                 ((<$>), (<*>))
 import           Data.Aeson
@@ -14,9 +17,11 @@ import qualified Data.Text                   as Text
 import           Data.Text                           (Text)
 import qualified Data.Vector                 as V
 import qualified Data.HashMap.Strict         as Map
+import           GHC.Generics
 
 import           Test.QuickCheck.Arbitrary
 import           Test.QuickCheck
+import           Test.SmallCheck.Series
 
 instance Arbitrary Text where
   arbitrary = Text.pack  <$> sized (`vectorOf` alphabetic)
@@ -28,15 +33,18 @@ instance (Arbitrary a) => Arbitrary (V.Vector a) where
 
 instance (Arbitrary v) => Arbitrary (Map.HashMap Text v) where
   arbitrary = makeMap <$> arbitrary
-    where
-      makeMap  = Map.fromList
-               . nubBy  ((==)    `on` fst)
-               . sortBy (compare `on` fst)
+
+-- | Helper function for generating Arbitrary and Series instances
+-- for @Data.HashMap.Strict.Map@ from lists of pairs.
+makeMap  = Map.fromList
+         . nubBy  ((==)    `on` fst)
+         . sortBy (compare `on` fst)
 
 instance Arbitrary Scientific where
   arbitrary = scientific <$> arbitrary <*> arbitrary
 
 -- TODO: top value has to be complex: Object or Array
+-- TODO: how to accumulate cost when generating the series?
 instance Arbitrary Value where
   arbitrary = sized arb
     where
@@ -61,5 +69,21 @@ complexGens i = [Object . Map.fromList <$> resize i arbitrary,
 
 -- | Arbitrary JSON (must start with Object or Array.)
 arbitraryTopValue :: Gen Value
-arbitraryTopValue = sized $ oneof . complexGens
+arbitraryTopValue  = sized $ oneof . complexGens
+
+-- * SmallCheck Serial instances
+instance Monad m => Serial m Text where
+  series = newtypeCons Text.pack
+
+instance Monad m => Serial m Scientific where
+  series = cons2 scientific
+
+instance Serial m a => Serial m (V.Vector a) where
+  series = newtypeCons V.fromList
+
+instance Serial m v => Serial m (Map.HashMap Text v) where
+  series = newtypeCons makeMap
+
+-- This one is generated with Generics and instances above
+instance Monad m => Serial m Value
 

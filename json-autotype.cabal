@@ -172,6 +172,7 @@ executable json-autotype-qc-test
                        pretty               >=1.1  && <1.3,
                        process              >=1.1  && <1.4,
                        scientific           >=0.3  && <0.5,
+                       smallcheck           >=1.0  && <1.2,
                        text                 >=1.1  && <1.4,
                        uniplate             >=1.6  && <1.7,
                        unordered-containers >=0.2  && <0.3,

@@ -83,9 +83,12 @@ extractTypeFromJSONFile inputFilename =
                myTrace $ "Type: " ++ pretty t
                return $ Just t
 
+--withoutDuplicates gen = undefined
+
 -- | Take a set of JSON input filenames, Haskell output filename, and generate module parsing these JSON files.
 generateTestJSONs :: IO ()
 generateTestJSONs = do
+    generate
     results <- forM (zip inputFilenames outputFilenames) $ \(inputFilename, outputFilename) -> do
       jsonValue :: Value <- generate $ resize flags_size arbitraryTopValue
       BSL.writeFile inputFilename $ encode jsonValue

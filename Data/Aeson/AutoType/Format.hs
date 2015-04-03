@@ -65,9 +65,10 @@ wrapDecl identifier contents = Text.unlines [header, contents, "  } deriving (Sh
     header = Text.concat ["data ", identifier, " = ", identifier, " { "]
 
 -- | Explanatory type alias for making declarations
--- First element of the pair is original JSON identifier,
--- second element of the pair is the mapped identifier name in Haskell.
-type MappedKey = (Text, Text)
+-- First element of the triple is original JSON identifier,
+-- second element of the triple is the mapped identifier name in Haskell.
+-- third element of the triple shows the type in a formatted way
+type MappedKey = (Text, Text, Text)
 
 -- | Make ToJSON declaration, given identifier (object name in Haskell) and mapping of its keys
 -- from JSON to Haskell identifiers *in the same order* as in *data type declaration*.
@@ -81,8 +82,9 @@ makeFromJSON identifier contents =
     makeParser identifier [] = Text.unwords ["return ", identifier]
     makeParser identifier _  = Text.unwords [identifier, "<$>", inner]
     inner                    = " <*> " `Text.intercalate`
-                                  map (takeValue . fst) contents
-    takeValue jsonId = Text.concat ["v .: \"", jsonId, "\""]
+                                  map takeValue contents
+    takeValue (jsonId, _, ty) | isNullable ty  = Text.concat ["v .:? \"", jsonId, "\""]
+    takeValue (jsonId, _, _ )                  = Text.concat ["v .:  \"", jsonId, "\""]
 -- Contents example for wrapFromJSON:
 -- " <$>
 --"                           v .: "hexValue"  <*>
@@ -101,7 +103,7 @@ makeToJSON identifier contents =
              | otherwise            = ".."
     inner = ", " `Text.intercalate`
               map putValue contents
-    putValue (jsonId, haskellId) = Text.unwords [escapeText jsonId, ".=", haskellId]
+    putValue (jsonId, haskellId, _typeText) = Text.unwords [escapeText jsonId, ".=", haskellId]
     escapeText = Text.pack . show . Text.unpack
 -- Contents example for wrapToJSON
 --"hexValue"  .= hexValue
@@ -119,12 +121,11 @@ newDecl :: Text -> [(Text, Type)] -> DeclM Text
 newDecl identifier kvs = do attrs <- forM kvs $ \(k, v) -> do
                               formatted <- formatType v
                               return (k, normalizeFieldName identifier k, formatted)
-                            let fieldMapping = map (\(jn, hn, _) -> (jn, hn)) attrs
                             let decl = Text.unlines [wrapDecl     identifier $ fieldDecls attrs
                                                     ,""
-                                                    ,makeFromJSON identifier fieldMapping
+                                                    ,makeFromJSON identifier attrs
                                                     ,""
-                                                    ,makeToJSON   identifier fieldMapping]
+                                                    ,makeToJSON   identifier attrs]
                             addDecl decl
                             return identifier
   where
@@ -132,6 +133,9 @@ newDecl identifier kvs = do attrs <- forM kvs $ \(k, v) -> do
     fieldDecl :: (Text, Text, Text) -> Text
     fieldDecl (_jsonName, haskellName, fType) = Text.concat [
                                                   "    ", haskellName, " :: ", fType]
+
+-- | Whether the type is nullable or in other words - represented by Maybe type.
+isNullable = ("Maybe" `Text.isPrefixOf`)
 
 addDecl decl = decls %%= (\ds -> ((), decl:ds))
 
@@ -168,6 +172,7 @@ formatType (TLabel l)                        =    return $ normalizeTypeName l
 formatType (TUnion u) | uu <- u `Set.difference` emptySetLikes,
                         Set.size uu == 1     = do fmt <- formatType $ head $ Set.toList uu
                                                   return $ "Maybe " `Text.append` fmt
+-- TODO: Use Maybe (...) when nullable?
 formatType (TUnion u)                        = do tys <- forM (Set.toList u) formatType
                                                   return $ mkUnion tys
   where

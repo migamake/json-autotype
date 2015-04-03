@@ -1,5 +1,9 @@
 Changelog
 =========
+    0.4  Apr 2015
+
+        * Release candidate for current functionality.
+
     0.3  Apr 2015
 
         * Passed all smallcheck/quickcheck tests.

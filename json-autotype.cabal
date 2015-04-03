@@ -1,6 +1,6 @@
 -- Build information for the package.
 name:                json-autotype
-version:             0.3
+version:             0.4
 synopsis:            Automatic type declaration for JSON input data
 description:         Generates datatype declarations with Aeson's "FromJSON" instances
                      from a set of example ".json" files.
@@ -110,7 +110,8 @@ executable json-autotype
   default-language:    Haskell2010
 
 -- test suites
-executable json-autotype-random-test
+test-suite json-autotype-random-test
+  type:                exitcode-stdio-1.0
   main-is:             GenerateTestJSON.hs
   other-modules:       Data.Aeson.AutoType.Util,
                        Data.Aeson.AutoType.Test,

@@ -10,6 +10,7 @@ I should probably write a short paper to explain the methodology.
 
 [![Build Status](https://api.travis-ci.org/mgajda/json-autotype.png?branch=master)](https://travis-ci.org/mgajda/json-autotype)
 [![Hackage](https://budueba.com/hackage/json-autotype)](https://hackage.haskell.org/package/json-autotype)
+[![Hackage Dependencies](https://img.shields.io/hackage-deps/v/json-autotype.svg?style=plastic)](http://packdeps.haskellers.com/feed?needle=json-autotype)
 
 Details on official releases are on [Hackage](https://hackage.haskell.org/package/json-autotype)
 

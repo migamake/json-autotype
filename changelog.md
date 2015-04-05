@@ -4,6 +4,7 @@ Changelog
 
         * Reduced name space pollution when generating code.
           Now all valid JSON test examples do work.
+        * Corrected build failure on GHC 7.8.4
 
     0.4  Apr 2015
 

@@ -35,11 +35,11 @@ script:
   # this builds all libraries and executables
   # (including tests/benchmarks)
   - cabal-$CABALVER build
-  - find dist -iname '*.tix'
-  - find dist -iname '*.mix'
+  - find . -iname '*.tix'
+  - find . -iname '*.mix'
 
   - cabal-$CABALVER test --keep-tix-files
-  - find dist -iname '*.tix'
+  - find . -iname '*.tix'
 
   - bash testit.sh
   - echo "Unit tests successful!"
@@ -64,6 +64,6 @@ after_script:
   - echo ${PWD}
   - find dist -iname '*.tix'
   - travis_retry cabal install codecov-haskell hpc-coveralls
-  - codecov-haskell --repo-token ${CODECOV_KEY}   json-autotype-random-test json-autotype-qc-test 
+  - codecov-haskell                               json-autotype-random-test json-autotype-qc-test 
   - hpc-coveralls   --repo-token ${COVERALLS_KEY} json-autotype-random-test json-autotype-qc-test
 

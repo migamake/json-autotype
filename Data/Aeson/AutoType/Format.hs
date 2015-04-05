@@ -7,7 +7,8 @@
 -- | Formatting type declarations and class instances for inferred types. 
 module Data.Aeson.AutoType.Format(
   displaySplitTypes, splitTypeByLabel, unificationCandidates,
-  unifyCandidates
+  unifyCandidates,
+  normalizeTypeName
 ) where
 
 import           Control.Arrow             ((&&&))

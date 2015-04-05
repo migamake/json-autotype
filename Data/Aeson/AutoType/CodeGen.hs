@@ -1,4 +1,5 @@
 {-# LANGUAGE OverloadedStrings #-}
+{-# LANGUAGE ViewPatterns      #-}
 -- | Wrappers for generating prologue and epilogue code in Haskell.
 module Data.Aeson.AutoType.CodeGen(
     writeHaskellModule
@@ -9,6 +10,7 @@ import qualified Data.Text           as Text
 import qualified Data.Text.IO        as Text
 import           Data.Text
 import qualified Data.HashMap.Strict as Map
+import           Control.Arrow               (first)
 import           System.FilePath
 import           System.IO
 
@@ -81,8 +83,11 @@ writeHaskellModule outputFilename types =
       Text.hPutStrLn hOut $ displaySplitTypes types
       Text.hPutStrLn hOut   epilogue
   where
-    (moduleName, extension) = splitExtension $
-                                if     outputFilename == "-"
-                                  then defaultOutputFilename
-                                  else outputFilename
+    (moduleName, extension) =
+       first normalizeTypeName'     $
+       splitExtension               $
+       if     outputFilename == "-"
+         then defaultOutputFilename
+         else outputFilename
+    normalizeTypeName' = Text.unpack . normalizeTypeName . Text.pack
 

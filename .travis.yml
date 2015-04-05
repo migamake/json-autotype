@@ -60,7 +60,7 @@ script:
 after_script:
   - echo $(PWD)
   - travis_retry cabal install codecov-haskell
-  - codecov-haskell [options] [test-suite-names]
-  - travis_retry cabal install hpc-coveralls # coverage testing
-  - hpc-coveralls json-autotype-random-test json-autotype-qc-test || true
+  - codecov-haskell json-autotype-random-test json-autotype-qc-test 
+    #- travis_retry cabal install hpc-coveralls # coverage testing
+    #- hpc-coveralls json-autotype-random-test json-autotype-qc-test || true
 

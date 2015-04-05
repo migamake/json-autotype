@@ -22,7 +22,7 @@ before_install:
  - cabal --version
 
 install:
- - travis_retry cabal-$CABALVER install --only-dependencies --force-reinstalls ${COVOPT}
+  - travis_retry cabal-$CABALVER install --only-dependencies --force-reinstalls --enable-tests ${COVOPT}
 
 #script:
 # - bash testit.sh

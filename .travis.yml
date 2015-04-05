@@ -22,7 +22,7 @@ before_install:
  - cabal --version
 
 install:
- - travis_retry cabal-$CABALVER install --only-dependencies --force-reinstalls --enable-tests
+  - travis_retry cabal-$CABALVER install --only-dependencies --force-reinstalls --enable-tests --enable-profiling ${COVOPT}
 
 #script:
 # - bash testit.sh
@@ -30,7 +30,7 @@ install:
 
 script:
   # -v2 provides useful information for debugging
-  - cabal-$CABALVER configure --enable-tests ${COVOPT} --enable-benchmarks -v2
+  - cabal-$CABALVER configure --enable-tests ${COVOPT} --enable-benchmarks --enable-profiling -v2
 
   # this builds all libraries and executables
   # (including tests/benchmarks)
@@ -59,8 +59,7 @@ script:
 
 after_script:
   - echo $(PWD)
-  - travis_retry cabal install codecov-haskell
-  - codecov-haskell json-autotype-random-test json-autotype-qc-test 
-    #- travis_retry cabal install hpc-coveralls # coverage testing
-    #- hpc-coveralls json-autotype-random-test json-autotype-qc-test || true
+  - travis_retry cabal install codecov-haskell hpc-coveralls
+  - codecov-haskell --repo-token ${CODECOV_KEY}   json-autotype-random-test json-autotype-qc-test 
+  - hpc-coveralls   --repo-token ${COVERALLS_KEY} json-autotype-random-test json-autotype-qc-test
 

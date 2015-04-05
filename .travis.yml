@@ -55,10 +55,10 @@ script:
        echo "expected '$SRC_TGZ' not found";
        exit 1;
     fi
-  - echo $(PWD)
+  - echo ${PWD}
 
 after_script:
-  - echo $(PWD)
+  - echo ${PWD}
   - travis_retry cabal install codecov-haskell hpc-coveralls
   - codecov-haskell --repo-token ${CODECOV_KEY}   json-autotype-random-test json-autotype-qc-test 
   - hpc-coveralls   --repo-token ${COVERALLS_KEY} json-autotype-random-test json-autotype-qc-test

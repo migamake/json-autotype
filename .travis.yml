@@ -2,15 +2,15 @@ language: haskell
 
 matrix:
   allow_failures:
-    #- env: GHCVER=head   CABALVER=head COVOPT=--enable-coverage
     - env: GHCVER=7.8.4  CABALVER=1.18 COVOPT=--enable-library-coverage
     - env: GHCVER=7.6.3  CABALVER=1.18 COVOPT=--enable-library-coverage
+    #- env: GHCVER=head   CABALVER=head COVOPT=--enable-coverage
 
 env:
- #- GHCVER=head   CABALVER=head COVOPT=--enable-coverage
  - GHCVER=7.10.1 CABALVER=1.22 COVOPT=--enable-coverage
  - GHCVER=7.8.3  CABALVER=1.18 COVOPT=--enable-library-coverage
  - GHCVER=7.6.3  CABALVER=1.18 COVOPT=--enable-library-coverage
+ #- GHCVER=head   CABALVER=head COVOPT=--enable-coverage
 
 before_install:
  - sudo add-apt-repository -y ppa:hvr/ghc

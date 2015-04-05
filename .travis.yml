@@ -36,7 +36,7 @@ script:
   # (including tests/benchmarks)
   - cabal-$CABALVER build
 
-  - cabal-$CABALVER test
+  - cabal-$CABALVER test --keep-tix-files
 
   - bash testit.sh
   - echo "Unit tests successful!"
@@ -59,6 +59,7 @@ script:
 
 after_script:
   - echo ${PWD}
+  - find dist -iname '*.tix'
   - travis_retry cabal install codecov-haskell hpc-coveralls
   - codecov-haskell --repo-token ${CODECOV_KEY}   json-autotype-random-test json-autotype-qc-test 
   - hpc-coveralls   --repo-token ${COVERALLS_KEY} json-autotype-random-test json-autotype-qc-test

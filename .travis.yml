@@ -3,7 +3,7 @@ language: haskell
 matrix:
   allow_failures:
     - env: GHCVER=head   CABALVER=head COVOPT=--enable-coverage
-    - env: GHCVER=7.8.3  CABALVER=1.18 COVOPT=--enable-library-coverage
+    - env: GHCVER=7.8.4  CABALVER=1.18 COVOPT=--enable-library-coverage
     - env: GHCVER=7.6.3  CABALVER=1.18 COVOPT=--enable-library-coverage
 
 env:

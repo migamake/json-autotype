@@ -242,13 +242,16 @@ displaySplitTypes dict = trace ("displaySplitTypes: " ++ show (toposort dict)) $
         formatObjectType (normalizeTypeName name) typ
 
 normalizeTypeName :: Text -> Text
-normalizeTypeName = escapeKeywords           .
-                    escapeFirstNonAlpha      .
-                    Text.concat              .
-                    map capitalize           .
-                    filter (not . Text.null) .
-                    Text.split (not . acceptableInVariable)
+normalizeTypeName s  = ifEmpty "JsonEmptyKey"                  .
+                       escapeKeywords                          .
+                       escapeFirstNonAlpha                     .
+                       Text.concat                             .
+                       map capitalize                          .
+                       filter     (not . Text.null)            .
+                       Text.split (not . acceptableInVariable) $ s
   where
+    ifEmpty x ""       = x
+    ifEmpty _ nonEmpty = nonEmpty
     acceptableInVariable c = isAlpha c || isDigit c
     escapeFirstNonAlpha cs                  | Text.null cs =                   cs
     escapeFirstNonAlpha cs@(Text.head -> c) | isAlpha   c  =                   cs

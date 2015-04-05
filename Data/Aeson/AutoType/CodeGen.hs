@@ -44,9 +44,8 @@ header moduleName = Text.unlines [
   ,"import           Control.Applicative"
   ,"import           Data.Aeson.AutoType.Alternative"
   ,"import           Data.Aeson(decode, Value(..), FromJSON(..), ToJSON(..),"
-  ,"                            (.:), (.:?), (.!=), (.=), object)"
+  ,"                            (.:), (.:?), (.=), object)"
   ,"import           Data.Text (Text)"
-  ,"import           Data.Aeson.TH" 
   ,"import           GHC.Generics" 
   ,""]
 

@@ -1,5 +1,10 @@
 Changelog
 =========
+    0.5  Apr 2015
+
+        * Reduced name space pollution when generating code.
+          Now all valid JSON test examples do work.
+
     0.4  Apr 2015
 
         * Release candidate for current functionality.

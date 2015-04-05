@@ -30,7 +30,7 @@ install:
 
 script:
  # -v2 provides useful information for debugging
- - cabal-$CABALVER configure --enable-tests ${COV} --enable-benchmarks -v2
+ - cabal-$CABALVER configure --enable-tests ${COVOPT} --enable-benchmarks -v2
 
  # this builds all libraries and executables
  # (including tests/benchmarks)
@@ -56,7 +56,7 @@ script:
       exit 1;
    fi
 
-after-script:
+after_script:
   - travis_retry cabal install hpc-coveralls # coverage testing
   - hpc-coveralls json-autotype-random-test json-autotype-qc-test
 

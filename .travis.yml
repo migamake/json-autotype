@@ -22,7 +22,8 @@ before_install:
  - cabal --version
 
 install:
-  - travis_retry cabal-$CABALVER install --only-dependencies --force-reinstalls --enable-tests ${COVOPT}
+  - travis_retry cabal-$CABALVER install --only-dependencies --force-reinstalls --enable-tests
+  #- travis_retry cabal-$CABALVER install --only-dependencies --force-reinstalls --enable-tests ${COVOPT}
 
 #script:
 # - bash testit.sh
@@ -30,7 +31,8 @@ install:
 
 script:
   # -v2 provides useful information for debugging
-  - cabal-$CABALVER configure --enable-tests ${COVOPT} --enable-benchmarks -v2
+  #- cabal-$CABALVER configure --enable-tests ${COVOPT} --enable-benchmarks -v2
+  - cabal-$CABALVER configure --enable-tests --enable-benchmarks -v2
 
   # this builds all libraries and executables
   # (including tests/benchmarks)
@@ -38,7 +40,8 @@ script:
   - find . -iname '*.tix'
   - find . -iname '*.mix'
 
-  - cabal-$CABALVER test --keep-tix-files
+  #- cabal-$CABALVER test --keep-tix-files
+  - cabal-$CABALVER test
   - find . -iname '*.tix'
 
   - bash testit.sh
@@ -60,10 +63,10 @@ script:
     fi
   - echo ${PWD}
 
-after_script:
-  - echo ${PWD}
-  - find dist -iname '*.tix'
-  - travis_retry cabal install codecov-haskell hpc-coveralls
-  - codecov-haskell                               json-autotype-random-test json-autotype-qc-test 
-  - hpc-coveralls   --repo-token ${COVERALLS_KEY} json-autotype-random-test json-autotype-qc-test
-
+#after_script:
+#  - echo ${PWD}
+#  - find dist -iname '*.tix'
+#  - travis_retry cabal install codecov-haskell hpc-coveralls
+#  - codecov-haskell                               json-autotype-random-test json-autotype-qc-test 
+#  - hpc-coveralls   --repo-token ${COVERALLS_KEY} json-autotype-random-test json-autotype-qc-test
+#

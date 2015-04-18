@@ -1,5 +1,9 @@
 Changelog
 =========
+    1.0  Apr 2015
+
+        * First stable release.
+
     0.5  Apr 2015
 
         * Reduced name space pollution when generating code.

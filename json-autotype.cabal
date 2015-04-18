@@ -1,6 +1,6 @@
 -- Build information for the package.
 name:                json-autotype
-version:             0.5
+version:             1.0
 synopsis:            Automatic type declaration for JSON input data
 description:         Generates datatype declarations with Aeson's "FromJSON" instances
                      from a set of example ".json" files.
@@ -18,12 +18,14 @@ description:         Generates datatype declarations with Aeson's "FromJSON" ins
                      .
                      "$ runghc JSONTypes.hs input.json"
                      .
+                     One can now use multiple input files to generate better type description.
+                     .
                      See introduction on  <https://github.com/mgajda/json-autotype>
                      for details.
 homepage:            https://github.com/mgajda/json-autotype
 license:             BSD3
 license-file:        LICENSE
-stability:           beta
+stability:           stable
 author:              Michal J. Gajda
 maintainer:          mjgajda@gmail.com
 copyright:           Copyright by Michal J. Gajda '2014-'2015

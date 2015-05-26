@@ -1,7 +1,7 @@
 % Automatictypeinferencefro-MA.tex
 \begin{hcarentry}[new]{Automatic type inference from JSON}
 \label{jsonautotype}
-\report{Michal J. Gajda}%11/14
+\report{Michal J. Gajda}%05/15
 \status{stable}
 \makeheader
 
@@ -9,7 +9,7 @@ This rapid software development tool \href{https://github.com/mgajda/json-autoty
 data and converts them into Haskell module with data type declarations.
 
 \begin{verbatim}
-$ json-autotype input1.json ... inputN.json -o JSONTypes.hs"
+$ json-autotype input.json -o JSONTypes.hs
 \end{verbatim}
 
 The generated declarations use automatically derived Aeson class instances
@@ -19,7 +19,7 @@ and facilitate interaction with growing number of large JSON APIs.
 Generated parser can be immediately tested on an input data:
 
 \begin{verbatim}
-$ runghc JSONTypes.hs input.json"
+$ runghc JSONTypes.hs input.json
 \end{verbatim}
 
 The software can be installed directly from Hackage.
@@ -33,5 +33,5 @@ for all JSON inputs considered valid by Aeson.
 The author welcomes comments and suggestions at \email{mjgajda@@gmail.com}.
 
 \FurtherReading
-\url{http://hackage.haskell.org/packages/json-autotype}
+\url{http://hackage.haskell.org/package/json-autotype}
 \end{hcarentry}

@@ -1,0 +1,67 @@
+\documentclass[11pt]{article}
+%Gummi|065|=)
+\title{\textbf{SOFTWARE DEMO\\JSON Autotype \\\large{Automatic bridge from untyped Web APIs\\to typeful haven of Haskell}}}
+\author{Micha\l{} J. Gajda}
+\date{April 3rd, 2015}
+\renewcommand{\abstractname}{Extended abstract}
+
+\begin{document}
+
+\maketitle
+
+\section*{Demo abstract}
+\subsection*{Introduction}
+I want to demonstrate the tool for practical web-service development using type theory.
+
+JSON is a subset of JavaScript, and convenient and ubiquitous data format for Web 2.0 applications. Structured Web APIs often use JSON messages to transmit large answer sets that may be leveraged when building both mash-ups, and complex web services.
+
+Since Haskell excels in precise description of such complex systems, it enjoys relatively large set of parsing, validation, and web libraries.
+
+JSON-Autotype facilitates automatic creation of Web API interfaces in Haskell, and uses union typing for ad-hoc type discovery.
+
+I will introduce problem by examples, and discuss most frequent problems of type-based interface ,,discovery''.
+
+\subsection*{Interface discovery by examples}
+
+The simplest example would be a single JSON document:
+
+\begin{verbatim}
+{ "colorsArray":[{ "colorName":"red",
+                   "hexValue":"#f00" },
+                 { "colorName":"green",
+                   "hexValue":"#0f0" },
+                 { "colorName":"blue",
+                   "hexValue":"#00f" }] }
+\end{verbatim}
+
+When fed to JSON-autotype tool by running \texttt{json-autotype color.json -o Color.hs} we get a simple type declaration along with instances of Aeson's \texttt{ToJSON} and \texttt{FromJSON} classes:
+
+\begin{verbatim}
+data TopLevel = TopLevel                    { 
+    topLevelColorsArray :: [ColorsArrayElt] }
+data ColorsArrayElt = ColorsArrayElt { 
+    colorsArrayEltHexValue  :: Text,
+    colorsArrayEltColorName :: Text  }
+\end{verbatim}
+
+After explaining the output of this example, I will proceed by demonstrating use of JSON-autotype to:
+\begin{enumerate}
+\item treatment of ambiguous types
+\item defining custom types to be recognized by JSON-Autotype
+\item implement a sample endpoint of Facebook query API
+\item flagging record tags in order to reconstruct full algebraic types of dependent records
+\item use in conjuction with \emph{wget} in order to reconstruct types within multiple endpoint Web API
+\item use of JSON-Autotype to report validation errors with respect to previously assumed schema
+\item use of JSON-Autotype in conjunction with database
+\item use of \emph{JSON-Autotype} to derive \emph{JSON Schema}.
+\end{enumerate}
+
+Each example will be shown along with the motivation, and example code will be provided through GitHub to encourage attendees to follow it step by step.
+
+\subsection*{Final discussion}
+Author plans to follow users' request. The few minutes left at the end of the demo session will be left specifically for gathering feedback and further user requests for this tool.
+
+%\subsection*{Acknowledgments}
+%I'd like to thank many JSON API authors that were so kind as to provide numerous response and request examples on the web, even before imagining any schema for JSON. They provided the motivation for making of this tool.
+
+\end{document}

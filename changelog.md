@@ -1,6 +1,10 @@
 Changelog
 =========
-    1.0.0.1  Apr 2015
+    1.0.2  Jun 2015
+
+        * Relaxed dependency for lens-4.11.
+
+    1.0.1  Apr 2015
 
         * Relaxed dependency to lens-4.10.
 

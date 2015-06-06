@@ -1,5 +1,8 @@
 \documentclass[11pt]{article}
 %Gummi|065|=)
+
+\newcommand{\timePermits}[0]{\emph{(If time permits.)}}
+
 \title{\textbf{{\large SOFTWARE DEMO}\\JSON Autotype\\
 \vspace{5pt}{\large
 Automatic bridge from untyped Web APIs
@@ -21,7 +24,7 @@ JSON is a subset of JavaScript, and convenient and ubiquitous data format for We
 
 Since Haskell excels in precise description of such complex systems, it enjoys relatively large set of parsing, validation, and web libraries.
 
-JSON-Autotype facilitates automatic creation of Web API interfaces in Haskell, and uses union typing for ad-hoc type discovery.
+JSON-Autotype facilitates automatic creation of Web API interfaces in Haskell. It uses union typing for ad-hoc type discovery.
 
 I will introduce problem by examples, and discuss most frequent problems of type-based interface ,,discovery''.
 
@@ -38,7 +41,7 @@ The simplest example would be a single JSON document:
                    "hexValue":"#00f" }] }
 \end{verbatim}
 
-When fed to JSON-autotype tool by running \texttt{json-autotype color.json -o Color.hs} we get a simple type declaration along with instances of Aeson's \texttt{ToJSON} and \texttt{FromJSON} classes:
+When fed to JSON-autotype tool by running \begin{verbatim}json-autotype color.json -o Color.hs\end{verbatim} we get a simple type declaration along with instances of Aeson's \texttt{ToJSON} and \texttt{FromJSON} classes:
 
 \begin{verbatim}
 data TopLevel = TopLevel                    { 
@@ -50,18 +53,20 @@ data ColorsArrayElt = ColorsArrayElt {
 
 After explaining the output of this example, I will proceed by demonstrating use of JSON-autotype to:
 \begin{enumerate}
-\item treatment of ambiguous types
-\item defining custom types to be recognized by JSON-Autotype
-\item implement a sample endpoint of Facebook query API
-\item flagging record tags in order to reconstruct full algebraic types of dependent records
-\item use in conjuction with \emph{wget} in order to reconstruct types within multiple endpoint Web API
-\item use of JSON-Autotype to report validation errors with respect to previously assumed schema
-\item use of JSON-Autotype in conjunction with database
-\item use of \emph{JSON-Autotype} to derive \emph{JSON Schema}.
-\item if time permits, we show how to use \emph{JSON-Autotype} to derive boilerplate code for typeful web frameworks like \emph{Servant}.
+\item Treat ambiguous types.
+\item Automatically detect and unify type aliases.
+\item Define custom types to be recognized by JSON-Autotype.
+\item Implement a sample endpoint of Facebook query API.
+\item Reconstruct full algebraic types of dependent records. \timePermits{}
+\item Use in conjuction with \emph{wget} in order to reconstruct consistent types for API with multiple endpoints.
+\item Report significant changes with respect to previously assumed schema. (Audit API evolution.)
+\item Audit or reconstruct JSON database schema. \timePermits{}
+\item Derive \emph{JSON Schema}.
+\item Derive boilerplate code for type-based web frameworks like \emph{Servant}. \timePermits{}
 \end{enumerate}
 
-Each example will be shown along with the motivation, and example code will be provided through GitHub to encourage attendees to follow it step by step.
+%Each example will be shown along with the motivation, and 
+%Example code will be provided through GitHub to encourage attendees to follow it step by step.
 
 \subsection*{Final discussion}
 Author plans to follow users' request. The few minutes left at the end of the demo session will be left specifically for gathering feedback and further user requests for this tool.

@@ -56,9 +56,7 @@ defineFlag "fakeFlag"           True                  "Ignore this flag - it doe
 
 -- Tracing is switched off:
 myTrace :: String -> IO ()
-myTrace msg = if flags_debug
-                then putStrLn msg
-                else return ()
+myTrace msg = flags_debug `when` putStrLn msg
 
 -- | Report an error to error output.
 report   :: Text -> IO ()
@@ -92,7 +90,7 @@ vectorWithoutDuplicates i gen = take i
                              <$> infiniteListOf gen
 
 removeDuplicates ::  Ord a => [a] -> [a]
-removeDuplicates list = fst $ filterM checkDup list `runState` Set.empty
+removeDuplicates list = filterM checkDup list `evalState` Set.empty
   where
     checkDup x = do seen <- State.get
                     if x `Set.member` seen
@@ -156,7 +154,7 @@ generateTestJSONs = do
         writeHaskellModule outputFilename unified
         if flags_test
           then do
-            r <- (==ExitSuccess) <$> system (unwords $ ["runghc", outputFilename, inputFilename])
+            r <- (==ExitSuccess) <$> system (unwords ["runghc", outputFilename, inputFilename])
             when r $ mapM_ removeFile [inputFilename, outputFilename]
             return r
           else

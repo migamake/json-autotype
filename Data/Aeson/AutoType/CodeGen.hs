@@ -1,5 +1,4 @@
 {-# LANGUAGE OverloadedStrings #-}
-{-# LANGUAGE ViewPatterns      #-}
 -- | Wrappers for generating prologue and epilogue code in Haskell.
 module Data.Aeson.AutoType.CodeGen(
     writeHaskellModule

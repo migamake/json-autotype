@@ -8,14 +8,13 @@
 module Main where
 
 import           Control.Applicative
-import           Control.Monad
+import           Control.Monad             (forM_, when, unless)
 import           Data.Maybe
 import           Data.List                 (partition)
 import           System.Exit
 import           System.IO                 (stdin, stderr, stdout, IOMode(..))
 import           System.FilePath           (splitExtension)
 import           System.Process            (system)
-import           Control.Monad             (forM_, when)
 import qualified Data.ByteString.Lazy.Char8 as BSL
 import qualified Data.HashMap.Strict        as Map
 import           Data.Aeson
@@ -43,9 +42,7 @@ defineFlag "fakeFlag"          True                  "Ignore this flag - it does
 
 -- | Works like @Debug.trace@ when the --debug flag is enabled, and does nothing otherwise.
 myTrace :: String -> IO ()
-myTrace msg = if flags_debug
-                then putStrLn msg
-                else return ()
+myTrace msg = flags_debug `when` putStrLn msg
 
 -- | Report an error to error output.
 report   :: Text -> IO ()
@@ -81,7 +78,7 @@ extractTypeFromJSONFile inputFilename =
 -- and return a list of filenames for files that passed the check.
 typeChecking :: Type -> [FilePath] -> [Value] -> IO [FilePath]
 typeChecking ty filenames values = do
-    when (not $ null failures ) $ report $ Text.unwords $ "Failed to typecheck with unified type: ":
+    unless (null failures) $ report $ Text.unwords $ "Failed to typecheck with unified type: ":
                                                           (Text.pack `map` failures)
     when (      null successes) $ fatal    "No files passed the typecheck."
     return successes

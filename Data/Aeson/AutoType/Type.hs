@@ -2,7 +2,6 @@
 {-# LANGUAGE DeriveGeneric         #-}
 {-# LANGUAGE FlexibleInstances     #-}
 {-# LANGUAGE MultiParamTypeClasses #-}
-{-# LANGUAGE ViewPatterns          #-}
 {-# LANGUAGE OverloadedStrings     #-}
 -- | Union types describing JSON objects, and operations for querying these types.
 module Data.Aeson.AutoType.Type(typeSize,

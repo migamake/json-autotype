@@ -102,8 +102,8 @@ makeToJSON identifier contents =
         Text.concat ["  toJSON (", identifier, " {", wildcard, "}) = object [", inner, "]"]
       ]
   where
-    wildcard | length contents == 0 = ""
-             | otherwise            = ".."
+    wildcard | null contents = ""
+             | otherwise     = ".."
     inner = ", " `Text.intercalate`
               map putValue contents
     putValue (jsonId, haskellId, _typeText, _nullable) = Text.unwords [escapeText jsonId, ".=", haskellId]
@@ -242,6 +242,12 @@ displaySplitTypes dict = trace ("displaySplitTypes: " ++ show (toposort dict)) $
       forM (toposort dict) $ \(name, typ) ->
         formatObjectType (normalizeTypeName name) typ
 
+-- | Normalize type name by:
+-- 1. Treating all characters that are not acceptable in Haskell variable name as end of word.
+-- 2. Capitalizing each word, but a first (camelCase).
+-- 3. Adding underscore if first character is non-alphabetic.
+-- 4. Escaping Haskell keywords if the whole identifier is such keyword.
+-- 5. If identifier is empty, then substituting "JsonEmptyKey" for its name.
 normalizeTypeName :: Text -> Text
 normalizeTypeName s  = ifEmpty "JsonEmptyKey"                  .
                        escapeKeywords                          .

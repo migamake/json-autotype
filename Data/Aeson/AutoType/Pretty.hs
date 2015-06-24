@@ -1,4 +1,3 @@
-{-# LANGUAGE TemplateHaskell     #-}
 {-# LANGUAGE ScopedTypeVariables #-}
 {-# LANGUAGE OverloadedStrings   #-}
 {-# LANGUAGE DeriveGeneric       #-}
@@ -45,7 +44,7 @@ instance (Out a) => Out (Set a) where
 instance (Out a, Out b) => Out (HashMap a b) where
   doc (Hash.toList -> dict) = (foldl ($$) "{" $
                                  map formatPair dict)
-                            $$ nest 1 "}"
+                           $$  nest 1 "}"
                       
   docPrec _ = doc
 

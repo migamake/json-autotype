@@ -157,6 +157,7 @@ test-suite json-autotype-random-test
   other-modules:       Data.Aeson.AutoType.Util,
                        Data.Aeson.AutoType.Test,
                        Data.Aeson.AutoType.Type
+                       Data.Aeson.AutoType.Pretty
   other-extensions:    TemplateHaskell,
                        ScopedTypeVariables,
                        OverloadedStrings,

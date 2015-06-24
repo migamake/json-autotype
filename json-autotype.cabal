@@ -82,7 +82,15 @@ library
 
 executable json-autotype
   main-is:             GenerateJSONParser.hs
-  other-modules:       Data.Aeson.AutoType.Util
+  other-modules:       Data.Aeson.AutoType.Type
+                       Data.Aeson.AutoType.Extract
+                       Data.Aeson.AutoType.Format
+                       Data.Aeson.AutoType.Pretty
+                       Data.Aeson.AutoType.CodeGen
+                       Data.Aeson.AutoType.Alternative
+                       Data.Aeson.AutoType.Plugin.Subtype
+                       Data.Aeson.AutoType.Plugin.Loader
+                       Data.Aeson.AutoType.Util
   other-extensions:    TemplateHaskell,
                        ScopedTypeVariables,
                        OverloadedStrings,
@@ -117,9 +125,11 @@ executable json-autotype
 test-suite json-autotype-qc-test
   type:                exitcode-stdio-1.0
   main-is:             TestQC.hs
-  other-modules:       Data.Aeson.AutoType.Util,
-                       Data.Aeson.AutoType.Test,
+  other-modules:       Data.Aeson.AutoType.Util
+                       Data.Aeson.AutoType.Extract
+                       Data.Aeson.AutoType.Test
                        Data.Aeson.AutoType.Type
+                       Data.Aeson.AutoType.Pretty
   other-extensions:    TemplateHaskell,
                        ScopedTypeVariables,
                        OverloadedStrings,
@@ -154,10 +164,13 @@ test-suite json-autotype-qc-test
 test-suite json-autotype-random-test
   type:                exitcode-stdio-1.0
   main-is:             GenerateTestJSON.hs
-  other-modules:       Data.Aeson.AutoType.Util,
-                       Data.Aeson.AutoType.Test,
-                       Data.Aeson.AutoType.Type
-                       Data.Aeson.AutoType.Pretty
+  other-modules:       Data.Aeson.AutoType.Util
+                       Data.Aeson.AutoType.Pretty 
+                       Data.Aeson.AutoType.Type   
+                       Data.Aeson.AutoType.Extract
+                       Data.Aeson.AutoType.Format 
+                       Data.Aeson.AutoType.CodeGen
+                       Data.Aeson.AutoType.Test   
   other-extensions:    TemplateHaskell,
                        ScopedTypeVariables,
                        OverloadedStrings,

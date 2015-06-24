@@ -1,5 +1,10 @@
 Changelog
 =========
+    1.0.3-1.0.5  Jun 2015
+
+        * Bumped Aeson dependency up.
+        * Tiny docs corrections.
+
     1.0.2  Jun 2015
 
         * Relaxed dependency for lens-4.11.

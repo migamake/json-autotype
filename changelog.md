@@ -1,5 +1,9 @@
 Changelog
 =========
+    1.0.6  Jun 2015
+
+        * Make lens and aeson versions consistent in the *.cabal file.
+
     1.0.3-1.0.5  Jun 2015
 
         * Bumped Aeson dependency up.

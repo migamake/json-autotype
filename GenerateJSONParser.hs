@@ -38,6 +38,7 @@ defineFlag "autounify"         True                  "Automatically unify sugges
 defineFlag "t:test"            False                 "Try to run generated parser after"
 defineFlag "d:debug"           False                 "Set this flag to see more debugging info"
 defineFlag "y:typecheck"       True                  "Set this flag to typecheck after unification"
+defineFlag "p:preprocessor"    False                 "Work as GHC preprocessor (skip preprocessor pragma)"
 defineFlag "fakeFlag"          True                  "Ignore this flag - it doesn't exist!!! It is workaround to library problem."
 
 -- | Works like @Debug.trace@ when the --debug flag is enabled, and does nothing otherwise.
@@ -60,7 +61,7 @@ extractTypeFromJSONFile :: FilePath -> IO (Maybe (FilePath, Type, Value))
 extractTypeFromJSONFile inputFilename =
       withFileOrHandle inputFilename ReadMode stdin $ \hIn ->
         -- First we decode JSON input into Aeson's Value type
-        do bs <- BSL.hGetContents hIn
+        do bs <- preprocess <$> BSL.hGetContents hIn
            Text.hPutStrLn stderr $ "Processing " `Text.append` Text.pack (show inputFilename)
            myTrace ("Decoded JSON: " ++ pretty (decode bs :: Maybe Value))
            case decode bs of
@@ -73,6 +74,16 @@ extractTypeFromJSONFile inputFilename =
                (v `typeCheck` t) `unless` fatal ("Typecheck against base type failed for "
                                                     `Text.append` Text.pack inputFilename)
                return $ Just (inputFilename, t, v)
+
+-- | Perform preprocessing of JSON input to drop initial pragma.
+preprocess :: BSL.ByteString -> BSL.ByteString
+preprocess | flags_preprocessor = dropPragma
+           | otherwise          = id
+
+-- | Drop initial pragma.
+dropPragma :: BSL.ByteString -> BSL.ByteString
+dropPragma input | "{-#" `BSL.isPrefixOf` input = BSL.dropWhile (/='\n') input
+                 | otherwise                    = input
 
 -- | Type checking all input files with given type,
 -- and return a list of filenames for files that passed the check.

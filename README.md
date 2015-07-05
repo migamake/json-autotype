@@ -109,3 +109,8 @@ It will produce quite intuitive result (plus extra parentheses, and class deriva
 ```
 
 Real-world use case examples are provided in the package [source repository](https://github.com/mgajda/json-autotype/tree/master/test).
+
+Other approaches:
+=================
+
+There is a [json-sampler](https://maxs.io/generating-types-from-json-samples/) that allows to make simpler data structure from JSON examples, but doesn't seem to perform unification, nor is it suitable for big APIs.

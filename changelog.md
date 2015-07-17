@@ -1,5 +1,9 @@
 Changelog
 =========
+    1.0.7  Jul 2015
+
+        * Dependency bump for lens and vector.
+
     1.0.6  Jun 2015
 
         * Make lens and aeson versions consistent in the *.cabal file.

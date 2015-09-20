@@ -1,5 +1,9 @@
 Changelog
 =========
+    1.0.8  Sep 2015
+
+        * Dependency bump for lens 4.13 and aeson 0.10.
+
     1.0.7  Jul 2015
 
         * Dependency bump for lens and vector.

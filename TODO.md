@@ -5,6 +5,7 @@ FEATURES TO ADD IN THE FUTURE:
 2. Export to other languages:
     * JSON Schema (WAML?)
         - http://json-schema.org/
+	- https://hackage.haskell.org/package/json-schema-0.7.4.0/docs/Data-JSON-Schema-Types.html#t:Schema
     * OCaml code
     * Java
 3. Import type from JSON schema?

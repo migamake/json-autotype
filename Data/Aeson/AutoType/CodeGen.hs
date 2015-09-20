@@ -41,13 +41,16 @@ header moduleName = Text.unlines [
   ,"import           System.IO          (stderr, hPutStrLn)"
   ,"import qualified Data.ByteString.Lazy.Char8 as BSL"
   ,"import           System.Environment (getArgs)"
-  ,"import           Control.Monad      (forM_, mzero)"
+  ,"import           Control.Monad      (forM_, mzero, join)"
   ,"import           Control.Applicative"
   ,"import           Data.Aeson.AutoType.Alternative"
   ,"import           Data.Aeson(decode, Value(..), FromJSON(..), ToJSON(..),"
   ,"                            (.:), (.:?), (.=), object)"
   ,"import           Data.Text (Text)"
   ,"import           GHC.Generics" 
+  ,""
+  ,"-- | Workaround for https://github.com/bos/aeson/issues/287."
+  ,"o .:?? val = fmap join (o .:? val)"
   ,""]
 
 epilogue :: Text

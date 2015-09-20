@@ -1,5 +1,10 @@
 Changelog
 =========
+    1.0.10  Sep 2015
+
+        * Fixed bug appeared with aeson 0.10 breaking change:
+	https://github.com/bos/aeson/issues/287
+
     1.0.8  Sep 2015
 
         * Dependency bump for lens 4.13 and aeson 0.10.

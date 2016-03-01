@@ -13,6 +13,7 @@ import           Data.Maybe
 import           Data.List                 (partition)
 import           System.Exit
 import           System.IO                 (stdin, stderr, stdout, IOMode(..))
+--import           System.IO.Posix.MMap      (mmapFileByteString)
 import           System.FilePath           (splitExtension)
 import           System.Process            (system)
 import qualified Data.ByteString.Lazy.Char8 as BSL
@@ -59,12 +60,13 @@ fatal msg = do report msg
 -- @FilePath@, extracted @Type@, and a JSON @Value@.
 extractTypeFromJSONFile :: FilePath -> IO (Maybe (FilePath, Type, Value))
 extractTypeFromJSONFile inputFilename =
-      withFileOrHandle inputFilename ReadMode stdin $ \hIn ->
+      withFileOrHandle inputFilename ReadMode stdin $ \hInput ->
         -- First we decode JSON input into Aeson's Value type
-        do bs <- preprocess <$> BSL.hGetContents hIn
-           Text.hPutStrLn stderr $ "Processing " `Text.append` Text.pack (show inputFilename)
-           myTrace ("Decoded JSON: " ++ pretty (decode bs :: Maybe Value))
-           case decode bs of
+        do Text.hPutStrLn stderr $ "Processing " `Text.append` Text.pack (show inputFilename)
+           decodedJSON :: Maybe Value <- decode <$> BSL.hGetContents hInput
+           --let decodedJSON :: Maybe Value =  decodeValue input
+           -- myTrace ("Decoded JSON: " ++ pretty decoded)
+           case decodedJSON of
              Nothing -> do report $ "Cannot decode JSON input from " `Text.append` Text.pack (show inputFilename)
                            return Nothing
              Just v  -> do -- If decoding JSON was successful...
@@ -131,7 +133,7 @@ generateHaskellFromJSONs inputFilenames outputFilename = do
   -- We start by writing module header
   writeHaskellModule outputFilename unified
   when flags_test $
-    exitWith =<< system (unwords $ ["runghc", outputFilename] ++ passedTypeCheck)
+    exitWith =<< system (unwords $ ["runghc", "-package=aeson-0.9.0.1", outputFilename] ++ passedTypeCheck)
 
 -- | Initialize flags, and run @generateHaskellFromJSONs@.
 main :: IO ()

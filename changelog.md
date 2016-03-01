@@ -1,5 +1,10 @@
 Changelog
 =========
+    1.0.11  Mar 2016
+
+        * Updated to GHC 8.0
+
+
     1.0.10  Sep 2015
 
         * Fixed bug appeared with aeson 0.10 breaking change:

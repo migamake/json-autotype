@@ -1,6 +1,6 @@
 -- Build information for the package.
 name:                json-autotype
-version:             1.0.10
+version:             1.0.11
 synopsis:            Automatic type declaration for JSON input data
 description:         Generates datatype declarations with Aeson's "FromJSON" instances
                      from a set of example ".json" files.
@@ -60,9 +60,9 @@ library
   other-modules:
                        -- internal module
                        Data.Aeson.AutoType.Util
-  build-depends:       base                 >=4.3  && <4.9,
+  build-depends:       base                 >=4.3  && <4.10,
                        GenericPretty        >=1.2  && <1.3,
-                       aeson                >=0.7  && <0.11,
+                       aeson                >=0.7  && <0.12,
                        bytestring           >=0.9  && <0.11,
                        containers           >=0.3  && <0.6,
                        filepath             >=1.3  && <1.5,
@@ -70,9 +70,10 @@ library
                        hint                 >=0.3  && <0.5,
                        hflags               >=0.3  && <0.5,
                        lens                 >=4.1  && <4.14,
+                       mmap                 >=0.5  && <0.6,
                        mtl                  >=2.1  && <2.3,
                        pretty               >=1.1  && <1.3,
-                       process              >=1.1  && <1.4,
+                       process              >=1.1  && <1.5,
                        scientific           >=0.3  && <0.5,
                        text                 >=1.1  && <1.4,
                        uniplate             >=1.6  && <1.7,
@@ -99,9 +100,9 @@ executable json-autotype
                        DeriveDataTypeable,
                        DeriveGeneric,
                        RecordWildCards
-  build-depends:       base                 >=4.3  && <4.9,
+  build-depends:       base                 >=4.3  && <4.10,
                        GenericPretty        >=1.2  && <1.3,
-                       aeson                >=0.7  && <0.11,
+                       aeson                >=0.7  && <0.12,
                        bytestring           >=0.9  && <0.11,
                        containers           >=0.3  && <0.6,
                        filepath             >=1.3  && <1.5,
@@ -111,7 +112,7 @@ executable json-autotype
                        lens                 >=4.1  && <4.14,
                        mtl                  >=2.1  && <2.3,
                        pretty               >=1.1  && <1.3,
-                       process              >=1.1  && <1.4,
+                       process              >=1.1  && <1.5,
                        scientific           >=0.3  && <0.5,
                        text                 >=1.1  && <1.4,
                        uniplate             >=1.6  && <1.7,
@@ -139,9 +140,9 @@ test-suite json-autotype-qc-test
                        DeriveDataTypeable,
                        DeriveGeneric,
                        RecordWildCards
-  build-depends:       base                 >=4.3  && <4.9,
+  build-depends:       base                 >=4.3  && <4.10,
                        GenericPretty        >=1.2  && <1.3,
-                       aeson                >=0.7  && <0.11,
+                       aeson                >=0.7  && <0.12,
                        bytestring           >=0.9  && <0.11,
                        containers           >=0.3  && <0.6,
                        directory            >=1.1  && <1.3,
@@ -150,7 +151,7 @@ test-suite json-autotype-qc-test
                        lens                 >=4.1  && <4.14,
                        mtl                  >=2.1  && <2.3,
                        pretty               >=1.1  && <1.3,
-                       process              >=1.1  && <1.4,
+                       process              >=1.1  && <1.5,
                        scientific           >=0.3  && <0.5,
                        smallcheck           >=1.0  && <1.2,
                        text                 >=1.1  && <1.4,
@@ -180,9 +181,9 @@ test-suite json-autotype-random-test
                        DeriveDataTypeable,
                        DeriveGeneric,
                        RecordWildCards
-  build-depends:       base                 >=4.3  && <4.9,
+  build-depends:       base                 >=4.3  && <4.10,
                        GenericPretty        >=1.2  && <1.3,
-                       aeson                >=0.7  && <0.11,
+                       aeson                >=0.7  && <0.12,
                        bytestring           >=0.9  && <0.11,
                        containers           >=0.3  && <0.6,
                        directory            >=1.1  && <1.3,
@@ -192,7 +193,7 @@ test-suite json-autotype-random-test
                        lens                 >=4.1  && <4.14,
                        mtl                  >=2.1  && <2.3,
                        pretty               >=1.1  && <1.3,
-                       process              >=1.1  && <1.4,
+                       process              >=1.1  && <1.5,
                        scientific           >=0.3  && <0.5,
                        smallcheck           >=1.0  && <1.2,
                        text                 >=1.1  && <1.4,

@@ -36,4 +36,4 @@ FEATURES TO ADD IN THE FUTURE:
 TESTING:
 ========
 1. Check if fix-point of parse/write/infer types.
-
+2. Check writing with `toEncoding`.

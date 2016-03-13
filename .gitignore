@@ -8,6 +8,8 @@
 *.o
 *.p_hi
 *.p_o
+.cabal-sandbox
+*.tix
 GenerateJSONParser
 dist/
 tags

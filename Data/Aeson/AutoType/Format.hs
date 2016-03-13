@@ -165,7 +165,7 @@ escapeKeywords k                           = k
 -- the separate declarations on which this one is dependent.
 formatType :: Type -> DeclM Text
 formatType  TString                          = return "Text"
-formatType  TNum                             = return "Int"
+formatType  TNum                             = return "Double"
 formatType  TBool                            = return "Bool"
 formatType (TLabel l)                        = return $ normalizeTypeName l
 formatType (TUnion u)                        = wrap <$> case length nonNull of

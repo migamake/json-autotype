@@ -98,9 +98,9 @@ makeFromJSON identifier contents =
 makeToJSON :: Text -> [MappedKey] -> Text
 makeToJSON identifier contents =
     Text.unlines [
-        Text.concat ["instance ToJSON ", identifier, " where"],
-        Text.concat ["  toJSON (",     identifier, " {", wildcard, "}) = object [", inner ", ", "]"]
-        Text.concat ["  toEncoding (", identifier, " {", wildcard, "}) = pairs  (", inner "<>", ")"]
+        Text.concat ["instance ToJSON ", identifier, " where"]
+      , Text.concat ["  toJSON (",     identifier, " {", wildcard, "}) = object [", inner ", ", "]"]
+      , Text.concat ["  toEncoding (", identifier, " {", wildcard, "}) = pairs  (", inner "<>", ")"]
       ]
   where
     wildcard | null contents = ""

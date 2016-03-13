@@ -34,7 +34,7 @@ build-type:          Simple
 extra-source-files:  README.md changelog.md
 cabal-version:       >=1.10
 bug-reports:         https://github.com/mgajda/json-autotype/issues
-tested-with:         GHC==7.8.4,GHC==7.10.3,GHC==7.6.3,GHC==8.0.0
+tested-with:         GHC==7.8.4,GHC==7.10.3,GHC==7.6.3
 
 source-repository head
   type:     git

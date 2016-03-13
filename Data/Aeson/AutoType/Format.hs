@@ -1,3 +1,4 @@
+{-# LANGUAGE CPP                 #-}
 {-# LANGUAGE TemplateHaskell     #-}
 {-# LANGuaGE ScopedTypeVariables #-}
 {-# LANGUAGE ViewPatterns        #-}
@@ -18,6 +19,7 @@ import           Control.Lens
 import           Control.Monad             (forM)
 import           Control.Exception(assert)
 import qualified Data.HashMap.Strict        as Map
+import           Data.Monoid
 import qualified Data.Set                   as Set
 import qualified Data.Text                  as Text
 import           Data.Text                 (Text)
@@ -99,10 +101,15 @@ makeToJSON :: Text -> [MappedKey] -> Text
 makeToJSON identifier contents =
     Text.unlines [
         Text.concat ["instance ToJSON ", identifier, " where"]
-      , Text.concat ["  toJSON (",     identifier, " {", wildcard, "}) = object [", inner ", ", "]"]
-      , Text.concat ["  toEncoding (", identifier, " {", wildcard, "}) = pairs  (", inner "<>", ")"]
+      , Text.concat ["  toJSON     (", identifier, " {", wildcard, "}) = object [", inner ", ", "]"]
+#if MIN_VERSION_aeson(0,11,0)
+      , maybeToEncoding
+#endif
       ]
   where
+    maybeToEncoding | null contents = ""
+                    | otherwise     =
+                        Text.concat ["  toEncoding (", identifier, " {", wildcard, "}) = pairs  (", inner "<>", ")"]
     wildcard | null contents = ""
              | otherwise     = ".."
     inner separator = separator `Text.intercalate`

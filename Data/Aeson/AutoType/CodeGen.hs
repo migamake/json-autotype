@@ -1,3 +1,4 @@
+{-# LANGUAGE CPP               #-}
 {-# LANGUAGE OverloadedStrings #-}
 -- | Wrappers for generating prologue and epilogue code in Haskell.
 module Data.Aeson.AutoType.CodeGen(
@@ -45,7 +46,11 @@ header moduleName = Text.unlines [
   ,"import           Control.Applicative"
   ,"import           Data.Aeson.AutoType.Alternative"
   ,"import           Data.Aeson(decode, Value(..), FromJSON(..), ToJSON(..),"
+#if MIN_VERSION_aeson(0,11,0)
+  ,"                            pairs,"
+#endif
   ,"                            (.:), (.:?), (.=), object)"
+  ,"import           Data.Monoid"
   ,"import           Data.Text (Text)"
   ,"import           GHC.Generics" 
   ,""

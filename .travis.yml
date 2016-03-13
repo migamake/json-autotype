@@ -63,10 +63,3 @@ script:
     fi
   - echo ${PWD}
 
-#after_script:
-#  - echo ${PWD}
-#  - find dist -iname '*.tix'
-#  - travis_retry cabal install codecov-haskell hpc-coveralls
-#  - codecov-haskell                               json-autotype-random-test json-autotype-qc-test 
-#  - hpc-coveralls   --repo-token ${COVERALLS_KEY} json-autotype-random-test json-autotype-qc-test
-#

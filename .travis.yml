@@ -20,6 +20,7 @@ before_install:
  - export PATH=/opt/ghc/$GHCVER/bin:$PATH:$HOME/.cabal/bin
  - echo "Check version again"
  - ghc   --version
+ - which cabal
  - cabal --version
 
 install:

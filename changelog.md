@@ -3,6 +3,7 @@ Changelog
     1.0.12  Mar 2016
 
         * Fixed issue #8 - misrepresenting Double as Int.
+        * Fixed issue #9 - efficient formatting with new Aeson-0.10 builder (toEncoding.)
 
     1.0.11  Mar 2016
 

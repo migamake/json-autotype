@@ -1,5 +1,8 @@
 Changelog
 =========
+    1.0.13  Mar 2016
+        * Bumped up hint upper bound for v0.5.
+
     1.0.12  Mar 2016
 
         * Fixed issue #8 - misrepresenting Double as Int.

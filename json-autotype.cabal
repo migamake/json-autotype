@@ -1,6 +1,6 @@
 -- Build information for the package.
 name:                json-autotype
-version:             1.0.13
+version:             1.0.14
 synopsis:            Automatic type declaration for JSON input data
 description:         Generates datatype declarations with Aeson's "FromJSON" instances
                      from a set of example ".json" files.
@@ -47,8 +47,8 @@ library
                        Data.Aeson.AutoType.Pretty
                        Data.Aeson.AutoType.CodeGen
                        Data.Aeson.AutoType.Alternative
-                       Data.Aeson.AutoType.Plugin.Subtype
-                       Data.Aeson.AutoType.Plugin.Loader
+                       -- Data.Aeson.AutoType.Plugin.Subtype
+                       -- Data.Aeson.AutoType.Plugin.Loader
   other-extensions:    TemplateHaskell,
                        ScopedTypeVariables,
                        OverloadedStrings,
@@ -67,9 +67,9 @@ library
                        containers           >=0.3  && <0.6,
                        filepath             >=1.3  && <1.5,
                        hashable             >=1.2  && <1.3,
-                       hint                 >=0.4  && <0.6,
+                       ---hint                 >=0.4  && <0.6,
                        hflags               >=0.3  && <0.5,
-                       lens                 >=4.1  && <4.14,
+                       lens                 >=4.1  && <4.15,
                        mmap                 >=0.5  && <0.6,
                        mtl                  >=2.1  && <2.3,
                        pretty               >=1.1  && <1.3,
@@ -89,8 +89,8 @@ executable json-autotype
                        Data.Aeson.AutoType.Pretty
                        Data.Aeson.AutoType.CodeGen
                        Data.Aeson.AutoType.Alternative
-                       Data.Aeson.AutoType.Plugin.Subtype
-                       Data.Aeson.AutoType.Plugin.Loader
+                       -- Data.Aeson.AutoType.Plugin.Subtype
+                       -- Data.Aeson.AutoType.Plugin.Loader
                        Data.Aeson.AutoType.Util
   other-extensions:    TemplateHaskell,
                        ScopedTypeVariables,
@@ -107,9 +107,9 @@ executable json-autotype
                        containers           >=0.3  && <0.6,
                        filepath             >=1.3  && <1.5,
                        hashable             >=1.2  && <1.3,
-                       hint                 >=0.4  && <0.6,
+                       --hint                 >=0.4  && <0.6,
                        hflags               >=0.3  && <0.5,
-                       lens                 >=4.1  && <4.14,
+                       lens                 >=4.1  && <4.15,
                        mtl                  >=2.1  && <2.3,
                        pretty               >=1.1  && <1.3,
                        process              >=1.1  && <1.5,
@@ -148,7 +148,7 @@ test-suite json-autotype-qc-test
                        directory            >=1.1  && <1.3,
                        filepath             >=1.3  && <1.5,
                        hashable             >=1.2  && <1.3,
-                       lens                 >=4.1  && <4.14,
+                       lens                 >=4.1  && <4.15,
                        mtl                  >=2.1  && <2.3,
                        pretty               >=1.1  && <1.3,
                        process              >=1.1  && <1.5,
@@ -190,7 +190,7 @@ test-suite json-autotype-random-test
                        filepath             >=1.3  && <1.5,
                        hashable             >=1.2  && <1.3,
                        hflags               >=0.3  && <0.5,
-                       lens                 >=4.1  && <4.14,
+                       lens                 >=4.1  && <4.15,
                        mtl                  >=2.1  && <2.3,
                        pretty               >=1.1  && <1.3,
                        process              >=1.1  && <1.5,

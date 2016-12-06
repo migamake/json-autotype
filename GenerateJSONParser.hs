@@ -30,6 +30,7 @@ import           Data.Aeson.AutoType.Extract
 import           Data.Aeson.AutoType.Format
 import           Data.Aeson.AutoType.CodeGen
 import           Data.Aeson.AutoType.Util
+import qualified Data.Yaml as Yaml
 import           HFlags
 
 -- * Command line flags
@@ -39,6 +40,7 @@ defineFlag "autounify"         True                  "Automatically unify sugges
 defineFlag "t:test"            False                 "Try to run generated parser after"
 defineFlag "d:debug"           False                 "Set this flag to see more debugging info"
 defineFlag "y:typecheck"       True                  "Set this flag to typecheck after unification"
+defineFlag "yaml"              False                 "Parse inputs as YAML instead of JSON"
 defineFlag "p:preprocessor"    False                 "Work as GHC preprocessor (skip preprocessor pragma)"
 defineFlag "fakeFlag"          True                  "Ignore this flag - it doesn't exist!!! It is workaround to library problem."
 
@@ -63,7 +65,7 @@ extractTypeFromJSONFile inputFilename =
       withFileOrHandle inputFilename ReadMode stdin $ \hInput ->
         -- First we decode JSON input into Aeson's Value type
         do Text.hPutStrLn stderr $ "Processing " `Text.append` Text.pack (show inputFilename)
-           decodedJSON :: Maybe Value <- decode <$> BSL.hGetContents hInput
+           decodedJSON :: Maybe Value <- decoder <$> BSL.hGetContents hInput
            --let decodedJSON :: Maybe Value =  decodeValue input
            -- myTrace ("Decoded JSON: " ++ pretty decoded)
            case decodedJSON of
@@ -76,6 +78,9 @@ extractTypeFromJSONFile inputFilename =
                (v `typeCheck` t) `unless` fatal ("Typecheck against base type failed for "
                                                     `Text.append` Text.pack inputFilename)
                return $ Just (inputFilename, t, v)
+  where
+    decoder | flags_yaml = Yaml.decode . BSL.toStrict
+            | otherwise  =      decode
 
 -- | Perform preprocessing of JSON input to drop initial pragma.
 preprocess :: BSL.ByteString -> BSL.ByteString

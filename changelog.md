@@ -1,5 +1,11 @@
 Changelog
 =========
+    1.0.15  Dec 2016
+        * Support YAML input.
+
+    1.0.14  May 2016
+        * Update to latest lens.
+
     1.0.13  Mar 2016
         * Bumped up hint upper bound for v0.5.
 

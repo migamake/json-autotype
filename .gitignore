@@ -10,6 +10,7 @@
 *.p_o
 .cabal-sandbox
 *.tix
+cabal.sandbox.config
 GenerateJSONParser
 dist/
 tags

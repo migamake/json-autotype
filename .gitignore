@@ -11,6 +11,7 @@
 .cabal-sandbox
 *.tix
 cabal.sandbox.config
+.stack-work
 GenerateJSONParser
 dist/
 tags

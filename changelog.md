@@ -1,5 +1,9 @@
 Changelog
 =========
+    1.0.16  July 2017
+        * Switch to optparse-applicative
+        * Option to explicitly unify some entries
+
     1.0.15  Dec 2016
         * Support YAML input.
 

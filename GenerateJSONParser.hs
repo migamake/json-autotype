@@ -1,8 +1,8 @@
-{-# LANGUAGE TemplateHaskell      #-}
+-- {-# LANGUAGE TemplateHaskell      #-}
 {-# LANGUAGE ScopedTypeVariables  #-}
 {-# LANGUAGE OverloadedStrings    #-}
-{-# LANGUAGE DeriveGeneric        #-}
-{-# LANGUAGE StandaloneDeriving   #-}
+-- {-# LANGUAGE DeriveGeneric        #-}
+-- {-# LANGUAGE StandaloneDeriving   #-}
 {-# LANGUAGE ViewPatterns         #-}
 {-# OPTIONS_GHC -fno-warn-orphans #-}
 module Main where
@@ -31,22 +31,35 @@ import           Data.Aeson.AutoType.Format
 import           Data.Aeson.AutoType.CodeGen
 import           Data.Aeson.AutoType.Util
 import qualified Data.Yaml as Yaml
-import           HFlags
 
 -- * Command line flags
-defineFlag "o:outputFilename"  defaultOutputFilename "Write output to the given file"
-defineFlag "suggest"           True                  "Suggest candidates for unification"
-defineFlag "autounify"         True                  "Automatically unify suggested candidates"
-defineFlag "t:test"            False                 "Try to run generated parser after"
-defineFlag "d:debug"           False                 "Set this flag to see more debugging info"
-defineFlag "y:typecheck"       True                  "Set this flag to typecheck after unification"
-defineFlag "yaml"              False                 "Parse inputs as YAML instead of JSON"
-defineFlag "p:preprocessor"    False                 "Work as GHC preprocessor (skip preprocessor pragma)"
-defineFlag "fakeFlag"          True                  "Ignore this flag - it doesn't exist!!! It is workaround to library problem."
+--defineFlag "o:outputFilename"  defaultOutputFilename "Write output to the given file"
+--defineFlag "suggest"           True                  "Suggest candidates for unification"
+--defineFlag "autounify"         True                  "Automatically unify suggested candidates"
+--defineFlag "t:test"            False                 "Try to run generated parser after"
+--defineFlag "d:debug"           False                 "Set this flag to see more debugging info"
+--defineFlag "y:typecheck"       True                  "Set this flag to typecheck after unification"
+--defineFlag "yaml"              False                 "Parse inputs as YAML instead of JSON"
+--defineFlag "p:preprocessor"    False                 "Work as GHC preprocessor (skip preprocessor pragma)"
+--defineFlag "fakeFlag"          True                  "Ignore this flag - it doesn't exist!!! It is workaround to library problem."
 
--- | Works like @Debug.trace@ when the --debug flag is enabled, and does nothing otherwise.
-myTrace :: String -> IO ()
-myTrace msg = flags_debug `when` putStrLn msg
+data Options = Options {
+                 tyOpts :: TypeOptions
+               , outputFilename :: FilePath
+               , typecheck :: Bool
+               , yaml :: Bool
+               , preprocessor :: Bool
+               , filenames :: [FilePath]
+               }
+
+optParser :: Parser Options
+optParser  =
+    Options  <$> tyOptParser
+             <*> strOption (short "o" <> long "output" <> value defaultOptionFilename)
+             <*> unflag    (short "n" <> long "no-typecheck" <> help "Do not typecheck after unification")
+             <*> switch    (long "yaml"                  <> "Parse inputs as YAML instead of JSON"  )
+             <*> switch    (short "p" <> long "preprocessor" <> help "Work as GHC preprocessor (and skip preprocessor pragma)"  )
+             <*> some (argument str (metavar "FILES..."))
 
 -- | Report an error to error output.
 report   :: Text -> IO ()
@@ -60,8 +73,8 @@ fatal msg = do report msg
 -- | Extracts type from JSON file, along with the original @Value@.
 -- In order to facilitate dealing with failures, it returns a triple of
 -- @FilePath@, extracted @Type@, and a JSON @Value@.
-extractTypeFromJSONFile :: FilePath -> IO (Maybe (FilePath, Type, Value))
-extractTypeFromJSONFile inputFilename =
+extractTypeFromJSONFile :: _ -> FilePath -> IO (Maybe (FilePath, Type, Value))
+extractTypeFromJSONFile myTrace inputFilename =
       withFileOrHandle inputFilename ReadMode stdin $ \hInput ->
         -- First we decode JSON input into Aeson's Value type
         do Text.hPutStrLn stderr $ "Processing " `Text.append` Text.pack (show inputFilename)
@@ -86,11 +99,6 @@ extractTypeFromJSONFile inputFilename =
 preprocess :: BSL.ByteString -> BSL.ByteString
 preprocess | flags_preprocessor = dropPragma
            | otherwise          = id
-
--- | Drop initial pragma.
-dropPragma :: BSL.ByteString -> BSL.ByteString
-dropPragma input | "{-#" `BSL.isPrefixOf` input = BSL.dropWhile (/='\n') input
-                 | otherwise                    = input
 
 -- | Type checking all input files with given type,
 -- and return a list of filenames for files that passed the check.
@@ -139,9 +147,23 @@ generateHaskellFromJSONs inputFilenames outputFilename = do
   writeHaskellModule outputFilename unified
   when flags_test $
     exitWith =<< system (unwords $ ["runghc", "-package=aeson-0.9.0.1", outputFilename] ++ passedTypeCheck)
+  where
+    -- | Works like @Debug.trace@ when the --debug flag is enabled, and does nothing otherwise.
+    myTrace :: String -> IO ()
+    myTrace msg = debug `when` putStrLn msg
+
+-- | Drop initial pragma.
+dropPragma :: BSL.ByteString -> BSL.ByteString
+dropPragma input | "{-#" `BSL.isPrefixOf` input = BSL.dropWhile (/='\n') input
+                 | otherwise                    = input
+
 
 -- | Initialize flags, and run @generateHaskellFromJSONs@.
 main :: IO ()
-main = do filenames <- $initHFlags "json-autotype -- automatic type and parser generation from JSON"
-          -- TODO: should integrate all inputs into single type set!!!
-          generateHaskellFromJSONs filenames flags_outputFilename
+main = do opts <- execParser optInfo
+          generateHaskellFromJSONs (filenames opts) (outputFilename opts)
+  where
+    optInfo = info (optParser <**> helper)
+            ( fullDesc
+            <> progDesc "Parser JSON or YAML, get its type, and generate appropriate parser."
+            <> header "json-autotype -- automatic type and parser generation from JSON")

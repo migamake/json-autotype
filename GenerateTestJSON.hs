@@ -41,8 +41,9 @@ import           Data.Aeson.AutoType.Format
 import           Data.Aeson.AutoType.CodeGen
 import           Data.Aeson.AutoType.Util
 import           Data.Aeson.AutoType.Test
---import           HFlags -- TODO: remove
 import           Options.Applicative
+
+import           CommonCLI
 
 -- * Command line flags
 --defineFlag "z:size"            (10     :: Int)        "Size of generated elements"
@@ -57,13 +58,6 @@ import           Options.Applicative
 --defineFlag "keep"               False                 "Keep also the successful tests"
 --defineFlag "fakeFlag"           True                  "Ignore this flag - it doesn't exist!!! It is workaround for a library problem."
 
-data TypeOpts = TyOptions {
-                  autounify :: Bool
-                , debug     :: Bool
-                , test      :: Bool
-                , suggest   :: Bool
-                }
-
 data Options = Options {
                  tyOpts    :: TypeOpts
                , keep      :: Bool
@@ -71,15 +65,6 @@ data Options = Options {
                , count     :: Int
                , size      :: Int
                }
-
-unflag = flag True False
-
-tyOptParser :: Parser TypeOpts
-tyOptParser  = TyOptions
-            <$> unflag (long "no-autounify" <> help "Do not automatically unify suggested candidates")
-            <*> switch (long "debug"        <> help "Set this flag to see more debugging info"       )
-            <*> unflag (long "no-test"      <> help "Do not run generated parser afterwards"         )
-            <*> unflag (long "no-suggest"   <> help "Do not suggest candidates for unification"      )
 
 optParser :: Parser Options
 optParser  =

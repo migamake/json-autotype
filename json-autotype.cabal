@@ -92,6 +92,7 @@ executable json-autotype
                        -- Data.Aeson.AutoType.Plugin.Subtype
                        -- Data.Aeson.AutoType.Plugin.Loader
                        Data.Aeson.AutoType.Util
+                       CommonCLI
   other-extensions:    TemplateHaskell,
                        ScopedTypeVariables,
                        OverloadedStrings,
@@ -160,7 +161,7 @@ test-suite json-autotype-qc-test
                        unordered-containers >=0.2  && <0.3,
                        vector               >=0.9  && <0.13,
                        QuickCheck           >=2.4  && <3.0
-  -- hs-source-dirs:      
+  -- hs-source-dirs:
   default-language:    Haskell2010
 
 -- Test suite with Haskell code generation and compilation
@@ -168,12 +169,13 @@ test-suite json-autotype-gen-test
   type:                exitcode-stdio-1.0
   main-is:             GenerateTestJSON.hs
   other-modules:       Data.Aeson.AutoType.Util
-                       Data.Aeson.AutoType.Pretty 
-                       Data.Aeson.AutoType.Type   
+                       Data.Aeson.AutoType.Pretty
+                       Data.Aeson.AutoType.Type
                        Data.Aeson.AutoType.Extract
-                       Data.Aeson.AutoType.Format 
+                       Data.Aeson.AutoType.Format
                        Data.Aeson.AutoType.CodeGen
-                       Data.Aeson.AutoType.Test   
+                       Data.Aeson.AutoType.Test
+                       CommonCLI
   other-extensions:    TemplateHaskell,
                        ScopedTypeVariables,
                        OverloadedStrings,

@@ -8,20 +8,21 @@
 module Main where
 
 import           Control.Applicative
-import           Control.Monad             (forM_, when, unless)
+import           Control.Monad                  (forM_, when, unless)
 import           Data.Maybe
-import           Data.List                 (partition)
+import           Data.Monoid
+import           Data.List                      (partition)
 import           System.Exit
-import           System.IO                 (stdin, stderr, stdout, IOMode(..))
---import           System.IO.Posix.MMap      (mmapFileByteString)
-import           System.FilePath           (splitExtension)
-import           System.Process            (system)
+import           System.IO                      (stdin, stderr, stdout, IOMode(..))
+--import           System.IO.Posix.MMap           (mmapFileByteString)
+import           System.FilePath                (splitExtension)
+import           System.Process                 (system)
 import qualified Data.ByteString.Lazy.Char8 as BSL
 import qualified Data.HashMap.Strict        as Map
 import           Data.Aeson
 import qualified Data.Text                  as Text
 import qualified Data.Text.IO               as Text
-import           Data.Text                 (Text)
+import           Data.Text                      (Text)
 import           Text.PrettyPrint.GenericPretty (pretty)
 
 import           Data.Aeson.AutoType.Pretty
@@ -31,6 +32,9 @@ import           Data.Aeson.AutoType.Format
 import           Data.Aeson.AutoType.CodeGen
 import           Data.Aeson.AutoType.Util
 import qualified Data.Yaml as Yaml
+
+import           Options.Applicative
+import           CommonCLI
 
 -- * Command line flags
 --defineFlag "o:outputFilename"  defaultOutputFilename "Write output to the given file"
@@ -44,7 +48,7 @@ import qualified Data.Yaml as Yaml
 --defineFlag "fakeFlag"          True                  "Ignore this flag - it doesn't exist!!! It is workaround to library problem."
 
 data Options = Options {
-                 tyOpts :: TypeOptions
+                 tyOpts :: TypeOpts
                , outputFilename :: FilePath
                , typecheck :: Bool
                , yaml :: Bool
@@ -55,10 +59,10 @@ data Options = Options {
 optParser :: Parser Options
 optParser  =
     Options  <$> tyOptParser
-             <*> strOption (short "o" <> long "output" <> value defaultOptionFilename)
-             <*> unflag    (short "n" <> long "no-typecheck" <> help "Do not typecheck after unification")
-             <*> switch    (long "yaml"                  <> "Parse inputs as YAML instead of JSON"  )
-             <*> switch    (short "p" <> long "preprocessor" <> help "Work as GHC preprocessor (and skip preprocessor pragma)"  )
+             <*> strOption (short 'o' <> long "output" <> value defaultOutputFilename)
+             <*> unflag    (short 'n' <> long "no-typecheck" <> help "Do not typecheck after unification")
+             <*> switch    (long  "yaml"                  <> help "Parse inputs as YAML instead of JSON"  )
+             <*> switch    (short 'p' <> long "preprocessor" <> help "Work as GHC preprocessor (and skip preprocessor pragma)"  )
              <*> some (argument str (metavar "FILES..."))
 
 -- | Report an error to error output.
@@ -73,8 +77,8 @@ fatal msg = do report msg
 -- | Extracts type from JSON file, along with the original @Value@.
 -- In order to facilitate dealing with failures, it returns a triple of
 -- @FilePath@, extracted @Type@, and a JSON @Value@.
-extractTypeFromJSONFile :: _ -> FilePath -> IO (Maybe (FilePath, Type, Value))
-extractTypeFromJSONFile myTrace inputFilename =
+extractTypeFromJSONFile :: Options -> FilePath -> IO (Maybe (FilePath, Type, Value))
+extractTypeFromJSONFile opts inputFilename =
       withFileOrHandle inputFilename ReadMode stdin $ \hInput ->
         -- First we decode JSON input into Aeson's Value type
         do Text.hPutStrLn stderr $ "Processing " `Text.append` Text.pack (show inputFilename)
@@ -92,13 +96,16 @@ extractTypeFromJSONFile myTrace inputFilename =
                                                     `Text.append` Text.pack inputFilename)
                return $ Just (inputFilename, t, v)
   where
-    decoder | flags_yaml = Yaml.decode . BSL.toStrict
-            | otherwise  =      decode
+    decoder | yaml opts = Yaml.decode . BSL.toStrict
+            | otherwise =      decode
+    -- | Works like @Debug.trace@ when the --debug flag is enabled, and does nothing otherwise.
+    myTrace :: String -> IO ()
+    myTrace msg = debug (tyOpts opts) `when` putStrLn msg
+    -- | Perform preprocessing of JSON input to drop initial pragma.
+    preprocess :: BSL.ByteString -> BSL.ByteString
+    preprocess | preprocessor opts = dropPragma
+               | otherwise         = id
 
--- | Perform preprocessing of JSON input to drop initial pragma.
-preprocess :: BSL.ByteString -> BSL.ByteString
-preprocess | flags_preprocessor = dropPragma
-           | otherwise          = id
 
 -- | Type checking all input files with given type,
 -- and return a list of filenames for files that passed the check.
@@ -114,18 +121,18 @@ typeChecking ty filenames values = do
      map fst -> failures) = partition snd checkedFiles
 
 -- | Take a set of JSON input filenames, Haskell output filename, and generate module parsing these JSON files.
-generateHaskellFromJSONs :: [FilePath] -> FilePath -> IO ()
-generateHaskellFromJSONs inputFilenames outputFilename = do
+generateHaskellFromJSONs :: Options -> [FilePath] -> FilePath -> IO ()
+generateHaskellFromJSONs opts inputFilenames outputFilename = do
   -- Read type from each file
   (filenames,
    typeForEachFile,
-   valueForEachFile) <- (unzip3 . catMaybes) <$> mapM extractTypeFromJSONFile inputFilenames
+   valueForEachFile) <- (unzip3 . catMaybes) <$> mapM (extractTypeFromJSONFile opts) inputFilenames
   -- Unify all input types
   when (null typeForEachFile) $ do
     report "No valid JSON input file..."
     exitFailure
   let finalType = foldr1 unifyTypes typeForEachFile
-  passedTypeCheck <- if flags_typecheck
+  passedTypeCheck <- if typecheck opts
                         then typeChecking finalType filenames valueForEachFile
                         else return                 filenames
   -- We split different dictionary labels to become different type trees (and thus different declarations.)
@@ -135,22 +142,22 @@ generateHaskellFromJSONs inputFilenames outputFilename = do
   -- We compute which type labels are candidates for unification
   let uCands = unificationCandidates splitted
   myTrace $ "CANDIDATES:\n" ++ pretty uCands
-  when flags_suggest $ forM_ uCands $ \cs -> do
+  when (suggest $ tyOpts opts) $ forM_ uCands $ \cs -> do
                          putStr "-- "
                          Text.putStrLn $ "=" `Text.intercalate` cs
   -- We unify the all candidates or only those that have been given as command-line flags.
-  let unified = if flags_autounify
+  let unified = if autounify $ tyOpts opts
                   then unifyCandidates uCands splitted
                   else splitted
   myTrace $ "UNIFIED:\n" ++ pretty unified
   -- We start by writing module header
   writeHaskellModule outputFilename unified
-  when flags_test $
+  when (test $ tyOpts opts) $
     exitWith =<< system (unwords $ ["runghc", "-package=aeson-0.9.0.1", outputFilename] ++ passedTypeCheck)
   where
     -- | Works like @Debug.trace@ when the --debug flag is enabled, and does nothing otherwise.
     myTrace :: String -> IO ()
-    myTrace msg = debug `when` putStrLn msg
+    myTrace msg = debug (tyOpts opts) `when` putStrLn msg
 
 -- | Drop initial pragma.
 dropPragma :: BSL.ByteString -> BSL.ByteString
@@ -161,7 +168,7 @@ dropPragma input | "{-#" `BSL.isPrefixOf` input = BSL.dropWhile (/='\n') input
 -- | Initialize flags, and run @generateHaskellFromJSONs@.
 main :: IO ()
 main = do opts <- execParser optInfo
-          generateHaskellFromJSONs (filenames opts) (outputFilename opts)
+          generateHaskellFromJSONs opts (filenames opts) (outputFilename opts)
   where
     optInfo = info (optParser <**> helper)
             ( fullDesc

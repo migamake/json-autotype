@@ -52,7 +52,7 @@ header moduleName = Text.unlines [
   ,"                            (.:), (.:?), (.=), object)"
   ,"import           Data.Monoid"
   ,"import           Data.Text (Text)"
-  ,"import           GHC.Generics" 
+  ,"import qualified GHC.Generics" 
   ,""
   ,"-- | Workaround for https://github.com/bos/aeson/issues/287."
   ,"o .:?? val = fmap join (o .:? val)"

@@ -64,7 +64,7 @@ wrapAlias identifier contents = Text.unwords ["type", identifier, "=", contents]
 
 -- | Wrap a data type declaration
 wrapDecl ::  Text -> Text -> Text
-wrapDecl identifier contents = Text.unlines [header, contents, "  } deriving (Show,Eq,Generic)"]
+wrapDecl identifier contents = Text.unlines [header, contents, "  } deriving (Show,Eq,GHC.Generics.Generic)"]
                                             --,"\nderiveJSON defaultOptions ''" `Text.append` identifier]
   where
     header = Text.concat ["data ", identifier, " = ", identifier, " { "]

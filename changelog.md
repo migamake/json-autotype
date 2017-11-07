@@ -1,12 +1,12 @@
 Changelog
 =========
-    1.0.17  Nov 2017
+    1.0.16  Nov 2017
         * Dependencies updated to resolve #12, #15.
         * Fixed orphan Generic for Aeson >= 1.2.1 (#14).
-
-    1.0.16  July 2017
+        * Cleaned option parsing code.
+        * Qualify GHC.Generics import.
         * Switch to optparse-applicative
-        * Option to explicitly unify some entries
+        * Option to explicitly unify selected entries
 
     1.0.15  Dec 2016
         * Support YAML input.

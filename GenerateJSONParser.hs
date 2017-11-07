@@ -16,7 +16,7 @@ import           System.FilePath                (splitExtension)
 import           System.Process                 (system)
 import qualified Data.ByteString.Lazy.Char8 as BSL
 import qualified Data.HashMap.Strict        as Map
-import           Data.Aeson --(Value(..), decode, encode, FromJSON(..), ToJSON(..))
+import           Data.Aeson(Value(..), decode, encode, FromJSON(..), ToJSON(..))
 import qualified Data.Text                  as Text
 import qualified Data.Text.IO               as Text
 import           Data.Text                      (Text)

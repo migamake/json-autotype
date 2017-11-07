@@ -11,25 +11,33 @@ before_install:
 - export PATH=$HOME/.local/bin:$PATH
 - travis_retry curl -L https://www.stackage.org/stack/linux-x86_64 | tar xz --wildcards --strip-components=1 -C ~/.local/bin '*/stack'
 
-before_install:
-  - export PATH=/opt/ghc/7.10.2/bin:$PATH
-
-install:
-  - stack --no-terminal setup
-
 matrix:
   include:
-    - env: RESOLVER=lts-8
+    - env: RESOLVER=9.12
+    # for GHC 8.0.2
+    - env: RESOLVER=7.24
+    # for GHC 8.0.1
+    - env: RESOLVER=6.35
+    # for GHC 7.10.3
+    - env: RESOLVER=3.22
+    #for GHC 7.10.2
+    - env: RESOLVER=2.22
+    #for GHC 7.8.4
+    - env: RESOLVER=0.7
+    #for GHC 7.8.3
+
+install:
+  - stack --resolver $RESOLVER --no-terminal setup
 
 script:
-  - stack --no-terminal test 
+  - stack --resolver $RESOLVER --no-terminal test
   - bash  testit.sh
-  - stack --no-terminal exec -- cabal check
-  - stack --no-terminal exec -- cabal sdist
+  - stack --resolver $RESOLVER --no-terminal exec -- cabal check
+  - stack --resolver $RESOLVER --no-terminal exec -- cabal sdist
 # Check that the resulting source distribution can be built & installed.
 # If there are no other `.tar.gz` files in `dist`, this can be even simpler:
 # `cabal install --force-reinstalls dist/*-*.tar.gz`
  - SRC_TGZ=$(cabal$CABALVER info . | awk '{print $2;exit}').tar.gz &&
-   (cd dist && cabal$CABALVER install --force-reinstalls "$SRC_TGZ")
+   (cd dist && stack --resolver $RESOLVER install --force-reinstalls "$SRC_TGZ")
 
 # EOF

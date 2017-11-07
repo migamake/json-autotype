@@ -153,7 +153,7 @@ generateHaskellFromJSONs opts inputFilenames outputFilename = do
   -- We start by writing module header
   writeHaskellModule outputFilename unified
   when (test $ tyOpts opts) $
-    exitWith =<< system (unwords $ ["runghc", "-package=aeson-0.9.0.1", outputFilename] ++ passedTypeCheck)
+    exitWith =<< system (unwords $ ["runghc", "-package=aeson", outputFilename] ++ passedTypeCheck)
   where
     -- | Works like @Debug.trace@ when the --debug flag is enabled, and does nothing otherwise.
     myTrace :: String -> IO ()

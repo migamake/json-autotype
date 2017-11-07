@@ -1,8 +1,5 @@
--- {-# LANGUAGE TemplateHaskell      #-}
 {-# LANGUAGE ScopedTypeVariables  #-}
 {-# LANGUAGE OverloadedStrings    #-}
--- {-# LANGUAGE DeriveGeneric        #-}
--- {-# LANGUAGE StandaloneDeriving   #-}
 {-# LANGUAGE ViewPatterns         #-}
 {-# OPTIONS_GHC -fno-warn-orphans #-}
 module Main where

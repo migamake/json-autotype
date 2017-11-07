@@ -13,26 +13,26 @@ before_cache:
 
 matrix:
   include:
-    - env: CABALVER=1.16 GHCVER=7.6.3
+    - env: CABALVER=-1.16 GHCVER=7.6.3
       compiler: ": #GHC 7.6.3"
       addons: {apt: {packages: [cabal-install-1.16,ghc-7.6.3], sources: [hvr-ghc]}}
-    - env: CABALVER=1.18 GHCVER=7.8.4
+    - env: CABALVER=-1.18 GHCVER=7.8.4
       compiler: ": #GHC 7.8.4"
       addons: {apt: {packages: [cabal-install-1.18,ghc-7.8.4], sources: [hvr-ghc]}}
-    - env: CABALVER=1.22 GHCVER=7.10.3
+    - env: CABALVER=-1.22 GHCVER=7.10.3
       compiler: ": #GHC 7.10.3"
       addons: {apt: {packages: [cabal-install-1.22,ghc-7.10.3], sources: [hvr-ghc]}}
     - env: CABALVER=1.24 GHCVER=8.0.2
       compiler: ": #GHC 8.0.2"
       addons: {apt: {packages: [cabal-install-1.24,ghc-8.0.2], sources: [hvr-ghc]}}
-    - env: CABALVER=2.0 GHCVER=8.2.2
+    - env: CABALVER= GHCVER=8.2.2
       compiler: ": #GHC 8.2.2"
       addons: {apt: {packages: [cabal-install-1.24,ghc-8.2.2], sources: [hvr-ghc]}}
   allow_failures:
-    - env: GHCVER=8.2.2  CABALVER=1.24
-    - env: GHCVER=8.0.1  CABALVER=1.24
-    - env: GHCVER=7.8.4  CABALVER=1.18
-    - env: GHCVER=7.6.3  CABALVER=1.16
+    - env: GHCVER=8.2.2  CABALVER=
+    - env: GHCVER=8.0.1  CABALVER=
+    - env: GHCVER=7.8.4  CABALVER=-1.18
+    - env: GHCVER=7.6.3  CABALVER=-1.16
     - env: GHCVER=head   CABALVER=head
 
 before_install:
@@ -40,16 +40,16 @@ before_install:
  - export PATH=/opt/ghc/$GHCVER/bin:/opt/cabal/$CABALVER/bin:$PATH
 
 install:
- - cabal-$CABALVER --version
+ - cabal$CABALVER --version
  - echo "$(ghc --version) [$(ghc --print-project-git-commit-id 2> /dev/null || echo '?')]"
  - if [ -f $HOME/.cabal/packages/hackage.haskell.org/00-index.tar.gz ];
    then
      zcat $HOME/.cabal/packages/hackage.haskell.org/00-index.tar.gz >
           $HOME/.cabal/packages/hackage.haskell.org/00-index.tar;
    fi
- - travis_retry cabal-$CABALVER update -v
+ - travis_retry cabal$CABALVER update -v
  - sed -i 's/^jobs:/-- jobs:/' ${HOME}/.cabal/config
- - cabal-$CABALVER install --only-dependencies --enable-tests --enable-benchmarks --dry -v > installplan.txt
+ - cabal$CABALVER install --only-dependencies --enable-tests --enable-benchmarks --dry -v > installplan.txt
  - sed -i -e '1,/^Resolving /d' installplan.txt; cat installplan.txt
 
 # check whether current requested install-plan matches cached package-db snapshot
@@ -63,7 +63,7 @@ install:
      echo "cabal build-cache MISS";
      rm -rf $HOME/.cabsnap;
      mkdir -p $HOME/.ghc $HOME/.cabal/lib $HOME/.cabal/share $HOME/.cabal/bin;
-     cabal-$CABALVER install --only-dependencies --enable-tests --enable-benchmarks;
+     cabal$CABALVER install --only-dependencies --enable-tests --enable-benchmarks;
    fi
 
 # snapshot package-db on cache miss
@@ -79,17 +79,17 @@ install:
 # any command which exits with a non-zero exit code causes the build to fail.
 script:
  - if [ -f configure.ac ]; then autoreconf -i; fi
- - cabal-$CABALVER configure --enable-tests --enable-benchmarks -v2  # -v2 provides useful information for debugging
- - cabal-$CABALVER build   # this builds all libraries and executables (including tests/benchmarks)
- - cabal-$CABALVER test
+ - cabal$CABALVER configure --enable-tests --enable-benchmarks -v2  # -v2 provides useful information for debugging
+ - cabal$CABALVER build   # this builds all libraries and executables (including tests/benchmarks)
+ - cabal$CABALVER test
  - bash testit.sh
- - cabal-$CABALVER check
- - cabal-$CABALVER sdist   # tests that a source-distribution can be generated
+ - cabal$CABALVER check
+ - cabal$CABALVER sdist   # tests that a source-distribution can be generated
 
 # Check that the resulting source distribution can be built & installed.
 # If there are no other `.tar.gz` files in `dist`, this can be even simpler:
 # `cabal install --force-reinstalls dist/*-*.tar.gz`
- - SRC_TGZ=$(cabal-$CABALVER info . | awk '{print $2;exit}').tar.gz &&
-   (cd dist && cabal-$CABALVER install --force-reinstalls "$SRC_TGZ")
+ - SRC_TGZ=$(cabal$CABALVER info . | awk '{print $2;exit}').tar.gz &&
+   (cd dist && cabal$CABALVER install --force-reinstalls "$SRC_TGZ")
 
 # EOF

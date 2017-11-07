@@ -3,7 +3,11 @@
 {-# LANGUAGE DeriveGeneric       #-}
 {-# LANGUAGE StandaloneDeriving  #-}
 {-# LANGUAGE ViewPatterns        #-}
+{-# LANGUAGE CPP                 #-}
+#if MIN_VERSION_aeson(1,2,1)
+#else
 {-# OPTIONS_GHC -fno-warn-orphans #-}
+#endif
 
 -- | Instances of @Text.PrettyPrint.Out@ class to visualize
 -- Aeson @Value@ data structure. 
@@ -33,7 +37,10 @@ instance (Out a) => Out (Vector a) where
   doc (V.toList -> v) = "<" <+> doc v <+> ">"
   docPrec _ = doc
 
+#if MIN_VERSION_aeson(1,2,1)
+#else
 deriving instance Generic Value
+#endif
 
 instance Out Value
 

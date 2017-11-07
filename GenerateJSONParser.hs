@@ -13,19 +13,19 @@ import           Data.Maybe
 import           Data.Monoid
 import           Data.List                      (partition)
 import           System.Exit
-import           System.IO                      (stdin, stderr, stdout, IOMode(..))
+import           System.IO                      (stdin, stderr, IOMode(..))
 --import           System.IO.Posix.MMap           (mmapFileByteString)
 import           System.FilePath                (splitExtension)
 import           System.Process                 (system)
 import qualified Data.ByteString.Lazy.Char8 as BSL
 import qualified Data.HashMap.Strict        as Map
-import           Data.Aeson
+import           Data.Aeson --(Value(..), decode, encode, FromJSON(..), ToJSON(..))
 import qualified Data.Text                  as Text
 import qualified Data.Text.IO               as Text
 import           Data.Text                      (Text)
 import           Text.PrettyPrint.GenericPretty (pretty)
 
-import           Data.Aeson.AutoType.Pretty
+--import           Data.Aeson.AutoType.Pretty
 import           Data.Aeson.AutoType.Type
 import           Data.Aeson.AutoType.Extract
 import           Data.Aeson.AutoType.Format
@@ -110,13 +110,13 @@ extractTypeFromJSONFile opts inputFilename =
 -- | Type checking all input files with given type,
 -- and return a list of filenames for files that passed the check.
 typeChecking :: Type -> [FilePath] -> [Value] -> IO [FilePath]
-typeChecking ty filenames values = do
+typeChecking ty inputFilenames values = do
     unless (null failures) $ report $ Text.unwords $ "Failed to typecheck with unified type: ":
                                                           (Text.pack `map` failures)
     when (      null successes) $ fatal    "No files passed the typecheck."
     return successes
   where
-    checkedFiles = zip filenames $ map (`typeCheck` ty) values
+    checkedFiles = zip inputFilenames $ map (`typeCheck` ty) values
     (map fst -> successes,
      map fst -> failures) = partition snd checkedFiles
 

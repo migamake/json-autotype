@@ -56,7 +56,7 @@ data Options = Options {
 optParser :: Parser Options
 optParser  =
     Options  <$> tyOptParser
-             <*> strOption (short 'o' <> long "output" <> value defaultOutputFilename)
+             <*> strOption (short 'o' <> long "output" <> long "outputFilename" <> value defaultOutputFilename)
              <*> unflag    (short 'n' <> long "no-typecheck" <> help "Do not typecheck after unification")
              <*> switch    (long  "yaml"                  <> help "Parse inputs as YAML instead of JSON"  )
              <*> switch    (short 'p' <> long "preprocessor" <> help "Work as GHC preprocessor (and skip preprocessor pragma)"  )
@@ -150,7 +150,7 @@ generateHaskellFromJSONs opts inputFilenames outputFilename = do
   -- We start by writing module header
   writeHaskellModule outputFilename unified
   when (test $ tyOpts opts) $
-    exitWith =<< system (unwords $ ["runghc", "-package=aeson", outputFilename] ++ passedTypeCheck)
+    exitWith =<< system (unwords $ ["cabal", "exec", "--", "runghc", outputFilename] ++ passedTypeCheck)
   where
     -- | Works like @Debug.trace@ when the --debug flag is enabled, and does nothing otherwise.
     myTrace :: String -> IO ()

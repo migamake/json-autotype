@@ -22,7 +22,7 @@ import           Control.Monad             (forM_, forM, when)
 import qualified Data.ByteString.Lazy.Char8 as BSL
 import qualified Data.HashMap.Strict        as Map
 import qualified Data.Set                   as Set
-import           Data.Semigroup            ((<>))
+import           Data.Monoid               ((<>))
 import           Data.Aeson
 import           Data.Function             (on)
 import           Data.List

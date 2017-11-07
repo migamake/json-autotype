@@ -26,7 +26,7 @@ matrix:
       compiler: ": #GHC 8.0.2"
       addons: {apt: {packages: [cabal-install-1.24,ghc-8.0.2], sources: [hvr-ghc]}}
     - env: CABALVER=2.0 GHCVER=8.2.2
-      compiler: ": #GHC 8.0.2"
+      compiler: ": #GHC 8.2.2"
       addons: {apt: {packages: [cabal-install-1.24,ghc-8.2.2], sources: [hvr-ghc]}}
   allow_failures:
     - env: GHCVER=8.2.2  CABALVER=1.24

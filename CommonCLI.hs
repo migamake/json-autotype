@@ -1,6 +1,6 @@
 module CommonCLI(TypeOpts(..), unflag, tyOptParser) where
 
-import Data.Semigroup((<>))
+import Data.Monoid((<>))
 import Options.Applicative
 
 data TypeOpts = TyOptions {

@@ -13,6 +13,7 @@
 cabal.sandbox.config
 .stack-work
 GenerateJSONParser
+GenerateTestJSON
 dist/
 tags
 TAGS

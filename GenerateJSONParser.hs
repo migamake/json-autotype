@@ -150,7 +150,8 @@ generateHaskellFromJSONs opts inputFilenames outputFilename = do
   -- We start by writing module header
   writeHaskellModule outputFilename unified
   when (test $ tyOpts opts) $
-    exitWith =<< system (unwords $ ["cabal", "exec", "--", "runghc", outputFilename] ++ passedTypeCheck)
+import           System.Process                 (system)
+    exitWith =<< runghc (outputFilename:passedTypeCheck)
   where
     -- | Works like @Debug.trace@ when the --debug flag is enabled, and does nothing otherwise.
     myTrace :: String -> IO ()

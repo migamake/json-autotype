@@ -174,7 +174,7 @@ generateTestJSONs Options {tyOpts=TyOptions {..}, ..}= do
         writeHaskellModule outputFilename unified
         if test
           then do
-            r <- (==ExitSuccess) <$> system (unwords ["cabal", "exec", "--", "runghc", outputFilename, inputFilename])
+            r <- (==ExitSuccess) <$> runghc [outputFilename, inputFilename]
             when r $ mapM_ removeFile [inputFilename, outputFilename]
             return r
           else

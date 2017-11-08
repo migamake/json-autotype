@@ -14,7 +14,15 @@ for EXT in json bad_json auto_error; do
   done
 done
 
+for JSON in `find examples/ -iname '*.json'` \
+            test/*.json; do
+  rm -f `basename $JSON .json`.hs;
+done
+
 rm -f Test[0-9].hs Test[0-9].json Test[0-9][0-9].hs Test[0-9][0-9].json
+
+#rm -f iPhoneMenu.hs fstab.hs fstab-schema.hs moeDict.hs union.hs od600.hs instructions.hs oligo.hs
+#rm -f pcr.hs product-schema.hs productdb.hs BasicSchema.hs youtube.hs
 
 echo Finished
 

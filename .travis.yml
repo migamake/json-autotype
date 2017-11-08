@@ -30,6 +30,7 @@ install:
   - stack --resolver $RESOLVER --no-terminal setup
 
 script:
+  - stack --resolver $RESOLVER --no-terminal build
   - stack --resolver $RESOLVER --no-terminal test
   - bash  testit.sh
   - stack --resolver $RESOLVER --no-terminal exec -- cabal check

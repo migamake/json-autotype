@@ -36,10 +36,10 @@ script:
   - bash  testit.sh
   - stack --resolver $RESOLVER --ghc-options=-Werror --no-terminal exec -- cabal check
   - stack --resolver $RESOLVER --ghc-options=-Werror --no-terminal exec -- cabal sdist
-# Check that the resulting source distribution can be built & installed.
-# If there are no other `.tar.gz` files in `dist`, this can be even simpler:
-# `cabal install --force-reinstalls dist/*-*.tar.gz`
- - SRC_TGZ=$(stack exec -- cabal info . | awk '{print $2;exit}').tar.gz &&
-   (cd dist && stack --resolver $RESOLVER install --force-reinstalls "$SRC_TGZ")
+  # Check that the resulting source distribution can be built & installed.
+  # If there are no other `.tar.gz` files in `dist`, this can be even simpler:
+  # `cabal install --force-reinstalls dist/*-*.tar.gz`
+  - SRC_TGZ=$(stack exec -- cabal info . | awk '{print $2;exit}').tar.gz &&
+    (cd dist && stack --resolver $RESOLVER install --force-reinstalls "$SRC_TGZ")
 
 # EOF

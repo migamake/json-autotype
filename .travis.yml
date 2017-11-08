@@ -1,5 +1,7 @@
 sudo: false
 
+language: generic
+
 # Caching so the next build will be fast too.
 cache:
   directories:
@@ -30,10 +32,10 @@ install:
   - stack --resolver $RESOLVER --no-terminal setup
 
 script:
-  - stack --resolver $RESOLVER --no-terminal test
+  - stack --resolver $RESOLVER --ghc-options=-Werror --no-terminal test
   - bash  testit.sh
-  - stack --resolver $RESOLVER --no-terminal exec -- cabal check
-  - stack --resolver $RESOLVER --no-terminal exec -- cabal sdist
+  - stack --resolver $RESOLVER --ghc-options=-Werror --no-terminal exec -- cabal check
+  - stack --resolver $RESOLVER --ghc-options=-Werror --no-terminal exec -- cabal sdist
 # Check that the resulting source distribution can be built & installed.
 # If there are no other `.tar.gz` files in `dist`, this can be even simpler:
 # `cabal install --force-reinstalls dist/*-*.tar.gz`

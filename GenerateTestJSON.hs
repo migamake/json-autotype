@@ -23,7 +23,7 @@ import qualified Data.ByteString.Lazy.Char8 as BSL
 import qualified Data.HashMap.Strict        as Map
 import qualified Data.Set                   as Set
 import           Data.Monoid               ((<>))
-import           Data.Aeson
+import           Data.Aeson                (Value(..), decode, encode, FromJSON(..), ToJSON(..))
 import           Data.Function             (on)
 import           Data.List
 import qualified Data.Text                  as Text

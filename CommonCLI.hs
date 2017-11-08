@@ -1,8 +1,9 @@
-module CommonCLI(TypeOpts(..), unflag, tyOptParser) where
+module CommonCLI(TypeOpts(..), unflag, tyOptParser, runghc) where
 
-import Data.Monoid((<>))
-import Options.Applicative
+import           Data.Monoid                    ((<>))
+import           Options.Applicative
 import           System.Process                 (system)
+import           System.Environment             (lookupEnv)
 
 data TypeOpts = TyOptions {
                   autounify :: Bool

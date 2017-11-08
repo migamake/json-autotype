@@ -25,8 +25,6 @@ matrix:
     #for GHC 7.10.2
     - env: RESOLVER=lts-2.22
     #for GHC 7.8.4
-    - env: RESOLVER=lts-0.7
-    #for GHC 7.8.3
 
 install:
   - stack --resolver $RESOLVER --no-terminal setup

@@ -1,8 +1,8 @@
 #!/bin/bash
 
 #EXE=GenerateJSONParser
-#EXE=dist/build/json-autotype/json-autotype
-EXE=json-autotype
+EXE=dist/build/json-autotype/json-autotype
+#EXE=json-autotype
 #SRC=${EXE}.hs
 
 #GHCOPTS=-package=aeson

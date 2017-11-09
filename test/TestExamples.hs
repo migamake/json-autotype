@@ -3,6 +3,7 @@ module Main(main) where
 
 import Control.Monad(forM)
 import Data.Char(toUpper)
+import Data.Functor ((<$>))
 import Data.List(isPrefixOf, isSuffixOf)
 import System.Directory(doesDirectoryExist, getDirectoryContents)
 import System.FilePath(dropExtension, (</>), (<.>))

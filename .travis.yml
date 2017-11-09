@@ -99,13 +99,13 @@ script:
  - if $HADDOCK; then cabal new-haddock -w ${HC} --disable-tests --disable-benchmarks all; else echo "Skipping haddock generation";fi
 # REGENDATA ["json-autotype.cabal"]
 # EOF
-deploy:
-  provider: hackage
-  username: MichalGajda
-  password:
-    secure: DMo6eqrtvtKk5qcsTkkQnxRRCIfCXHzgH59HoRtxtto6cA9oFJ5SnFndawONMtcMTH6k/1uhZAjdqFGi8NqxekOfd4xggEiBLZ8HDbN/tLULONM3TTI+Y7McL32WB+5wAeZlZLvm9giL3qgVlZBE+MjnEwfyxd646UbC67kS4EM=
-  on:
-    repo: mgajda/json-autotype
-  tags: yes
-  skip_cleanup: true
+#deploy:
+#  provider: hackage
+#  username: MichalGajda
+#  password:
+#    secure: DMo6eqrtvtKk5qcsTkkQnxRRCIfCXHzgH59HoRtxtto6cA9oFJ5SnFndawONMtcMTH6k/1uhZAjdqFGi8NqxekOfd4xggEiBLZ8HDbN/tLULONM3TTI+Y7McL32WB+5wAeZlZLvm9giL3qgVlZBE+MjnEwfyxd646UbC67kS4EM=
+#  on:
+#    repo: mgajda/json-autotype
+#  tags: yes
+#  skip_cleanup: true
 

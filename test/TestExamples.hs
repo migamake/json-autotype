@@ -1,8 +1,12 @@
 -- Test over all files in examples/ directory
 module Main(main) where
 
-import System.FilePath(dropExtension)
-import System.Exit(ExitCode(..))
+import Control.Monad(forM)
+import Data.Char(toUpper)
+import Data.List(isPrefixOf, isSuffixOf)
+import System.Directory(doesDirectoryExist, getDirectoryContents)
+import System.FilePath(dropExtension, (</>), (<.>))
+import System.Exit(ExitCode(..), exitWith)
 
 import CommonCLI
 
@@ -23,23 +27,23 @@ getRecursiveContents topdir = do
           return (concat paths) 
         else return []
 
+capitalize :: String -> String
+capitalize (s:ss) = toUpper s:ss
+
 main :: IO ()
 main  = do
-  filenames <- getRecursiveContents "examples"
-  results <- forM filenames $ \filename -> do
-    -- basename $i
-    -- echo stack exec -- ${EXE} $i
-    -- OUT=`basename $i .json`.hs
-    -- time stack exec -- ${EXE} $i --outputFilename ${OUT} && stack exec -- ghc ${GHCOPTS} ${OUT} || exit 1
-    -- stack exec -- runghc -- ${GHCOPTS} ${OUT} ${i} || exit 2
-    let outputFilename = dropExtension filename <.> "hs"
+  filenames <-  filter (isSuffixOf ".json")
+            <$> getRecursiveContents "examples"
+  results   <- forM filenames $ \filename -> do
+    let outputFilename = capitalize (dropExtension filename) <.> "hs"
     genResult <- runghc ["GenerateJSONParser.hs", filename, "--outputFilename", outputFilename]
+    return 0
     if genResult == ExitSuccess
       then return 0 -- number of failures so far
       else do
-        parserResult <- runghc ["GenerateJSONParser.hs", outputFilename, "--outputFilename", outputFilename]
-        return $ if parserResult == ExitSuccess
-                    then 0
-                    else 1
-    exitFailure $ sum results
+        parserResult <- runghc [outputFilename, filename]
+        if parserResult == ExitSuccess
+           then return 0
+           else return 1
+  exitWith $ ExitFailure $ sum results
 

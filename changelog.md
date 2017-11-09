@@ -1,5 +1,8 @@
 Changelog
 =========
+    1.0.18  Nov 2017
+        * Fixed unit tests.
+
     1.0.17  Nov 2017
         * Fixed build and test issues.
 

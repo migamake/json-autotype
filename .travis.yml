@@ -8,6 +8,7 @@ language: c
 sudo: false
 
 git:
+  depth: 3
   submodules: false  # whether to recursively clone submodules
 
 cache:

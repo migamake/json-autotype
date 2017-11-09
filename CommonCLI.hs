@@ -4,6 +4,7 @@ import           Data.Monoid                    ((<>))
 import           Options.Applicative
 import           System.Process                 (system)
 import qualified System.Environment             (lookupEnv)
+import           System.Exit                    (ExitCode)
 
 data TypeOpts = TyOptions {
                   autounify :: Bool
@@ -22,6 +23,7 @@ tyOptParser  = TyOptions
             <*> unflag (long "no-test"      <> help "Do not run generated parser afterwards"         )
             <*> unflag (long "no-suggest"   <> help "Do not suggest candidates for unification"      )
 
+runghc :: [String] -> IO ExitCode
 runghc arguments = do
     maybeStack <- System.Environment.lookupEnv "STACK_EXEC"
     maybeCabal <- System.Environment.lookupEnv "CABAL_SANDBOX_CONFIG"

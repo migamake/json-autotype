@@ -6,7 +6,7 @@ import Data.Char(toUpper)
 import Data.List(isPrefixOf, isSuffixOf)
 import System.Directory(doesDirectoryExist, getDirectoryContents)
 import System.FilePath(dropExtension, (</>), (<.>))
-import System.Exit(ExitCode(..), exitWith)
+import System.Exit(exitSuccess, exitWith, ExitCode(..))
 
 import CommonCLI
 
@@ -45,5 +45,9 @@ main  = do
         if parserResult == ExitSuccess
            then return 0
            else return 1
-  exitWith $ ExitFailure $ sum results
+  exitCode $ sum results
+
+exitCode  :: Int -> IO ()
+exitCode 0 = exitSuccess
+exitCode n = exitWith $ ExitFailure n
 

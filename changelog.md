@@ -2,6 +2,7 @@ Changelog
 =========
     1.0.18  Nov 2017
         * Fixed unit tests.
+        * Fixed import for inclusion in Stackage.
 
     1.0.17  Nov 2017
         * Fixed build and test issues.

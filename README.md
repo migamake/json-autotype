@@ -113,4 +113,8 @@ Real-world use case examples are provided in the package [source repository](htt
 Other approaches:
 =================
 
-There is a [json-sampler](https://maxs.io/generating-types-from-json-samples/) that allows to make simpler data structure from JSON examples, but doesn't seem to perform unification, nor is it suitable for big APIs.
+* There was a [json-sampler](https://maxs.io/generating-types-from-json-samples/) that allows to make simpler data structure from JSON examples, but doesn't seem to perform unification, nor is it suitable for big APIs.
+
+* There is a [TypeScript type provider](https://jvilk.com/MakeTypes/), and [PLDI 2016 paper](https://dl.acm.org/citation.cfm?id=2908115) on solving this problem using <em>preferred type shapes</em> instead of union types.
+One can think about it as a alternative theory that gives very similar results, with more complicated exposition. It also does not tackle the problem of tagged records. It also does not attempt to <em>guess</em> unification candidates in order to reduce type complexity.
+* [PADS project](https://www.cs.princeton.edu/~dpw/papers/padsml06.pdf) is another attempt to automatically infer types to treat <em>arbitrary</em> data formats (not just JSON). It mixes type declarations, with parsing/printing information in order to have a consistent view of both. It does not handle automatic type inference though.

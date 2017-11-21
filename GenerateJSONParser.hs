@@ -22,7 +22,6 @@ import qualified Data.Text.IO               as Text
 import           Data.Text                      (Text)
 import           Text.PrettyPrint.GenericPretty (pretty)
 
---import           Data.Aeson.AutoType.Pretty
 import           Data.Aeson.AutoType.Type
 import           Data.Aeson.AutoType.Extract
 import           Data.Aeson.AutoType.Format
@@ -34,19 +33,10 @@ import           Options.Applicative
 import           CommonCLI
 
 -- * Command line flags
---defineFlag "o:outputFilename"  defaultOutputFilename "Write output to the given file"
---defineFlag "suggest"           True                  "Suggest candidates for unification"
---defineFlag "autounify"         True                  "Automatically unify suggested candidates"
---defineFlag "t:test"            False                 "Try to run generated parser after"
---defineFlag "d:debug"           False                 "Set this flag to see more debugging info"
---defineFlag "y:typecheck"       True                  "Set this flag to typecheck after unification"
---defineFlag "yaml"              False                 "Parse inputs as YAML instead of JSON"
---defineFlag "p:preprocessor"    False                 "Work as GHC preprocessor (skip preprocessor pragma)"
---defineFlag "fakeFlag"          True                  "Ignore this flag - it doesn't exist!!! It is workaround to library problem."
-
 data Options = Options {
                  tyOpts :: TypeOpts
                , outputFilename :: FilePath
+               , toplevel :: String
                , typecheck :: Bool
                , yaml :: Bool
                , preprocessor :: Bool
@@ -56,10 +46,18 @@ data Options = Options {
 optParser :: Parser Options
 optParser  =
     Options  <$> tyOptParser
-             <*> strOption (short 'o' <> long "output" <> long "outputFilename" <> value defaultOutputFilename)
-             <*> unflag    (short 'n' <> long "no-typecheck" <> help "Do not typecheck after unification")
-             <*> switch    (long  "yaml"                  <> help "Parse inputs as YAML instead of JSON"  )
-             <*> switch    (short 'p' <> long "preprocessor" <> help "Work as GHC preprocessor (and skip preprocessor pragma)"  )
+             <*> strOption (short 'o'             <>
+                            long "output"         <>
+                            long "outputFilename" <> value defaultOutputFilename)
+             <*> strOption (short 't'             <>
+                            long "toplevel"       <> value "TopLevel"
+                                                  <> help "Name for toplevel data type")
+             <*> unflag    (short 'n'             <>
+                            long "no-typecheck"   <> help "Do not typecheck after unification")
+             <*> switch    (long  "yaml"          <> help "Parse inputs as YAML instead of JSON")
+             <*> switch    (short 'p'             <>
+                            long "preprocessor"   <>
+                              help "Work as GHC preprocessor (and skip preprocessor pragma)")
              <*> some (argument str (metavar "FILES..."))
 
 -- | Report an error to error output.
@@ -133,7 +131,7 @@ generateHaskellFromJSONs opts inputFilenames outputFilename = do
                         then typeChecking finalType filenames valueForEachFile
                         else return                 filenames
   -- We split different dictionary labels to become different type trees (and thus different declarations.)
-  let splitted = splitTypeByLabel "TopLevel" finalType
+  let splitted = splitTypeByLabel (Text.pack $ toplevel opts) finalType
   myTrace $ "SPLITTED: " ++ pretty splitted
   assertM $ not $ any hasNonTopTObj $ Map.elems splitted
   -- We compute which type labels are candidates for unification
@@ -148,7 +146,7 @@ generateHaskellFromJSONs opts inputFilenames outputFilename = do
                   else splitted
   myTrace $ "UNIFIED:\n" ++ pretty unified
   -- We start by writing module header
-  writeHaskellModule outputFilename unified
+  writeHaskellModule outputFilename (Text.pack $ toplevel opts) unified
   when (test $ tyOpts opts) $
     exitWith =<< runghc (outputFilename:passedTypeCheck)
   where

@@ -141,7 +141,9 @@ instance Ord Value where
 
 -- | Take a set of JSON input filenames, Haskell output filename, and generate module parsing these JSON files.
 generateTestJSONs :: Options -> IO ()
-generateTestJSONs Options {tyOpts=TyOptions {..}, ..}= do
+generateTestJSONs Options {tyOpts=TyOptions {..},
+                           toplevel=capitalize -> toplevel,
+                           ..}= do
     testValues :: [Value] <- generate $
                                resize size $
                                  vectorWithoutDuplicates 100 arbitraryTopValue
@@ -156,7 +158,7 @@ generateTestJSONs Options {tyOpts=TyOptions {..}, ..}= do
           exitFailure
         let finalType = foldr1 unifyTypes typeForEachFile
         -- We split different dictionary labels to become different type trees (and thus different declarations.)
-        let splitted = splitTypeByLabel "TopLevel" finalType
+        let splitted = splitTypeByLabel toplevel finalType
         --myTrace $ "SPLITTED: " ++ pretty splitted
         assertM $ not $ any hasNonTopTObj $ Map.elems splitted
         -- We compute which type labels are candidates for unification

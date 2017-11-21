@@ -11,6 +11,7 @@ import qualified Data.Text.IO        as Text
 import           Data.Text
 import qualified Data.HashMap.Strict as Map
 import           Control.Arrow               (first)
+import           Data.Monoid                 ((<>))
 import           System.FilePath
 import           System.IO
 
@@ -58,16 +59,16 @@ header moduleName = Text.unlines [
   ,"o .:?? val = fmap join (o .:? val)"
   ,""]
 
-epilogue :: Text
-epilogue          = Text.unlines
+epilogue :: Text -> Text
+epilogue toplevelName = Text.unlines
   [""
-  ,"parse :: FilePath -> IO TopLevel"
+  ,"parse :: FilePath -> IO " <> toplevelName
   ,"parse filename = do input <- BSL.readFile filename"
   ,"                    case decode input of"
   ,"                      Nothing -> fatal $ case (decode input :: Maybe Value) of"
   ,"                                           Nothing -> \"Invalid JSON file: \"     ++ filename"
   ,"                                           Just v  -> \"Mismatched JSON value from file: \" ++ filename"
-  ,"                      Just r  -> return (r :: TopLevel)"
+  ,"                      Just r  -> return (r :: " <> toplevelName <> ")"
   ,"  where"
   ,"    fatal :: String -> IO a"
   ,"    fatal msg = do hPutStrLn stderr msg"
@@ -81,14 +82,14 @@ epilogue          = Text.unlines
   ,""]
 
 -- | Write a Haskell module to an output file, or stdout if `-` filename is given.
-writeHaskellModule :: FilePath -> Map.HashMap Text Type -> IO ()
-writeHaskellModule outputFilename types =
+writeHaskellModule :: FilePath -> Text -> Map.HashMap Text Type -> IO ()
+writeHaskellModule outputFilename toplevelName types =
     withFileOrHandle outputFilename WriteMode stdout $ \hOut -> do
       assertM (extension == ".hs")
       Text.hPutStrLn hOut $ header $ Text.pack moduleName
       -- We write types as Haskell type declarations to output handle
       Text.hPutStrLn hOut $ displaySplitTypes types
-      Text.hPutStrLn hOut   epilogue
+      Text.hPutStrLn hOut $ epilogue toplevelName
   where
     (moduleName, extension) =
        first normalizeTypeName'     $

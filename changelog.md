@@ -1,5 +1,8 @@
 Changelog
 =========
+    1.0.19  Nov 2017
+        * Allow to have a custom name for toplevel data type.
+
     1.0.18  Nov 2017
         * Fixed unit tests.
         * Fixed import for inclusion in Stackage.

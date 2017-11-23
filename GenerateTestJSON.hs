@@ -142,7 +142,7 @@ instance Ord Value where
 -- | Take a set of JSON input filenames, Haskell output filename, and generate module parsing these JSON files.
 generateTestJSONs :: Options -> IO ()
 generateTestJSONs Options {tyOpts=TyOptions {..},
-                           toplevel=capitalize -> toplevel,
+                           toplevel,
                            ..}= do
     testValues :: [Value] <- generate $
                                resize size $
@@ -190,6 +190,7 @@ generateTestJSONs Options {tyOpts=TyOptions {..},
     outputFilenames    = map makeOutputFilename [1..count]
     myTrace :: String -> IO ()
     myTrace msg = debug `when` putStrLn msg
+    toplevelName = capitalize $ Text.pack toplevel
 
 main :: IO ()
 main = do opts <- execParser optInfo

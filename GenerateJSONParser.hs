@@ -1,5 +1,6 @@
 {-# LANGUAGE ScopedTypeVariables  #-}
 {-# LANGUAGE OverloadedStrings    #-}
+{-# LANGUAGE NamedFieldPuns       #-}
 {-# LANGUAGE ViewPatterns         #-}
 {-# OPTIONS_GHC -fno-warn-orphans #-}
 module Main where
@@ -117,7 +118,7 @@ typeChecking ty inputFilenames values = do
 
 -- | Take a set of JSON input filenames, Haskell output filename, and generate module parsing these JSON files.
 generateHaskellFromJSONs :: Options -> [FilePath] -> FilePath -> IO ()
-generateHaskellFromJSONs opts inputFilenames outputFilename = do
+generateHaskellFromJSONs opts@(Options { toplevel }) inputFilenames outputFilename = do
   -- Read type from each file
   (filenames,
    typeForEachFile,
@@ -131,7 +132,7 @@ generateHaskellFromJSONs opts inputFilenames outputFilename = do
                         then typeChecking finalType filenames valueForEachFile
                         else return                 filenames
   -- We split different dictionary labels to become different type trees (and thus different declarations.)
-  let splitted = splitTypeByLabel (Text.pack $ toplevel opts) finalType
+  let splitted = splitTypeByLabel (Text.pack toplevel) finalType
   myTrace $ "SPLITTED: " ++ pretty splitted
   assertM $ not $ any hasNonTopTObj $ Map.elems splitted
   -- We compute which type labels are candidates for unification
@@ -146,7 +147,7 @@ generateHaskellFromJSONs opts inputFilenames outputFilename = do
                   else splitted
   myTrace $ "UNIFIED:\n" ++ pretty unified
   -- We start by writing module header
-  writeHaskellModule outputFilename (Text.pack $ toplevel opts) unified
+  writeHaskellModule outputFilename (Text.pack toplevel) unified
   when (test $ tyOpts opts) $
     exitWith =<< runghc (outputFilename:passedTypeCheck)
   where

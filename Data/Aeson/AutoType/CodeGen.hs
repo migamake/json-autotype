@@ -24,10 +24,6 @@ import           Data.Aeson.AutoType.Util
 defaultOutputFilename :: FilePath
 defaultOutputFilename = "JSONTypes.hs"
 
-capitalize :: Text -> Text
-capitalize input = Text.toUpper (Text.take 1 input)
-                   `Text.append` Text.drop 1 input
-
 header :: Text -> Text
 header moduleName = Text.unlines [
    "{-# LANGUAGE TemplateHaskell     #-}"

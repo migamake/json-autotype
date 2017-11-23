@@ -9,7 +9,8 @@
 module Data.Aeson.AutoType.Format(
   displaySplitTypes, splitTypeByLabel, unificationCandidates,
   unifyCandidates,
-  normalizeTypeName
+  normalizeTypeName,
+  capitalize
 ) where
 
 import           Control.Arrow             ((&&&))

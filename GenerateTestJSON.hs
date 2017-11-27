@@ -3,6 +3,7 @@
 {-# LANGUAGE OverloadedStrings    #-}
 {-# LANGUAGE DeriveGeneric        #-}
 {-# LANGUAGE StandaloneDeriving   #-}
+{-# LANGUAGE NamdedFieldPuns      #-}
 {-# LANGUAGE RecordWildCards      #-}
 {-# LANGUAGE ViewPatterns         #-}
 {-# LANGUAGE FlexibleInstances    #-}

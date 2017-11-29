@@ -1,7 +1,6 @@
 :set -XOverloadedStrings
 :set -XNoMonomorphismRestriction
 import           Data.Aeson
-import           Data.Default
 import qualified Data.ByteString.Lazy.Char8 as BSL
 let decodeValue = decode :: BSL.ByteString -> Maybe Value
 let printJSON x = case decode x of {Nothing -> print "Failed!" ; Just x -> print x}

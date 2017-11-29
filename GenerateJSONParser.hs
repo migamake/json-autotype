@@ -118,7 +118,7 @@ typeChecking ty inputFilenames values = do
 
 -- | Take a set of JSON input filenames, Haskell output filename, and generate module parsing these JSON files.
 generateHaskellFromJSONs :: Options -> [FilePath] -> FilePath -> IO ()
-generateHaskellFromJSONs opts@(Options { toplevel }) inputFilenames outputFilename = do
+generateHaskellFromJSONs opts@Options { toplevel } inputFilenames outputFilename = do
   -- Read type from each file
   (filenames,
    typeForEachFile,
@@ -167,6 +167,6 @@ main = do opts <- execParser optInfo
           generateHaskellFromJSONs opts (filenames opts) (outputFilename opts)
   where
     optInfo = info (optParser <**> helper)
-            ( fullDesc
+            (  fullDesc
             <> progDesc "Parser JSON or YAML, get its type, and generate appropriate parser."
             <> header "json-autotype -- automatic type and parser generation from JSON")

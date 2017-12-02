@@ -37,7 +37,6 @@ import           CommonCLI
 data Options = Options {
                  tyOpts :: TypeOpts
                , outputFilename :: FilePath
-               , toplevel :: String
                , typecheck :: Bool
                , yaml :: Bool
                , preprocessor :: Bool
@@ -50,9 +49,6 @@ optParser  =
              <*> strOption (short 'o'             <>
                             long "output"         <>
                             long "outputFilename" <> value defaultOutputFilename)
-             <*> strOption (short 't'             <>
-                            long "toplevel"       <> value "TopLevel"
-                                                  <> help "Name for toplevel data type")
              <*> unflag    (short 'n'             <>
                             long "no-typecheck"   <> help "Do not typecheck after unification")
              <*> switch    (long  "yaml"          <> help "Parse inputs as YAML instead of JSON")
@@ -118,7 +114,7 @@ typeChecking ty inputFilenames values = do
 
 -- | Take a set of JSON input filenames, Haskell output filename, and generate module parsing these JSON files.
 generateHaskellFromJSONs :: Options -> [FilePath] -> FilePath -> IO ()
-generateHaskellFromJSONs opts@Options { toplevel } inputFilenames outputFilename = do
+generateHaskellFromJSONs opts@Options { tyOpts=TyOptions { toplevel } } inputFilenames outputFilename = do
   -- Read type from each file
   (filenames,
    typeForEachFile,
@@ -132,7 +128,7 @@ generateHaskellFromJSONs opts@Options { toplevel } inputFilenames outputFilename
                         then typeChecking finalType filenames valueForEachFile
                         else return                 filenames
   -- We split different dictionary labels to become different type trees (and thus different declarations.)
-  let splitted = splitTypeByLabel (Text.pack toplevel) finalType
+  let splitted = splitTypeByLabel toplevelName finalType
   myTrace $ "SPLITTED: " ++ pretty splitted
   assertM $ not $ any hasNonTopTObj $ Map.elems splitted
   -- We compute which type labels are candidates for unification
@@ -147,13 +143,14 @@ generateHaskellFromJSONs opts@Options { toplevel } inputFilenames outputFilename
                   else splitted
   myTrace $ "UNIFIED:\n" ++ pretty unified
   -- We start by writing module header
-  writeHaskellModule outputFilename (Text.pack toplevel) unified
+  writeHaskellModule outputFilename toplevelName unified
   when (test $ tyOpts opts) $
     exitWith =<< runghc (outputFilename:passedTypeCheck)
   where
     -- | Works like @Debug.trace@ when the --debug flag is enabled, and does nothing otherwise.
     myTrace :: String -> IO ()
     myTrace msg = debug (tyOpts opts) `when` putStrLn msg
+    toplevelName = capitalize $ Text.pack toplevel
 
 -- | Drop initial pragma.
 dropPragma :: BSL.ByteString -> BSL.ByteString

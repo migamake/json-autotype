@@ -44,9 +44,9 @@ The simplest example would be a single JSON document:
 When fed to JSON-autotype tool by running \begin{verbatim}json-autotype color.json -o Color.hs\end{verbatim} we get a simple type declaration along with instances of Aeson's \texttt{ToJSON} and \texttt{FromJSON} classes:
 
 \begin{verbatim}
-data TopLevel = TopLevel                    { 
+data TopLevel = TopLevel                    {
     topLevelColorsArray :: [ColorsArrayElt] }
-data ColorsArrayElt = ColorsArrayElt { 
+data ColorsArrayElt = ColorsArrayElt {
     colorsArrayEltHexValue  :: Text,
     colorsArrayEltColorName :: Text  }
 \end{verbatim}
@@ -65,7 +65,7 @@ After explaining the output of this example, I will proceed by demonstrating use
 \item Derive boilerplate code for type-based web frameworks like \emph{Servant}. \timePermits{}
 \end{enumerate}
 
-%Each example will be shown along with the motivation, and 
+%Each example will be shown along with the motivation, and
 %Example code will be provided through GitHub to encourage attendees to follow it step by step.
 
 \subsection*{Final discussion}

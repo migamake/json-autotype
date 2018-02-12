@@ -1,6 +1,6 @@
 {"markers": [
         {
-            "point":new GLatLng(40.266044,-74.718479), 
+            "point":new GLatLng(40.266044,-74.718479),
             "homeTeam":"Lawrence Library",
             "awayTeam":"LUGip",
             "markerImage":"images/red.png",

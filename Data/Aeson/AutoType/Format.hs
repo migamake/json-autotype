@@ -5,7 +5,7 @@
 {-# LANGUAGE OverloadedStrings   #-}
 {-# LANGuaGE DeriveGeneric       #-}
 {-# LANGuaGE FlexibleContexts    #-}
--- | Formatting type declarations and class instances for inferred types. 
+-- | Formatting type declarations and class instances for inferred types.
 module Data.Aeson.AutoType.Format(
   displaySplitTypes, splitTypeByLabel, unificationCandidates,
   unifyCandidates,
@@ -51,13 +51,13 @@ makeLenses ''DeclState
 
 type DeclM = State DeclState
 
-type Map k v = Map.HashMap k v 
+type Map k v = Map.HashMap k v
 
 stepM :: DeclM Int
 stepM = counter %%= (\i -> (i, i+1))
 
 tShow :: (Show a) => a -> Text
-tShow = Text.pack . show 
+tShow = Text.pack . show
 
 -- | Wrap a type alias.
 wrapAlias :: Text -> Text -> Text
@@ -191,7 +191,7 @@ formatType (TArray a)                        = do inner <- formatType a
 formatType (TObj   o)                        = do ident <- genericIdentifier
                                                   newDecl ident d
   where
-    d = Map.toList $ unDict o 
+    d = Map.toList $ unDict o
 formatType  e | e `Set.member` emptySetLikes = return emptyTypeRepr
 formatType  t                                = return $ "ERROR: Don't know how to handle: " `Text.append` tShow t
 
@@ -284,7 +284,7 @@ uncapitalize word = Text.toLower first `Text.append` rest
     (first, rest) = Text.splitAt 1 word
 
 -- | Topological sorting of splitted types so that it is accepted declaration order.
-toposort :: Map Text Type -> [(Text, Type)]  
+toposort :: Map Text Type -> [(Text, Type)]
 toposort splitted = map ((id &&& (splitted Map.!)) . fst3 . graphKey) $ Graph.topSort graph
   where
     (graph, graphKey) = Graph.graphFromEdges' $ map makeEntry $ Map.toList splitted
@@ -323,7 +323,7 @@ unifyCandidates :: [[Text]] -> Map Text Type -> Map Text Type
 unifyCandidates candidates splitted = Map.map (remapLabels labelMapping) $ replacements splitted
   where
     unifiedType  :: [Text] -> Type
-    unifiedType cset      = foldr1 unifyTypes         $ 
+    unifiedType cset      = foldr1 unifyTypes         $
                             map (splitted Map.!) cset
     replace      :: [Text] -> Map Text Type -> Map Text Type
     replace  cset@(c:_) s = Map.insert c (unifiedType cset) (foldr Map.delete s cset)
@@ -342,4 +342,3 @@ remapLabels ls (TArray t) = TArray $                 remapLabels ls  t
 remapLabels ls (TUnion u) = TUnion $        Set.map (remapLabels ls) u
 remapLabels ls (TLabel l) = TLabel $ Map.lookupDefault l l ls
 remapLabels _  other      = other
-

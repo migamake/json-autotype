@@ -10,7 +10,7 @@
 #endif
 
 -- | Instances of @Text.PrettyPrint.Out@ class to visualize
--- Aeson @Value@ data structure. 
+-- Aeson @Value@ data structure.
 module Data.Aeson.AutoType.Pretty() where
 
 import qualified Data.HashMap.Strict as Hash
@@ -52,10 +52,9 @@ instance (Out a, Out b) => Out (HashMap a b) where
   doc (Hash.toList -> dict) = (foldl ($$) "{" $
                                  map formatPair dict)
                            $$  nest 1 "}"
-                      
+
   docPrec _ = doc
 
 instance Out Text where
   doc       = text . Text.unpack -- TODO: check if there may be direct way?
   docPrec _ = doc
-

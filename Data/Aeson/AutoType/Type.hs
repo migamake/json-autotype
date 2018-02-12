@@ -87,11 +87,11 @@ instance Uniplate Type where
 
 -- | Empty type
 emptyType :: Type
-emptyType = TUnion Set.empty 
+emptyType = TUnion Set.empty
 
 -- | Lookup the Type within the dictionary.
 get :: Text -> Dict -> Type
-get key = Hash.lookupDefault TNull key . unDict 
+get key = Hash.lookupDefault TNull key . unDict
 
 -- $derive makeUniplateDirect ''Type
 
@@ -149,10 +149,9 @@ hasNonTopTObj         :: Type -> Bool
 hasNonTopTObj (TObj o) = any hasTObj $ Hash.elems $ unDict o
 hasNonTopTObj _        = False
 
--- | Check if the given type has TObj on top or within array.. 
+-- | Check if the given type has TObj on top or within array..
 hasTObj           :: Type -> Bool
 hasTObj (TObj   _) = True
 hasTObj (TArray a) = hasTObj a
 hasTObj (TUnion u) = any hasTObj u
 hasTObj _          = False
-

@@ -111,11 +111,11 @@ Changelog
     0.2.5.7  Mar 2015
 
         * Fixed documentation anchors, and unit test classification for failures.
-    
+
     0.2.5.6  Mar 2015
 
         * Relaxed upper bounds for lens 4.8.
-    
+
     0.2.5.5  Mar 2015
 
         * (Skipped this version number by mistake.)
@@ -176,4 +176,3 @@ Changelog
 
 	* First experiments uploaded to GitHub, and discussed to
 	HackerSpace.SG.
-

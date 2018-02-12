@@ -16,4 +16,3 @@
 	},
 	"required": ["firstName", "lastName"]
 }
-

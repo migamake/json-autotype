@@ -1,4 +1,4 @@
-GET	
+GET
 https://api.twitter.com/1.1/statuses/user_timeline.json?screen_name=twitterapi&count=2
 [
   {
@@ -20,10 +20,10 @@ https://api.twitter.com/1.1/statuses/user_timeline.json?screen_name=twitterapi&c
         }
       ],
       "hashtags": [
- 
+
       ],
       "user_mentions": [
- 
+
       ]
     },
     "in_reply_to_user_id_str": null,
@@ -64,7 +64,7 @@ https://api.twitter.com/1.1/statuses/user_timeline.json?screen_name=twitterapi&c
         },
         "description": {
           "urls": [
- 
+
           ]
         }
       },
@@ -119,10 +119,10 @@ https://api.twitter.com/1.1/statuses/user_timeline.json?screen_name=twitterapi&c
         }
       ],
       "hashtags": [
- 
+
       ],
       "user_mentions": [
- 
+
       ]
     },
     "in_reply_to_user_id_str": null,
@@ -163,7 +163,7 @@ https://api.twitter.com/1.1/statuses/user_timeline.json?screen_name=twitterapi&c
         },
         "description": {
           "urls": [
- 
+
           ]
         }
       },

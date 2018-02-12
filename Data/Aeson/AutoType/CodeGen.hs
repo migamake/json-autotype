@@ -49,7 +49,7 @@ header moduleName = Text.unlines [
   ,"                            (.:), (.:?), (.=), object)"
   ,"import           Data.Monoid"
   ,"import           Data.Text (Text)"
-  ,"import qualified GHC.Generics" 
+  ,"import qualified GHC.Generics"
   ,""
   ,"-- | Workaround for https://github.com/bos/aeson/issues/287."
   ,"o .:?? val = fmap join (o .:? val)"
@@ -94,4 +94,3 @@ writeHaskellModule outputFilename toplevelName types =
          then defaultOutputFilename
          else outputFilename
     normalizeTypeName' = Text.unpack . normalizeTypeName . Text.pack
-

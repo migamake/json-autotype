@@ -15,7 +15,7 @@ import CommonCLI
 getRecursiveContents :: FilePath -> IO [FilePath]
 getRecursiveContents topdir = do
   ex<-doesDirectoryExist topdir
-  if ex 
+  if ex
         then do
           names <- getDirectoryContents topdir
           let properNames = filter (not . isPrefixOf ".") names
@@ -25,7 +25,7 @@ getRecursiveContents topdir = do
             if isDirectory
               then getRecursiveContents path
               else return [path]
-          return (concat paths) 
+          return (concat paths)
         else return []
 
 capitalize :: String -> String
@@ -51,4 +51,3 @@ main  = do
 exitCode  :: Int -> IO ()
 exitCode 0 = exitSuccess
 exitCode n = exitWith $ ExitFailure n
-

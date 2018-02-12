@@ -90,4 +90,3 @@ instance Serial m v => Serial m (Map.HashMap Text v) where
 
 -- This one is generated with Generics and instances above
 instance Monad m => Serial m Value
-

@@ -35,4 +35,3 @@ runghc arguments = do
                    | Just cabalConfig <- maybeCabal = ["cabal",   "exec", "--"]
                    | otherwise                      = []
     system (unwords $ execPrefix ++ ["runghc"] ++ arguments)
-

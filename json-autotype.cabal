@@ -84,7 +84,6 @@ executable json-autotype
                        Data.Aeson.AutoType.Format
                        Data.Aeson.AutoType.Pretty
                        Data.Aeson.AutoType.CodeGen
-                       Data.Aeson.AutoType.Alternative
                        -- Data.Aeson.AutoType.Plugin.Subtype
                        -- Data.Aeson.AutoType.Plugin.Loader
                        Data.Aeson.AutoType.Util
@@ -125,8 +124,7 @@ executable json-autotype
 test-suite json-autotype-qc-test
   type:                exitcode-stdio-1.0
   main-is:             test/TestQC.hs
-  other-modules:       Data.Aeson.AutoType.Util
-                       Data.Aeson.AutoType.Extract
+  other-modules:       Data.Aeson.AutoType.Extract
                        Data.Aeson.AutoType.Test
                        Data.Aeson.AutoType.Type
                        Data.Aeson.AutoType.Pretty
@@ -157,11 +155,7 @@ test-suite json-autotype-qc-test
 test-suite json-autotype-examples
   type:                exitcode-stdio-1.0
   main-is:             test/TestExamples.hs
-  other-modules:       Data.Aeson.AutoType.Util
-                       Data.Aeson.AutoType.Extract
-                       Data.Aeson.AutoType.Test
-                       Data.Aeson.AutoType.Type
-                       Data.Aeson.AutoType.Pretty
+  other-modules:       Data.Aeson.AutoType.Pretty
                        CommonCLI
   other-extensions:    TemplateHaskell,
                        ScopedTypeVariables,

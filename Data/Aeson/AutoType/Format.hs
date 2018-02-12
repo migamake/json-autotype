@@ -258,13 +258,13 @@ displaySplitTypes dict = trace ("displaySplitTypes: " ++ show (toposort dict)) $
 -- 4. Escaping Haskell keywords if the whole identifier is such keyword.
 -- 5. If identifier is empty, then substituting "JsonEmptyKey" for its name.
 normalizeTypeName :: Text -> Text
-normalizeTypeName s  = ifEmpty "JsonEmptyKey"                  .
-                       escapeKeywords                          .
-                       escapeFirstNonAlpha                     .
-                       Text.concat                             .
-                       map capitalize                          .
-                       filter     (not . Text.null)            .
-                       Text.split (not . acceptableInVariable) $ s
+normalizeTypeName = ifEmpty "JsonEmptyKey"                  .
+                    escapeKeywords                          .
+                    escapeFirstNonAlpha                     .
+                    Text.concat                             .
+                    map capitalize                          .
+                    filter     (not . Text.null)            .
+                    Text.split (not . acceptableInVariable)
   where
     ifEmpty x ""       = x
     ifEmpty _ nonEmpty = nonEmpty

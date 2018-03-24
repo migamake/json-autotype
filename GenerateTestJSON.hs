@@ -16,6 +16,7 @@ import           System.FilePath           (splitExtension, (<.>))
 import           System.Directory          (removeFile)
 import           System.Process            (system)
 import           Control.Monad             (forM_, forM, when)
+import           Control.Exception         (assert)
 import qualified Data.ByteString.Lazy.Char8 as BSL
 import qualified Data.HashMap.Strict        as Map
 import qualified Data.Set                   as Set
@@ -156,27 +157,27 @@ generateTestJSONs Options {tyOpts=TyOptions {..},
         -- We split different dictionary labels to become different type trees (and thus different declarations.)
         let splitted = splitTypeByLabel toplevelName finalType
         --myTrace $ "SPLITTED: " ++ pretty splitted
-        assertM $ not $ any hasNonTopTObj $ Map.elems splitted
-        -- We compute which type labels are candidates for unification
-        let uCands = unificationCandidates splitted
-        myTrace $ "CANDIDATES:\n" ++ pretty uCands
-        when suggest $ forM_ uCands $ \cs -> do
-                               putStr "-- "
-                               Text.putStrLn $ "=" `Text.intercalate` cs
-        -- We unify the all candidates or only those that have been given as command-line flags.
-        let unified = if autounify
-                        then unifyCandidates uCands splitted
-                        else splitted
-        myTrace $ "UNIFIED:\n" ++ pretty unified
-        -- We start by writing module header
-        writeHaskellModule outputFilename toplevelName unified
-        if test
-          then do
-            r <- (==ExitSuccess) <$> runghc [outputFilename, inputFilename]
-            when r $ mapM_ removeFile [inputFilename, outputFilename]
-            return r
-          else
-            return True
+        assert (not $ any hasNonTopTObj $ Map.elems splitted) $ do
+          -- We compute which type labels are candidates for unification
+          let uCands = unificationCandidates splitted
+          myTrace $ "CANDIDATES:\n" ++ pretty uCands
+          when suggest $ forM_ uCands $ \cs -> do
+                                 putStr "-- "
+                                 Text.putStrLn $ "=" `Text.intercalate` cs
+          -- We unify the all candidates or only those that have been given as command-line flags.
+          let unified = if autounify
+                          then unifyCandidates uCands splitted
+                          else splitted
+          myTrace $ "UNIFIED:\n" ++ pretty unified
+          -- We start by writing module header
+          writeHaskellModule outputFilename toplevelName unified
+          if test
+            then do
+              r <- (==ExitSuccess) <$> runghc [outputFilename, inputFilename]
+              when r $ mapM_ removeFile [inputFilename, outputFilename]
+              return r
+            else
+              return True
     putStrLn $ "Successfully generated "      ++ show (length results) ++
                " JSON files, out of planned " ++ show count  ++ " cases."
   where

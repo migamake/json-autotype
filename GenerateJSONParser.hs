@@ -6,6 +6,7 @@
 module Main where
 
 import           Control.Applicative
+import           Control.Exception              (assert)
 import           Control.Monad                  (forM_, when, unless)
 import           Data.Maybe
 import           Data.Monoid
@@ -137,22 +138,22 @@ generateHaskellFromJSONs opts@Options { tyOpts=TyOptions { toplevel } } inputFil
   -- We split different dictionary labels to become different type trees (and thus different declarations.)
   let splitted = splitTypeByLabel toplevelName finalType
   myTrace $ "SPLITTED: " ++ pretty splitted
-  assertM $ not $ any hasNonTopTObj $ Map.elems splitted
-  -- We compute which type labels are candidates for unification
-  let uCands = unificationCandidates splitted
-  myTrace $ "CANDIDATES:\n" ++ pretty uCands
-  when (suggest $ tyOpts opts) $ forM_ uCands $ \cs -> do
-                         putStr "-- "
-                         Text.putStrLn $ "=" `Text.intercalate` cs
-  -- We unify the all candidates or only those that have been given as command-line flags.
-  let unified = if autounify $ tyOpts opts
-                  then unifyCandidates uCands splitted
-                  else splitted
-  myTrace $ "UNIFIED:\n" ++ pretty unified
-  -- We start by writing module header
-  writeModule (lang opts) outputFilename toplevelName unified
-  when (test $ tyOpts opts) $
-    exitWith =<< runghc (outputFilename:passedTypeCheck)
+  assert (not $ any hasNonTopTObj $ Map.elems splitted) $ do
+    -- We compute which type labels are candidates for unification
+    let uCands = unificationCandidates splitted
+    myTrace $ "CANDIDATES:\n" ++ pretty uCands
+    when (suggest $ tyOpts opts) $ forM_ uCands $ \cs -> do
+                           putStr "-- "
+                           Text.putStrLn $ "=" `Text.intercalate` cs
+    -- We unify the all candidates or only those that have been given as command-line flags.
+    let unified = if autounify $ tyOpts opts
+                    then unifyCandidates uCands splitted
+                    else splitted
+    myTrace $ "UNIFIED:\n" ++ pretty unified
+    -- We start by writing module header
+    writeModule (lang opts) outputFilename toplevelName unified
+    when (test $ tyOpts opts) $
+      exitWith =<< runghc (outputFilename:passedTypeCheck)
   where
     -- | Works like @Debug.trace@ when the --debug flag is enabled, and does nothing otherwise.
     myTrace :: String -> IO ()

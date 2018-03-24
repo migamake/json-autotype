@@ -173,7 +173,7 @@ generateTestJSONs Options {tyOpts=TyOptions {..},
           writeHaskellModule outputFilename toplevelName unified
           if test
             then do
-              r <- (==ExitSuccess) <$> runghc [outputFilename, inputFilename]
+              r <- (==ExitSuccess) <$> runModule (lang opts) [outputFilename, inputFilename]
               when r $ mapM_ removeFile [inputFilename, outputFilename]
               return r
             else

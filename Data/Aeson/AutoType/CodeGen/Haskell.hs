@@ -3,18 +3,22 @@
 -- | Wrappers for generating prologue and epilogue code in Haskell.
 module Data.Aeson.AutoType.CodeGen.Haskell(
     writeHaskellModule
+  , runHaskellModule
   , defaultHaskellFilename
   ) where
 
 import qualified Data.Text           as Text
 import qualified Data.Text.IO        as Text
-import           Data.Text
+import           Data.Text hiding (unwords)
 import qualified Data.HashMap.Strict as Map
 import           Control.Arrow               (first)
 import           Control.Exception (assert)
 import           Data.Monoid                 ((<>))
 import           System.FilePath
 import           System.IO
+import           System.Process                 (system)
+import qualified System.Environment             (lookupEnv)
+import           System.Exit                    (ExitCode)
 
 import           Data.Aeson.AutoType.Format
 import           Data.Aeson.AutoType.Type
@@ -97,3 +101,11 @@ writeHaskellModule outputFilename toplevelName types =
          else outputFilename
     normalizeTypeName' = Text.unpack . normalizeTypeName . Text.pack
 
+runHaskellModule :: [String] -> IO ExitCode
+runHaskellModule arguments = do
+    maybeStack <- System.Environment.lookupEnv "STACK_EXEC"
+    maybeCabal <- System.Environment.lookupEnv "CABAL_SANDBOX_CONFIG"
+    let execPrefix | Just stackExec <- maybeStack = [stackExec, "exec", "--"]
+                   | Just _         <- maybeCabal = ["cabal",   "exec", "--"]
+                   | otherwise                    = []
+    system (Prelude.unwords $ execPrefix ++ ["runghc"] ++ arguments)

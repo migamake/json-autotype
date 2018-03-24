@@ -4,6 +4,7 @@
 module Data.Aeson.AutoType.CodeGen(
     Lang(..)
   , writeModule
+  , runModule
   , defaultOutputFilename
   ) where
 
@@ -38,3 +39,6 @@ defaultOutputFilename Elm     = defaultElmFilename
 writeModule :: Lang -> FilePath -> Text -> Map.HashMap Text Type -> IO ()
 writeModule Haskell = writeHaskellModule
 writeModule Elm     = writeElmModule
+
+runModule Haskell = runHaskellModule
+runModule Elm     = runElmModule

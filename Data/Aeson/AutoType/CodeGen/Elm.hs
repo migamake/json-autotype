@@ -4,6 +4,7 @@
 module Data.Aeson.AutoType.CodeGen.Elm(
     defaultElmFilename
   , writeElmModule
+  , runElmModule
   ) where
 
 import qualified Data.Text           as Text
@@ -55,3 +56,4 @@ writeElmModule outputFilename toplevelName types =
          else outputFilename
     normalizeTypeName' = Text.unpack . normalizeTypeName . Text.pack
 
+runElmModule = error "Yet undefined!"

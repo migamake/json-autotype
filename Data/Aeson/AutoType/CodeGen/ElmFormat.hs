@@ -5,7 +5,7 @@
 {-# LANGUAGE OverloadedStrings   #-}
 {-# LANGuaGE DeriveGeneric       #-}
 {-# LANGuaGE FlexibleContexts    #-}
--- | Formatting type declarations and class instances for inferred types. 
+-- | Formatting type declarations and class instances for inferred types.
 module Data.Aeson.AutoType.CodeGen.ElmFormat(
   displaySplitTypes,
   normalizeTypeName) where
@@ -50,55 +50,69 @@ makeLenses ''DeclState
 
 type DeclM = State DeclState
 
-type Map k v = Map.HashMap k v 
+type Map k v = Map.HashMap k v
 
 stepM :: DeclM Int
 stepM = counter %%= (\i -> (i, i+1))
 
 tShow :: (Show a) => a -> Text
-tShow = Text.pack . show 
+tShow = Text.pack . show
 
 -- | Wrap a type alias.
 wrapAlias :: Text -> Text -> Text
-wrapAlias identifier contents = Text.unwords ["type alias", identifier, "=", contents]
+wrapAlias identifier contents = Text.unwords ["type alias ", identifier, "=", contents]
 
 -- | Wrap a data type declaration
 wrapDecl ::  Text -> Text -> Text
 wrapDecl identifier contents = Text.unlines [header, contents, "  }"]
                                             --,"\nderiveJSON defaultOptions ''" `Text.append` identifier]
   where
-    header = Text.concat ["data ", identifier, " = ", identifier, " { "]
+    header = Text.concat ["type ", identifier, " = ", identifier, " { "]
 
 -- | Explanatory type alias for making declarations
 -- First element of the triple is original JSON identifier,
 -- second element of the triple is the mapped identifier name in Haskell.
 -- third element of the triple shows the type in a formatted way
-type MappedKey = (Text, Text, Text, Bool)
+type MappedKey = (Text, Text, Text, Type, Bool)
 
--- | Make ToJSON declaration, given identifier (object name in Haskell) and mapping of its keys
+-- | Make Decoder declaration, given identifier (object name in Haskell) and mapping of its keys
 -- from JSON to Haskell identifiers *in the same order* as in *data type declaration*.
-makeFromJSON ::  Text -> [MappedKey] -> Text
-makeFromJSON identifier contents =
+makeDecoder ::  Text -> [MappedKey] -> Text
+makeDecoder identifier contents =
   Text.unlines [
-      Text.unwords ["instance FromJSON", identifier, "where"]
-    , Text.unwords ["  parseJSON (Object v) =", makeParser identifier contents]
-    , "  parseJSON _          = mzero" ]
+      Text.concat  [decodeIdentifier, " : Json.Decode.Decoder ", identifier]
+    , Text.concat  [decodeIdentifier, " ="]
+    , Text.unwords ["    Json.Decode.Pipeline.decode", identifier]
+    , Text.unlines (makeParser identifier <$> contents) ]
   where
-    makeParser identifier [] = Text.unwords ["return ", identifier]
-    makeParser identifier _  = Text.unwords [identifier, "<$>", inner]
-    inner                    = " <*> " `Text.intercalate`
-                                  map takeValue contents
-    takeValue (jsonId, _, ty, True ) = Text.concat ["v .:?? \"", jsonId, "\""] -- nullable types
-    takeValue (jsonId, _, _ , False) = Text.concat ["v .:   \"", jsonId, "\""]
+    decodeIdentifier         = decoderIdent identifier
+    makeParser identifier (jsonId, _, _, ty, isOptional) = Text.unwords [
+          "  |>"
+        , if isOptional
+             then "Json.Decode.Pipeline.optional"
+             else "Json.Decode.Pipeline.required"
+        , Text.concat ["\"", jsonId, "\""]
+        , getDecoder ty ] -- quote
+
+getDecoder x = case x of
+  TString   -> "Json.Decode.string"
+  TNum      -> "Json.Decode.float"
+  TBool     -> "Json.Decode.bool"
+  TArray  t -> "Json.Decode.list (" <> getDecoder t <> ")"
+  TLabel  l -> decoderIdent l
+  TObj    o -> error "getDecoder cannot handle complex object types!"
+  TUnion  u -> error $ "getDecoder cannot yet handle union types:" <> show u
+
+decoderIdent ident = "decode" <> ident
 -- Contents example for wrapFromJSON:
 -- " <$>
 --"                           v .: "hexValue"  <*>
 --"                           v .: "colorName\""
 
--- | Make ToJSON declaration, given identifier (object name in Haskell) and mapping of its keys
+-- | Make Encoder declaration, given identifier (object name in Haskell) and mapping of its keys
 -- from JSON to Haskell identifiers in the same order as in declaration
-makeToJSON :: Text -> [MappedKey] -> Text
-makeToJSON identifier contents =
+makeEncoder :: Text -> [MappedKey] -> Text
+makeEncoder identifier contents =
     Text.unlines [
         Text.concat ["instance ToJSON ", identifier, " where"]
       , Text.concat ["  toJSON     (", identifier, " {", wildcard, "}) = object [", inner ", ", "]"]
@@ -114,7 +128,7 @@ makeToJSON identifier contents =
              | otherwise     = ".."
     inner separator = separator `Text.intercalate`
                       map putValue contents
-    putValue (jsonId, haskellId, _typeText, _nullable) = Text.unwords [escapeText jsonId, ".=", haskellId]
+    putValue (jsonId, haskellId, _typeText, _ty, _nullable) = Text.unwords [escapeText jsonId, ".=", haskellId]
     escapeText = Text.pack . show . Text.unpack
 -- Contents example for wrapToJSON
 --"hexValue"  .= hexValue
@@ -131,19 +145,19 @@ genericIdentifier = do
 newDecl :: Text -> [(Text, Type)] -> DeclM Text
 newDecl identifier kvs = do attrs <- forM kvs $ \(k, v) -> do
                               formatted <- formatType v
-                              return (k, normalizeFieldName identifier k, formatted, isNullable v)
-                            let decl = Text.unlines [wrapDecl     identifier $ fieldDecls attrs
+                              return (k, normalizeFieldName identifier k, formatted, v, isNullable v)
+                            let decl = Text.unlines [wrapDecl    identifier $ fieldDecls attrs
                                                     ,""
-                                                    ,makeFromJSON identifier              attrs
+                                                    ,makeDecoder identifier              attrs
                                                     ,""
-                                                    ,makeToJSON   identifier              attrs]
+                                                    ,makeEncoder identifier              attrs]
                             addDecl decl
                             return identifier
   where
     fieldDecls attrList = Text.intercalate ",\n" $ map fieldDecl attrList
-    fieldDecl :: (Text, Text, Text, Bool) -> Text
-    fieldDecl (_jsonName, haskellName, fType, _nullable) = Text.concat [
-                                                             "    ", haskellName, " :: ", fType]
+    fieldDecl :: (Text, Text, Text, Type, Bool) -> Text
+    fieldDecl (_jsonName, haskellName, fType, _type, _nullable) = Text.concat [
+                                                                    "    ", haskellName, " : ", fType]
 
 addDecl decl = decls %%= (\ds -> ((), decl:ds))
 
@@ -163,7 +177,7 @@ normalizeFieldName identifier = escapeKeywords             .
                                 normalizeTypeName
 
 keywords ::  Set Text
-keywords = Set.fromList ["type", "alias", "exposing", "data", "module", "class",
+keywords = Set.fromList ["type", "alias", "exposing", "module", "class",
                          "where", "let", "do"]
 
 escapeKeywords ::  Text -> Text
@@ -191,7 +205,7 @@ formatType (TArray a)                        = do inner <- formatType a
 formatType (TObj   o)                        = do ident <- genericIdentifier
                                                   newDecl ident d
   where
-    d = Map.toList $ unDict o 
+    d = Map.toList $ unDict o
 formatType  e | e `Set.member` emptySetLikes = return emptyTypeRepr
 formatType  t                                = return $ "ERROR: Don't know how to handle: " `Text.append` tShow t
 
@@ -275,7 +289,7 @@ normalizeTypeName s  = ifEmpty "JsonEmptyKey"                  .
     escapeFirstNonAlpha cs                                 = "_" `Text.append` cs
 
 -- | Topological sorting of splitted types so that it is accepted declaration order.
-toposort :: Map Text Type -> [(Text, Type)]  
+toposort :: Map Text Type -> [(Text, Type)]
 toposort splitted = map ((id &&& (splitted Map.!)) . fst3 . graphKey) $ Graph.topSort graph
   where
     (graph, graphKey) = Graph.graphFromEdges' $ map makeEntry $ Map.toList splitted
@@ -298,4 +312,3 @@ remapLabels ls (TArray t) = TArray $                 remapLabels ls  t
 remapLabels ls (TUnion u) = TUnion $        Set.map (remapLabels ls) u
 remapLabels ls (TLabel l) = TLabel $ Map.lookupDefault l l ls
 remapLabels _  other      = other
-

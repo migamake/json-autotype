@@ -28,7 +28,7 @@ defaultElmFilename = "JSONTypes.elm"
 
 header :: Text -> Text
 header moduleName = Text.unlines [
-   Text.concat ["module ", capitalize moduleName]
+   Text.unwords ["module ", capitalize moduleName, " exposing(..)"]
   ,""
   ,"import Json.Encode exposing (..)"
   ,"import Json.Decode exposing (..)"

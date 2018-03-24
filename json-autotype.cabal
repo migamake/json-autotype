@@ -1,6 +1,6 @@
 -- Build information for the package.
 name:                json-autotype
-version:             1.0.19
+version:             1.1.0
 synopsis:            Automatic type declaration for JSON input data
 description:         Generates datatype declarations with Aeson's "FromJSON" instances
                      from a set of example ".json" files.
@@ -19,6 +19,10 @@ description:         Generates datatype declarations with Aeson's "FromJSON" ins
                      "$ runghc JSONTypes.hs input.json"
                      .
                      One can now use multiple input files to generate better type description.
+                     .
+                     Now with Elm code generation support!
+                     (If you want your favourite programming language supported too -
+                     name your price and mail the author.)
                      .
                      See introduction on  <https://github.com/mgajda/json-autotype>
                      for details.
@@ -59,6 +63,11 @@ library
   other-modules:
                        -- internal module
                        Data.Aeson.AutoType.Util
+                       Data.Aeson.AutoType.Split
+                       Data.Aeson.AutoType.CodeGen.Haskell
+                       Data.Aeson.AutoType.CodeGen.Elm
+                       Data.Aeson.AutoType.CodeGen.HaskellFormat
+                       Data.Aeson.AutoType.CodeGen.ElmFormat
   build-depends:       base                 >=4.3  && <4.11,
                        GenericPretty        >=1.2  && <1.3,
                        aeson                >=0.7  && <1.3,
@@ -86,7 +95,12 @@ executable json-autotype
                        Data.Aeson.AutoType.Extract
                        Data.Aeson.AutoType.Format
                        Data.Aeson.AutoType.Pretty
+                       Data.Aeson.AutoType.Split
                        Data.Aeson.AutoType.CodeGen
+                       Data.Aeson.AutoType.CodeGen.Haskell
+                       Data.Aeson.AutoType.CodeGen.Elm
+                       Data.Aeson.AutoType.CodeGen.HaskellFormat
+                       Data.Aeson.AutoType.CodeGen.ElmFormat
                        Data.Aeson.AutoType.Alternative
                        -- Data.Aeson.AutoType.Plugin.Subtype
                        -- Data.Aeson.AutoType.Plugin.Loader
@@ -130,6 +144,7 @@ test-suite json-autotype-qc-test
   main-is:             test/TestQC.hs
   other-modules:       Data.Aeson.AutoType.Util
                        Data.Aeson.AutoType.Extract
+                       Data.Aeson.AutoType.Format
                        Data.Aeson.AutoType.Test
                        Data.Aeson.AutoType.Type
                        Data.Aeson.AutoType.Pretty
@@ -168,6 +183,7 @@ test-suite json-autotype-examples
   main-is:             test/TestExamples.hs
   other-modules:       Data.Aeson.AutoType.Util
                        Data.Aeson.AutoType.Extract
+                       Data.Aeson.AutoType.Format
                        Data.Aeson.AutoType.Test
                        Data.Aeson.AutoType.Type
                        Data.Aeson.AutoType.Pretty
@@ -210,9 +226,14 @@ test-suite json-autotype-gen-test
   other-modules:       Data.Aeson.AutoType.Util
                        Data.Aeson.AutoType.Pretty
                        Data.Aeson.AutoType.Type
+                       Data.Aeson.AutoType.Split
                        Data.Aeson.AutoType.Extract
                        Data.Aeson.AutoType.Format
                        Data.Aeson.AutoType.CodeGen
+                       Data.Aeson.AutoType.CodeGen.Haskell
+                       Data.Aeson.AutoType.CodeGen.Elm
+                       Data.Aeson.AutoType.CodeGen.HaskellFormat
+                       Data.Aeson.AutoType.CodeGen.ElmFormat
                        Data.Aeson.AutoType.Test
                        CommonCLI
   other-extensions:    TemplateHaskell,

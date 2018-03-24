@@ -12,6 +12,8 @@
 *.tix
 cabal.sandbox.config
 .stack-work
+elm-package.json
+elm-stuff/
 GenerateJSONParser
 GenerateTestJSON
 dist/

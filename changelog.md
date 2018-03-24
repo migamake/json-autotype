@@ -1,5 +1,8 @@
 Changelog
 =========
+    1.1.0  Mar 2018
+        * Elm code generation.
+
     1.0.19  Nov 2017
         * Allow to have a custom name for toplevel data type.
 

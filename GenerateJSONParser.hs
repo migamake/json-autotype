@@ -23,10 +23,11 @@ import qualified Data.Text.IO               as Text
 import           Data.Text                      (Text)
 import           Text.PrettyPrint.GenericPretty (pretty)
 
-import           Data.Aeson.AutoType.Type
+import           Data.Aeson.AutoType.CodeGen
 import           Data.Aeson.AutoType.Extract
 import           Data.Aeson.AutoType.Format
-import           Data.Aeson.AutoType.CodeGen
+import           Data.Aeson.AutoType.Split
+import           Data.Aeson.AutoType.Type
 import           Data.Aeson.AutoType.Util
 import qualified Data.Yaml as Yaml
 
@@ -40,6 +41,7 @@ data Options = Options {
                , typecheck :: Bool
                , yaml :: Bool
                , preprocessor :: Bool
+               , lang :: Lang
                , filenames :: [FilePath]
                }
 
@@ -48,14 +50,19 @@ optParser  =
     Options  <$> tyOptParser
              <*> strOption (short 'o'             <>
                             long "output"         <>
-                            long "outputFilename" <> value defaultOutputFilename)
+                            long "outputFilename" <> value "")
              <*> unflag    (short 'n'             <>
                             long "no-typecheck"   <> help "Do not typecheck after unification")
              <*> switch    (long  "yaml"          <> help "Parse inputs as YAML instead of JSON")
              <*> switch    (short 'p'             <>
                             long "preprocessor"   <>
                               help "Work as GHC preprocessor (and skip preprocessor pragma)")
+             <*> langOpts
              <*> some (argument str (metavar "FILES..."))
+
+langOpts :: Parser Lang
+langOpts  =  flag Haskell Haskell (long "haskell")
+         <|> flag Haskell Elm     (long "elm")
 
 -- | Report an error to error output.
 report   :: Text -> IO ()
@@ -143,7 +150,7 @@ generateHaskellFromJSONs opts@Options { tyOpts=TyOptions { toplevel } } inputFil
                   else splitted
   myTrace $ "UNIFIED:\n" ++ pretty unified
   -- We start by writing module header
-  writeHaskellModule outputFilename toplevelName unified
+  writeModule (lang opts) outputFilename toplevelName unified
   when (test $ tyOpts opts) $
     exitWith =<< runghc (outputFilename:passedTypeCheck)
   where

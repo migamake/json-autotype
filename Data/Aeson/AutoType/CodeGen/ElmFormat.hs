@@ -136,7 +136,9 @@ getEncoder  TNull     = "Json.Encode.complexType"
 getEncoder (TLabel l) = encoderIdent l
 getEncoder (TArray e) = "Json.Encode.list <| List.map (" <> getEncoder e <> ")"
 getEncoder (TObj   o) = error $ "Seeing direct object encoder: "         <> show o
-getEncoder (TUnion u) = error $ "Union encoder is not yet implemented: " <> show u
+getEncoder (TUnion u) = "oneOf [" <> joinWith ", " (makeUnionDecoder u) <> "]"
+
+makeUnionDecoder u = error $ "Unfinished union decoding:" <> show u
 -- Contents example for wrapToJSON
 --"hexValue"  .= hexValue
 --                                        ,"colorName" .= colorName]

@@ -1,6 +1,6 @@
 {-# LANGUAGE CPP               #-}
 {-# LANGUAGE OverloadedStrings #-}
--- | Wrappers for generating prologue and epilogue code in Haskell.
+-- | Code generation and test running in different languages. (Switchbox.)
 module Data.Aeson.AutoType.CodeGen(
     Lang(..)
   , writeModule
@@ -11,21 +11,11 @@ module Data.Aeson.AutoType.CodeGen(
 import           Data.Text(Text)
 import qualified Data.HashMap.Strict as Map
 import           Data.Aeson.AutoType.Type
-{-
-import qualified Data.Text.IO        as Text
-import           Data.Text
-import qualified Data.HashMap.Strict as Map
-import           Control.Arrow               (first)
-import           Data.Monoid                 ((<>))
-import           System.FilePath
-import           System.IO
 
-import           Data.Aeson.AutoType.Type
-import           Data.Aeson.AutoType.Format
-import           Data.Aeson.AutoType.Util -}
 import           Data.Aeson.AutoType.CodeGen.Haskell
 import           Data.Aeson.AutoType.CodeGen.Elm
 
+-- | Available output languages.
 data Lang = Haskell
           | Elm
 
@@ -40,5 +30,6 @@ writeModule :: Lang -> FilePath -> Text -> Map.HashMap Text Type -> IO ()
 writeModule Haskell = writeHaskellModule
 writeModule Elm     = writeElmModule
 
+-- | Run module in a given language.
 runModule Haskell = runHaskellModule
 runModule Elm     = runElmModule

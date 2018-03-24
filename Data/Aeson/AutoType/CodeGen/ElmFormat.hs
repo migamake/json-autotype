@@ -67,7 +67,7 @@ wrapDecl ::  Text -> Text -> Text
 wrapDecl identifier contents = Text.unlines [header, contents, "  }"]
                                             --,"\nderiveJSON defaultOptions ''" `Text.append` identifier]
   where
-    header = Text.concat ["type ", identifier, " = ", identifier, " { "]
+    header = Text.concat ["type alias ", identifier, " = ", " { "]
 
 -- | Explanatory type alias for making declarations
 -- First element of the triple is original JSON identifier,
@@ -92,48 +92,58 @@ makeDecoder identifier contents =
              then "Json.Decode.Pipeline.optional"
              else "Json.Decode.Pipeline.required"
         , Text.concat ["\"", jsonId, "\""]
-        , getDecoder ty ] -- quote
+        , "(" <> getDecoder ty <> ")"] -- quote
 
-getDecoder x = case x of
-  TString   -> "Json.Decode.string"
-  TNum      -> "Json.Decode.float"
-  TBool     -> "Json.Decode.bool"
-  TArray  t -> "Json.Decode.list (" <> getDecoder t <> ")"
-  TLabel  l -> decoderIdent l
-  TObj    o -> error "getDecoder cannot handle complex object types!"
-  TUnion  u -> error $ "getDecoder cannot yet handle union types:" <> show u
+getDecoder  TString    = "Json.Decode.string"
+getDecoder  TNum       = "Json.Decode.float"
+getDecoder  TBool      = "Json.Decode.bool"
+getDecoder (TArray  t) = "Json.Decode.list (" <> getDecoder t <> ")"
+getDecoder (TLabel  l) = decoderIdent l
+getDecoder (TObj    o) = error "getDecoder cannot handle complex object types!"
+getDecoder (TUnion  u) = error $ "getDecoder cannot yet handle union types:" <> show u
 
-decoderIdent ident = "decode" <> ident
+decoderIdent ident = "decode" <> capitalize (normalizeTypeName ident)
 -- Contents example for wrapFromJSON:
 -- " <$>
 --"                           v .: "hexValue"  <*>
 --"                           v .: "colorName\""
+
+encoderIdent ident = "encode" <> capitalize (normalizeTypeName ident)
 
 -- | Make Encoder declaration, given identifier (object name in Haskell) and mapping of its keys
 -- from JSON to Haskell identifiers in the same order as in declaration
 makeEncoder :: Text -> [MappedKey] -> Text
 makeEncoder identifier contents =
     Text.unlines [
-        Text.concat ["instance ToJSON ", identifier, " where"]
-      , Text.concat ["  toJSON     (", identifier, " {", wildcard, "}) = object [", inner ", ", "]"]
-#if MIN_VERSION_aeson(0,11,0)
-      , maybeToEncoding
-#endif
+        Text.unwords [encoderIdent identifier, ":", identifier, "->", "Json.Encode.Value"]
+      , encoderIdent identifier <> " record ="
+      , "    Json.Encode.object ["
+      , "        " <> (joinWith "\n      , " (makeEncoder <$> contents))
+      , "    ]"
       ]
   where
-    maybeToEncoding | null contents = ""
-                    | otherwise     =
-                        Text.concat ["  toEncoding (", identifier, " {", wildcard, "}) = pairs  (", inner "<>", ")"]
-    wildcard | null contents = ""
-             | otherwise     = ".."
-    inner separator = separator `Text.intercalate`
-                      map putValue contents
-    putValue (jsonId, haskellId, _typeText, _ty, _nullable) = Text.unwords [escapeText jsonId, ".=", haskellId]
+    makeEncoder (jsonId, haskellId, _typeText, ty, _nullable) = Text.concat [
+            "(", tShow jsonId, ", ", getEncoder ty, " <| record.", normalizeFieldName identifier jsonId, ")"
+        ]
+    --"answers",  Json.Encode.list <| List.map encodeAnswer <| record.answers
     escapeText = Text.pack . show . Text.unpack
+
+getEncoder :: Type -> Text
+getEncoder  TString   = "Json.Encode.string"
+getEncoder  TNum      = "Json.Encode.float"
+getEncoder  TBool     = "Json.Encode.bool"
+getEncoder  TNull     = "Json.Encode.complexType"
+getEncoder (TLabel l) = encoderIdent l
+getEncoder (TArray e) = "Json.Encode.list <| List.map (" <> getEncoder e <> ")"
+getEncoder (TObj   o) = error $ "Seeing direct object encoder: "         <> show o
+getEncoder (TUnion u) = error $ "Union encoder is not yet implemented: " <> show u
 -- Contents example for wrapToJSON
 --"hexValue"  .= hexValue
 --                                        ,"colorName" .= colorName]
-
+-- | Join text with other as separator.
+joinWith :: Text -> [Text] -> Text
+joinWith _      []            = ""
+joinWith joiner (aFirst:rest) = aFirst <> Text.concat (map (joiner <>) rest)
 
 -- | Makes a generic identifier name.
 genericIdentifier :: DeclM Text

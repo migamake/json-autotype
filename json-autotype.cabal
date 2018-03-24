@@ -38,7 +38,7 @@ build-type:          Simple
 extra-source-files:  README.md changelog.md
 cabal-version:       >=1.10
 bug-reports:         https://github.com/mgajda/json-autotype/issues
-tested-with:         GHC==7.8.4,GHC==7.10.3,GHC==7.6.3,GHC==8.0.1,GHC==8.2.2
+tested-with:         GHC==7.8.4, GHC==7.10.3, GHC==7.6.3, GHC==8.0.1, GHC==8.2.2, GHC==8.4.1
 source-repository head
   type:     git
   location: https://github.com/mgajda/json-autotype.git
@@ -68,20 +68,17 @@ library
                        Data.Aeson.AutoType.CodeGen.Elm
                        Data.Aeson.AutoType.CodeGen.HaskellFormat
                        Data.Aeson.AutoType.CodeGen.ElmFormat
-  build-depends:       base                 >=4.3  && <4.11,
+  build-depends:       base                 >=4.3  && <4.12,
                        GenericPretty        >=1.2  && <1.3,
                        aeson                >=0.7  && <1.3,
-                       bytestring           >=0.9  && <0.11,
                        containers           >=0.3  && <0.6,
                        filepath             >=1.3  && <1.5,
                        hashable             >=1.2  && <1.3,
                        ---hint                 >=0.4  && <0.6,
-                       optparse-applicative >=0.11 && <1.0,
-                       lens                 >=4.1  && <4.16,
+                       lens                 >=4.1  && <4.17,
                        --mmap                 >=0.5  && <0.6,
                        mtl                  >=2.1  && <2.3,
                        pretty               >=1.1  && <1.3,
-                       process              >=1.1  && <1.7,
                        scientific           >=0.3  && <0.5,
                        text                 >=1.1  && <1.4,
                        uniplate             >=1.6  && <1.7,
@@ -114,7 +111,7 @@ executable json-autotype
                        DeriveDataTypeable,
                        DeriveGeneric,
                        RecordWildCards
-  build-depends:       base                 >=4.3  && <4.11,
+  build-depends:       base                 >=4.3  && <4.12,
                        GenericPretty        >=1.2  && <1.3,
                        aeson                >=0.7  && <1.3,
                        bytestring           >=0.9  && <0.11,
@@ -122,7 +119,7 @@ executable json-autotype
                        filepath             >=1.3  && <1.5,
                        hashable             >=1.2  && <1.3,
                        --hint                 >=0.4  && <0.6,
-                       lens                 >=4.1  && <4.16,
+                       lens                 >=4.1  && <4.17,
                        mtl                  >=2.1  && <2.3,
                        optparse-applicative >=0.12 && <1.0,
                        pretty               >=1.1  && <1.3,
@@ -133,7 +130,7 @@ executable json-autotype
                        unordered-containers >=0.2  && <0.3,
                        vector               >=0.9  && <0.13,
                        yaml                 >=0.8  && <0.9
-  -- hs-source-dirs:      
+  -- hs-source-dirs:
   default-language:    Haskell2010
 
 -- * Test suites
@@ -156,18 +153,12 @@ test-suite json-autotype-qc-test
                        DeriveDataTypeable,
                        DeriveGeneric,
                        RecordWildCards
-  build-depends:       base                 >=4.3  && <4.11,
+  build-depends:       base                 >=4.3  && <4.12,
                        GenericPretty        >=1.2  && <1.3,
                        aeson                >=0.7  && <1.3,
-                       bytestring           >=0.9  && <0.11,
                        containers           >=0.3  && <0.6,
-                       directory            >=1.1  && <1.4,
-                       filepath             >=1.3  && <1.5,
                        hashable             >=1.2  && <1.3,
-                       lens                 >=4.1  && <4.16,
-                       mtl                  >=2.1  && <2.3,
                        pretty               >=1.1  && <1.3,
-                       process              >=1.1  && <1.7,
                        scientific           >=0.3  && <0.5,
                        smallcheck           >=1.0  && <1.2,
                        text                 >=1.1  && <1.4,
@@ -196,26 +187,19 @@ test-suite json-autotype-examples
                        DeriveDataTypeable,
                        DeriveGeneric,
                        RecordWildCards
-  build-depends:       base                 >=4.3  && <4.11,
+  build-depends:       base                 >=4.3  && <4.12,
                        GenericPretty        >=1.2  && <1.3,
                        aeson                >=0.7  && <1.3,
-                       bytestring           >=0.9  && <0.11,
                        containers           >=0.3  && <0.6,
                        directory            >=1.1  && <1.4,
                        filepath             >=1.3  && <1.5,
-                       hashable             >=1.2  && <1.3,
-                       lens                 >=4.1  && <4.16,
-                       mtl                  >=2.1  && <2.3,
                        optparse-applicative >=0.11 && <1.0,
                        pretty               >=1.1  && <1.3,
                        process              >=1.1  && <1.7,
                        scientific           >=0.3  && <0.5,
-                       smallcheck           >=1.0  && <1.2,
                        text                 >=1.1  && <1.4,
-                       uniplate             >=1.6  && <1.7,
                        unordered-containers >=0.2  && <0.3,
-                       vector               >=0.9  && <0.13,
-                       QuickCheck           >=2.4  && <3.0
+                       vector               >=0.9  && <0.13
   -- hs-source-dirs:
   default-language:    Haskell2010
 
@@ -244,7 +228,7 @@ test-suite json-autotype-gen-test
                        DeriveDataTypeable,
                        DeriveGeneric,
                        RecordWildCards
-  build-depends:       base                 >=4.3  && <4.11,
+  build-depends:       base                 >=4.3  && <4.12,
                        GenericPretty        >=1.2  && <1.3,
                        aeson                >=0.7  && <1.3,
                        bytestring           >=0.9  && <0.11,
@@ -253,7 +237,7 @@ test-suite json-autotype-gen-test
                        filepath             >=1.3  && <1.5,
                        hashable             >=1.2  && <1.3,
                        optparse-applicative >=0.12 && <1.0,
-                       lens                 >=4.1  && <4.16,
+                       lens                 >=4.1  && <4.17,
                        mtl                  >=2.1  && <2.3,
                        pretty               >=1.1  && <1.3,
                        process              >=1.1  && <1.7,
@@ -264,6 +248,5 @@ test-suite json-autotype-gen-test
                        unordered-containers >=0.2  && <0.3,
                        vector               >=0.9  && <0.13,
                        QuickCheck           >=2.4  && <3.0
-  -- hs-source-dirs:      
+  -- hs-source-dirs:
   default-language:    Haskell2010
-

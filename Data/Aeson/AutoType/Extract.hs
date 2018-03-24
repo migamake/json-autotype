@@ -32,7 +32,7 @@ valueSize (Object o) = (1+) . sum . map valueSize . Map.elems $ o
 
 -- | Compute total size of the type of the @Value@.
 -- For:
--- * simple types it is always 1, 
+-- * simple types it is always 1,
 -- * for arrays it is just 1+_maximum_ size of the (single) element type,
 -- * for objects it is _sum_ of the sizes of fields (since each field type
 --   is assumed to be different.)
@@ -99,7 +99,7 @@ unifyTypes  TBool      TBool     = TBool
 unifyTypes  TNum       TNum      = TNum
 unifyTypes  TString    TString   = TString
 unifyTypes  TNull      TNull     = TNull
-unifyTypes (TObj   d) (TObj   e) = TObj newDict 
+unifyTypes (TObj   d) (TObj   e) = TObj newDict
   where
     newDict :: Dict
     newDict = Dict $ Map.fromList [(k, get k d `unifyTypes`

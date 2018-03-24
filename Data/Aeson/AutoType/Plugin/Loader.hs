@@ -51,4 +51,3 @@ importPlugins interfaceName pluginModules = do
       Right value -> return value
   where
     getInterfaceVar moduleName = Hint.interpret (moduleName ++ "." ++ interfaceName) Hint.as
-

@@ -38,3 +38,5 @@ Test*.hs
 TestQC
 GenerateJSONTest
 GenerateJSONParser
+/.*.environment.*
+/dist-newstyle/*

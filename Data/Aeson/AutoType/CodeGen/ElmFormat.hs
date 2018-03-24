@@ -163,7 +163,8 @@ normalizeFieldName identifier = escapeKeywords             .
                                 normalizeTypeName
 
 keywords ::  Set Text
-keywords = Set.fromList ["type", "data", "module", "class", "where", "let", "do"]
+keywords = Set.fromList ["type", "alias", "exposing", "data", "module", "class",
+                         "where", "let", "do"]
 
 escapeKeywords ::  Text -> Text
 escapeKeywords k | k `Set.member` keywords = k `Text.append` "_"
@@ -172,8 +173,8 @@ escapeKeywords k                           = k
 -- | Format the type within DeclM monad, that records
 -- the separate declarations on which this one is dependent.
 formatType :: Type -> DeclM Text
-formatType  TString                          = return "Text"
-formatType  TNum                             = return "Double"
+formatType  TString                          = return "String"
+formatType  TNum                             = return "Float"
 formatType  TBool                            = return "Bool"
 formatType (TLabel l)                        = return $ normalizeTypeName l
 formatType (TUnion u)                        = wrap <$> case length nonNull of
@@ -195,7 +196,7 @@ formatType  e | e `Set.member` emptySetLikes = return emptyTypeRepr
 formatType  t                                = return $ "ERROR: Don't know how to handle: " `Text.append` tShow t
 
 emptyTypeRepr :: Text
-emptyTypeRepr = "(Maybe Value)" -- default, accepts future extension where we found no data
+emptyTypeRepr = "(Maybe ComplexType)" -- default, accepts future extension where we found no data
 
 runDecl ::  DeclM a -> Text
 runDecl decl = Text.unlines $ finalState ^. decls

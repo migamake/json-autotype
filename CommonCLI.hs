@@ -31,8 +31,7 @@ runghc :: [String] -> IO ExitCode
 runghc arguments = do
     maybeStack <- System.Environment.lookupEnv "STACK_EXEC"
     maybeCabal <- System.Environment.lookupEnv "CABAL_SANDBOX_CONFIG"
-    let execPrefix | Just stackExec   <- maybeStack = [stackExec, "exec", "--"]
-                   | Just cabalConfig <- maybeCabal = ["cabal",   "exec", "--"]
-                   | otherwise                      = []
+    let execPrefix | Just stackExec <- maybeStack = [stackExec, "exec", "--"]
+                   | Just _         <- maybeCabal = ["cabal",   "exec", "--"]
+                   | otherwise                    = []
     system (unwords $ execPrefix ++ ["runghc"] ++ arguments)
-

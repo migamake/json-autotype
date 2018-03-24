@@ -125,7 +125,7 @@ generateHaskellFromJSONs opts@Options { tyOpts=TyOptions { toplevel } } inputFil
   -- Read type from each file
   (filenames,
    typeForEachFile,
-   valueForEachFile) <- (unzip3 . catMaybes) <$> mapM (extractTypeFromJSONFile opts) inputFilenames
+   valueForEachFile) <- unzip3 . catMaybes <$> mapM (extractTypeFromJSONFile opts) inputFilenames
   -- Unify all input types
   when (null typeForEachFile) $ do
     report "No valid JSON input file..."

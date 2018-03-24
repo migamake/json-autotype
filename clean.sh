@@ -4,7 +4,7 @@ rm `find . -iname '*.dyn_o' -or -iname '*.dyn_hi' -or -iname '*.o' -or -iname '*
 
 rm JSONTypes.hs
 
-for EXT in json bad_json auto_error; do 
+for EXT in json bad_json auto_error; do
   for i in "test/*.${EXT}"; do
     OUT=`basename $i .${EXT}`.hs;
     if [ "$OUT" != "*.hs" ] ; then
@@ -25,4 +25,3 @@ rm -f Test[0-9].hs Test[0-9].json Test[0-9][0-9].hs Test[0-9][0-9].json
 #rm -f pcr.hs product-schema.hs productdb.hs BasicSchema.hs youtube.hs
 
 echo Finished
-

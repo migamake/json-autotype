@@ -1,0 +1,11 @@
+json-schema/BasicSchema.hs
+json-schema/fstab-schema.hs
+json-schema/fstab.hs
+json-schema/product-schema.hs
+json-schema/product.hs
+moeDict.hs
+transcriptic/instruction/instructions.hs
+transcriptic/protocol/od600.hs
+transcriptic/protocol/oligo.hs
+transcriptic/protocol/pcr.hs
+union.hs

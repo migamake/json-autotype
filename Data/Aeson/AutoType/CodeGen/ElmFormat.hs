@@ -60,11 +60,11 @@ tShow = Text.pack . show
 
 -- | Wrap a type alias.
 wrapAlias :: Text -> Text -> Text
-wrapAlias identifier contents = Text.unwords ["type", identifier, "=", contents]
+wrapAlias identifier contents = Text.unwords ["type alias", identifier, "=", contents]
 
 -- | Wrap a data type declaration
 wrapDecl ::  Text -> Text -> Text
-wrapDecl identifier contents = Text.unlines [header, contents, "  } deriving (Show,Eq,GHC.Generics.Generic)"]
+wrapDecl identifier contents = Text.unlines [header, contents, "  }"]
                                             --,"\nderiveJSON defaultOptions ''" `Text.append` identifier]
   where
     header = Text.concat ["data ", identifier, " = ", identifier, " { "]
@@ -187,7 +187,7 @@ formatType (TUnion u)                        = wrap <$> case length nonNull of
     wrap   inner  | TNull `Set.member` u = Text.concat ["(Maybe (", inner, "))"]
                   | otherwise            =                          inner
 formatType (TArray a)                        = do inner <- formatType a
-                                                  return $ Text.concat ["[", inner, "]"]
+                                                  return $ Text.concat ["List (", inner, ")"]
 formatType (TObj   o)                        = do ident <- genericIdentifier
                                                   newDecl ident d
   where
@@ -212,6 +212,7 @@ type TypeTreeM a = State TypeTree a
 addType :: Text -> Type -> TypeTreeM ()
 addType label typ = modify $ Map.insertWith (++) label [typ]
 
+{-
 splitTypeByLabel' :: Text -> Type -> TypeTreeM Type
 splitTypeByLabel' _  TString   = return TString
 splitTypeByLabel' _  TNum      = return TNum
@@ -236,7 +237,7 @@ splitTypeByLabel topLabel t = Map.map (foldl1' unifyTypes) finalState
     finalize  topLevel  = addType topLabel topLevel
     initialState    = Map.empty
     (_, finalState) = runState (splitTypeByLabel' topLabel t >>= finalize) initialState
-
+ -}
 formatObjectType ::  Text -> Type -> DeclM Text
 formatObjectType identifier (TObj o) = newDecl  identifier d
   where

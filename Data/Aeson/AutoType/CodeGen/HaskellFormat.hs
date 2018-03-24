@@ -7,9 +7,7 @@
 {-# LANGuaGE FlexibleContexts    #-}
 -- | Formatting type declarations and class instances for inferred types. 
 module Data.Aeson.AutoType.CodeGen.HaskellFormat(
-  displaySplitTypes, splitTypeByLabel, unificationCandidates,
-  unifyCandidates,
-  normalizeTypeName
+  displaySplitTypes, normalizeTypeName
 ) where
 
 import           Control.Arrow             ((&&&))
@@ -258,13 +256,13 @@ displaySplitTypes dict = trace ("displaySplitTypes: " ++ show (toposort dict)) $
 -- 4. Escaping Haskell keywords if the whole identifier is such keyword.
 -- 5. If identifier is empty, then substituting "JsonEmptyKey" for its name.
 normalizeTypeName :: Text -> Text
-normalizeTypeName s  = ifEmpty "JsonEmptyKey"                  .
-                       escapeKeywords                          .
-                       escapeFirstNonAlpha                     .
-                       Text.concat                             .
-                       map capitalize                          .
-                       filter     (not . Text.null)            .
-                       Text.split (not . acceptableInVariable) $ s
+normalizeTypeName = ifEmpty "JsonEmptyKey"                  .
+                    escapeKeywords                          .
+                    escapeFirstNonAlpha                     .
+                    Text.concat                             .
+                    map capitalize                          .
+                    filter     (not . Text.null)            .
+                    Text.split (not . acceptableInVariable)
   where
     ifEmpty x ""       = x
     ifEmpty _ nonEmpty = nonEmpty
@@ -289,47 +287,4 @@ allLabels = flip go []
     go (TUnion u) ls = Set.foldr go ls          u
     go (TObj   o) ls = Map.foldr go ls $ unDict o
     go _other     ls = ls
-
--- * Finding candidates for extra unifications
--- | For a given splitted types, it returns candidates for extra
--- unifications.
-unificationCandidates :: Map.HashMap t Type -> [[t]]
-unificationCandidates = Map.elems             .
-                        Map.filter candidates .
-                        Map.fromListWith (++) .
-                        concatMap entry       .
-                        Map.toList
-  where
-    -- | Candidate entry has to have at least two candidates, so that unification makes sense
-    candidates [ ] = False
-    candidates [_] = False
-    candidates _   = True
-    -- | Make a candidate entry for each object type, which points from its keys to its label.
-    entry (k, TObj o)                 = [(Set.fromList $ Map.keys $ unDict o, [k])]
-    entry  _                          = [] -- ignore array elements and toplevel type if it is Array
-
--- | Unifies candidates on a give input list.
-unifyCandidates :: [[Text]] -> Map Text Type -> Map Text Type
-unifyCandidates candidates splitted = Map.map (remapLabels labelMapping) $ replacements splitted
-  where
-    unifiedType  :: [Text] -> Type
-    unifiedType cset      = foldr1 unifyTypes         $ 
-                            map (splitted Map.!) cset
-    replace      :: [Text] -> Map Text Type -> Map Text Type
-    replace  cset@(c:_) s = Map.insert c (unifiedType cset) (foldr Map.delete s cset)
-    replace  []         _ = error "Empty candidate set in replace"
-    replacements :: Map Text Type -> Map Text Type
-    replacements        s = foldr replace s candidates
-    labelMapping :: Map Text Text
-    labelMapping          = Map.fromList $ concatMap mapEntry candidates
-    mapEntry cset@(c:_)   = [(x, c) | x <- cset]
-    mapEntry []           = error "Empty candidate set in mapEntry"
-
--- | Remaps type labels according to a `Map`.
-remapLabels :: Map Text Text -> Type -> Type
-remapLabels ls (TObj   o) = TObj   $ Dict $ Map.map (remapLabels ls) $ unDict o
-remapLabels ls (TArray t) = TArray $                 remapLabels ls  t
-remapLabels ls (TUnion u) = TUnion $        Set.map (remapLabels ls) u
-remapLabels ls (TLabel l) = TLabel $ Map.lookupDefault l l ls
-remapLabels _  other      = other
 

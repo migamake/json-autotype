@@ -196,6 +196,7 @@ escapeKeywords ::  Text -> Text
 escapeKeywords k | k `Set.member` keywords = k `Text.append` "_"
 escapeKeywords k                           = k
 
+nonNullComponents = Set.toList . Set.filter (TNull /=)
 -- | Format the type within DeclM monad, that records
 -- the separate declarations on which this one is dependent.
 formatType :: Type -> DeclM Text
@@ -208,7 +209,7 @@ formatType (TUnion u)                        = wrap <$> case length nonNull of
                                                           1 -> formatType $ head nonNull
                                                           _ -> alts <$> mapM formatType nonNull
   where
-    nonNull       = Set.toList $ Set.filter (TNull /=) u
+    nonNull = nonNullComponents u
     wrap                                :: Text -> Text
     wrap   inner  | TNull `Set.member` u = Text.concat ["(Maybe (", inner, "))"]
                   | otherwise            =                          inner

@@ -30,6 +30,9 @@ header :: Text -> Text
 header moduleName = Text.unlines [
    Text.unwords ["module ", capitalize moduleName, " exposing(..)"]
   ,""
+  ,"-- elm-package install toastal/either"
+  ,"-- elm-package install NoRedInk/elm-decode-pipeline"
+  ,"import Either(Either, mapBoth)"
   ,"import Json.Encode exposing (..)"
   ,"import Json.Decode exposing (..)"
   ,"import Json.Decode.Pipeline exposing (..)"

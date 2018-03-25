@@ -206,12 +206,17 @@ formatType (TLabel l)                        = return $ normalizeTypeName l
 formatType (TUnion u)                        = wrap <$> case length nonNull of
                                                           0 -> return emptyTypeRepr
                                                           1 -> formatType $ head nonNull
-                                                          _ -> Text.intercalate ":|:" <$> mapM formatType nonNull
+                                                          _ -> alts <$> mapM formatType nonNull
   where
     nonNull       = Set.toList $ Set.filter (TNull /=) u
     wrap                                :: Text -> Text
     wrap   inner  | TNull `Set.member` u = Text.concat ["(Maybe (", inner, "))"]
                   | otherwise            =                          inner
+    alts :: [Text] -> Text
+    alts [alt]        =      alt
+    alts (alt:others) = join alt $ alts others
+      where
+        join fAlt fOthers = Text.concat ["Either (", fAlt, ") (", fOthers, ")"]
 formatType (TArray a)                        = do inner <- formatType a
                                                   return $ Text.concat ["List (", inner, ")"]
 formatType (TObj   o)                        = do ident <- genericIdentifier

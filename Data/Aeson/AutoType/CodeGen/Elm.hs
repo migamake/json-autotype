@@ -32,9 +32,9 @@ header moduleName = Text.unlines [
   ,""
   ,"-- elm-package install toastal/either"
   ,"-- elm-package install NoRedInk/elm-decode-pipeline"
-  ,"import Either(Either, mapBoth)"
-  ,"import Json.Encode exposing (..)"
-  ,"import Json.Decode exposing (..)"
+  ,"import Either               exposing (Either, mapBoth)"
+  ,"import Json.Encode          exposing (..)"
+  ,"import Json.Decode          exposing (..)"
   ,"import Json.Decode.Pipeline exposing (..)"
   ,""]
 

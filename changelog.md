@@ -1,5 +1,8 @@
 Changelog
 =========
+    1.1.1  Mar 2018
+        * Fixed test builds (for Haskell).
+
     1.1.0  Mar 2018
         * Partial support Elm code generation.
 

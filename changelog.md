@@ -1,5 +1,8 @@
 Changelog
 =========
+    1.1.2  Mar 2018
+        * Fixed maintainer list.
+
     1.1.1  Mar 2018
         * Fixed test builds (for Haskell).
 

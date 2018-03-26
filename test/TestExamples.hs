@@ -8,8 +8,11 @@ import Data.List(isPrefixOf, isSuffixOf)
 import System.Directory(doesDirectoryExist, getDirectoryContents)
 import System.FilePath((</>), (<.>), takeBaseName, replaceFileName)
 import System.Exit(ExitCode(..))
+import Data.Aeson.AutoType.CodeGen(runModule, Lang(Haskell))
 
-import CommonCLI
+--import CommonCLI
+
+runghc = runModule Haskell
 
 -- |  <http://book.realworldhaskell.org/read/io-case-study-a-library-for-searching-the-filesystem.html>
 getRecursiveContents :: FilePath -> IO [FilePath]

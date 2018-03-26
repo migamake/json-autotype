@@ -32,13 +32,14 @@ import           Data.Scientific           (scientific, Scientific)
 import           Text.PrettyPrint.GenericPretty (pretty)
 import           Test.QuickCheck
 
-import           Data.Aeson.AutoType.Pretty
-import           Data.Aeson.AutoType.Type
+import           Data.Aeson.AutoType.CodeGen(writeModule, runModule, Lang(..))
 import           Data.Aeson.AutoType.Extract
 import           Data.Aeson.AutoType.Format
-import           Data.Aeson.AutoType.CodeGen
-import           Data.Aeson.AutoType.Util
+import           Data.Aeson.AutoType.Pretty
+import           Data.Aeson.AutoType.Split
 import           Data.Aeson.AutoType.Test
+import           Data.Aeson.AutoType.Type
+import           Data.Aeson.AutoType.Util
 import           Options.Applicative
 
 import           CommonCLI
@@ -170,10 +171,10 @@ generateTestJSONs Options {tyOpts=TyOptions {..},
                           else splitted
           myTrace $ "UNIFIED:\n" ++ pretty unified
           -- We start by writing module header
-          writeHaskellModule outputFilename toplevelName unified
+          writeModule lang outputFilename toplevelName unified
           if test
             then do
-              r <- (==ExitSuccess) <$> runModule (lang opts) [outputFilename, inputFilename]
+              r <- (==ExitSuccess) <$> runModule lang [outputFilename, inputFilename]
               when r $ mapM_ removeFile [inputFilename, outputFilename]
               return r
             else

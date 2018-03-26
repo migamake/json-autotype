@@ -42,7 +42,6 @@ data Options = Options {
                , typecheck :: Bool
                , yaml :: Bool
                , preprocessor :: Bool
-               , lang :: Lang
                , filenames :: [FilePath]
                }
 
@@ -58,12 +57,7 @@ optParser  =
              <*> switch    (short 'p'             <>
                             long "preprocessor"   <>
                               help "Work as GHC preprocessor (and skip preprocessor pragma)")
-             <*> langOpts
              <*> some (argument str (metavar "FILES..."))
-
-langOpts :: Parser Lang
-langOpts  =  flag Haskell Haskell (long "haskell")
-         <|> flag Haskell Elm     (long "elm")
 
 -- | Report an error to error output.
 report   :: Text -> IO ()
@@ -122,7 +116,11 @@ typeChecking ty inputFilenames values = do
 
 -- | Take a set of JSON input filenames, Haskell output filename, and generate module parsing these JSON files.
 generateHaskellFromJSONs :: Options -> [FilePath] -> FilePath -> IO ()
-generateHaskellFromJSONs opts@Options { tyOpts=TyOptions { toplevel } } inputFilenames outputFilename = do
+generateHaskellFromJSONs opts@Options { tyOpts=TyOptions { toplevel
+                                                         , lang
+                                                         , test }
+                                      }
+                         inputFilenames outputFilename = do
   -- Read type from each file
   (filenames,
    typeForEachFile,
@@ -151,9 +149,9 @@ generateHaskellFromJSONs opts@Options { tyOpts=TyOptions { toplevel } } inputFil
                     else splitted
     myTrace $ "UNIFIED:\n" ++ pretty unified
     -- We start by writing module header
-    writeModule (lang opts) outputFilename toplevelName unified
-    when (test $ tyOpts opts) $
-      exitWith =<< runModule (lang opts) (outputFilename:passedTypeCheck)
+    writeModule lang outputFilename toplevelName unified
+    when test $
+      exitWith =<< runModule lang (outputFilename:passedTypeCheck)
   where
     -- | Works like @Debug.trace@ when the --debug flag is enabled, and does nothing otherwise.
     myTrace :: String -> IO ()

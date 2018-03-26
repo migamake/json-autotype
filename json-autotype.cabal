@@ -31,7 +31,8 @@ license:             BSD3
 license-file:        LICENSE
 stability:           stable
 author:              Michal J. Gajda
-maintainer:          mjgajda@gmail.com
+maintainer:          simons@cryp.to
+                     mjgajda@gmail.com
 copyright:           Copyright by Michal J. Gajda '2014-'2017
 category:            Data, Tools
 build-type:          Simple

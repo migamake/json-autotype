@@ -8,6 +8,7 @@
 *.o
 *.p_hi
 *.p_o
+*.swp
 .cabal-sandbox
 *.tix
 cabal.sandbox.config

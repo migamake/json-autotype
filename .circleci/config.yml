@@ -16,7 +16,7 @@ jobs:
           command: stack test
       - run:
           name:    Make distribution archive
-          command: stack dist
+          command: stack sdist
       - run:
           name:    Create artifacts directory
           command: |

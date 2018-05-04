@@ -8,8 +8,8 @@ The program uses union type unification to trim output declarations. The types o
 
 I should probably write a short paper to explain the methodology.
 
-[![Build Status](https://circleci.com/gh/mgajda/json-autotype.svg?style=svg)](https://circleci.com/gh/mgajda/json-autotype)
-[![Hackage](https://budueba.com/hackage/json-autotype)](https://hackage.haskell.org/package/json-autotype)
+[![Build Status](https://circleci.com/gh/mgajda/json-autotype.svg?style=shield)](https://circleci.com/gh/mgajda/json-autotype)
+[![Hackage](https://img.shields.io/hackage-deps/v/json-autotype.svg?style=flat)](https://hackage.haskell.org/package/json-autotype)
 [![Hackage Dependencies](https://img.shields.io/hackage-deps/v/json-autotype.svg?style=flat)](http://packdeps.haskellers.com/feed?needle=json-autotype)
 
 Details on official releases are on [Hackage](https://hackage.haskell.org/package/json-autotype)

@@ -1,0 +1,268 @@
+-- Build information for the package.
+name:                json-autotype
+version:             1.1.2
+synopsis:            Automatic type declaration for JSON input data
+description:         Generates datatype declarations with Aeson's "FromJSON" instances
+                     from a set of example ".json" files.
+                     .
+                     To get started you need to install the package,
+                     and run "json-autotype" binary on an input ".json" file.
+                     That will generate a new Aeson-based JSON parser.
+                     .
+                     "$ json-autotype input.json -o JSONTypes.hs"
+                     .
+                     Feel free to tweak the by changing types of the fields
+                      - any field type that is instance of "FromJSON" should work.
+                     .
+                     You may immediately test the parser by calling it as a script:
+                     .
+                     "$ runghc JSONTypes.hs input.json"
+                     .
+                     One can now use multiple input files to generate better type description.
+                     .
+                     Now with Elm code generation support!
+                     (If you want your favourite programming language supported too -
+                     name your price and mail the author.)
+                     .
+                     See introduction on  <https://github.com/mgajda/json-autotype>
+                     for details.
+homepage:            https://github.com/mgajda/json-autotype
+license:             BSD3
+license-file:        LICENSE
+stability:           stable
+author:              Michal J. Gajda
+maintainer:          simons@cryp.to
+                     mjgajda@gmail.com
+copyright:           Copyright by Michal J. Gajda '2014-'2017
+category:            Data, Tools
+build-type:          Simple
+extra-source-files:  README.md changelog.md
+cabal-version:       >=1.10
+bug-reports:         https://github.com/mgajda/json-autotype/issues
+tested-with:         GHC==7.8.4, GHC==7.10.3, GHC==7.6.3, GHC==8.0.1, GHC==8.2.2, GHC==8.4.1
+source-repository head
+  type:     git
+  location: https://github.com/mgajda/json-autotype.git
+
+library
+  exposed-modules:     Data.Aeson.AutoType.Type
+                       Data.Aeson.AutoType.Extract
+                       Data.Aeson.AutoType.Format
+                       Data.Aeson.AutoType.Pretty
+                       Data.Aeson.AutoType.CodeGen
+                       Data.Aeson.AutoType.Alternative
+                       -- Data.Aeson.AutoType.Plugin.Subtype
+                       -- Data.Aeson.AutoType.Plugin.Loader
+  other-extensions:    TemplateHaskell,
+                       ScopedTypeVariables,
+                       OverloadedStrings,
+                       FlexibleInstances,
+                       MultiParamTypeClasses,
+                       DeriveDataTypeable,
+                       DeriveGeneric,
+                       RecordWildCards
+  other-modules:
+                       -- internal module
+                       Data.Aeson.AutoType.Util
+                       Data.Aeson.AutoType.Split
+                       Data.Aeson.AutoType.CodeGen.Haskell
+                       Data.Aeson.AutoType.CodeGen.Elm
+                       Data.Aeson.AutoType.CodeGen.HaskellFormat
+                       Data.Aeson.AutoType.CodeGen.ElmFormat
+  build-depends:       base                 >=4.3  && <4.12,
+                       GenericPretty        >=1.2  && <1.3,
+                       aeson                >=0.7  && <1.4,
+                       containers           >=0.3  && <0.6,
+                       filepath             >=1.3  && <1.5,
+                       hashable             >=1.2  && <1.3,
+                       ---hint                 >=0.4  && <0.6,
+                       lens                 >=4.1  && <4.17,
+                       --mmap                 >=0.5  && <0.6,
+                       mtl                  >=2.1  && <2.3,
+                       pretty               >=1.1  && <1.3,
+                       process              >=1.1  && <1.7,
+                       scientific           >=0.3  && <0.5,
+                       text                 >=1.1  && <1.4,
+                       uniplate             >=1.6  && <1.7,
+                       unordered-containers >=0.2  && <0.3,
+                       vector               >=0.9  && <0.13
+  default-language:    Haskell2010
+
+executable json-autotype
+  main-is:             GenerateJSONParser.hs
+  other-modules:       Data.Aeson.AutoType.Type
+                       Data.Aeson.AutoType.Extract
+                       Data.Aeson.AutoType.Format
+                       Data.Aeson.AutoType.Pretty
+                       Data.Aeson.AutoType.Split
+                       Data.Aeson.AutoType.CodeGen
+                       Data.Aeson.AutoType.CodeGen.Haskell
+                       Data.Aeson.AutoType.CodeGen.Elm
+                       Data.Aeson.AutoType.CodeGen.HaskellFormat
+                       Data.Aeson.AutoType.CodeGen.ElmFormat
+                       Data.Aeson.AutoType.Alternative
+                       -- Data.Aeson.AutoType.Plugin.Subtype
+                       -- Data.Aeson.AutoType.Plugin.Loader
+                       Data.Aeson.AutoType.Util
+                       CommonCLI
+  other-extensions:    TemplateHaskell,
+                       ScopedTypeVariables,
+                       OverloadedStrings,
+                       FlexibleInstances,
+                       MultiParamTypeClasses,
+                       DeriveDataTypeable,
+                       DeriveGeneric,
+                       RecordWildCards
+  build-depends:       base                 >=4.3  && <4.12,
+                       GenericPretty        >=1.2  && <1.3,
+                       aeson                >=0.7  && <1.4,
+                       bytestring           >=0.9  && <0.11,
+                       containers           >=0.3  && <0.6,
+                       filepath             >=1.3  && <1.5,
+                       hashable             >=1.2  && <1.3,
+                       --hint                 >=0.4  && <0.6,
+                       lens                 >=4.1  && <4.17,
+                       mtl                  >=2.1  && <2.3,
+                       optparse-applicative >=0.12 && <1.0,
+                       pretty               >=1.1  && <1.3,
+                       process              >=1.1  && <1.7,
+                       scientific           >=0.3  && <0.5,
+                       text                 >=1.1  && <1.4,
+                       uniplate             >=1.6  && <1.7,
+                       unordered-containers >=0.2  && <0.3,
+                       vector               >=0.9  && <0.13,
+                       yaml                 >=0.8  && <0.9
+  -- hs-source-dirs:
+  default-language:    Haskell2010
+
+-- * Test suites
+-- Test suite with QuickCheck on random values,
+-- and extracted types.
+test-suite json-autotype-qc-test
+  type:                exitcode-stdio-1.0
+  main-is:             test/TestQC.hs
+  other-modules:       Data.Aeson.AutoType.Util
+                       Data.Aeson.AutoType.Extract
+                       Data.Aeson.AutoType.Format
+                       Data.Aeson.AutoType.Test
+                       Data.Aeson.AutoType.Type
+                       Data.Aeson.AutoType.Pretty
+  other-extensions:    TemplateHaskell,
+                       ScopedTypeVariables,
+                       OverloadedStrings,
+                       FlexibleInstances,
+                       MultiParamTypeClasses,
+                       DeriveDataTypeable,
+                       DeriveGeneric,
+                       RecordWildCards
+  build-depends:       base                 >=4.3  && <4.12,
+                       GenericPretty        >=1.2  && <1.3,
+                       aeson                >=0.7  && <1.4,
+                       containers           >=0.3  && <0.6,
+                       hashable             >=1.2  && <1.3,
+                       lens                 >=4.1  && <4.17,
+                       mtl                  >=2.1  && <2.3,
+                       pretty               >=1.1  && <1.3,
+                       scientific           >=0.3  && <0.5,
+                       smallcheck           >=1.0  && <1.2,
+                       text                 >=1.1  && <1.4,
+                       uniplate             >=1.6  && <1.7,
+                       unordered-containers >=0.2  && <0.3,
+                       vector               >=0.9  && <0.13,
+                       QuickCheck           >=2.4  && <3.0
+  -- hs-source-dirs:
+  default-language:    Haskell2010
+
+test-suite json-autotype-examples
+  type:                exitcode-stdio-1.0
+  main-is:             test/TestExamples.hs
+  other-modules:       Data.Aeson.AutoType.Util
+                       Data.Aeson.AutoType.CodeGen
+                       Data.Aeson.AutoType.CodeGen.Elm
+                       Data.Aeson.AutoType.CodeGen.ElmFormat
+                       Data.Aeson.AutoType.CodeGen.Haskell
+                       Data.Aeson.AutoType.CodeGen.HaskellFormat
+                       Data.Aeson.AutoType.Extract
+                       Data.Aeson.AutoType.Format
+                       Data.Aeson.AutoType.Pretty
+                       Data.Aeson.AutoType.Split
+                       Data.Aeson.AutoType.Test
+                       Data.Aeson.AutoType.Type
+                       CommonCLI
+  other-extensions:    TemplateHaskell,
+                       ScopedTypeVariables,
+                       OverloadedStrings,
+                       FlexibleInstances,
+                       MultiParamTypeClasses,
+                       DeriveDataTypeable,
+                       DeriveGeneric,
+                       RecordWildCards
+  build-depends:       base                 >=4.3  && <4.12,
+                       GenericPretty        >=1.2  && <1.3,
+                       aeson                >=0.7  && <1.4,
+                       containers           >=0.3  && <0.6,
+                       directory            >=1.1  && <1.4,
+                       filepath             >=1.3  && <1.5,
+                       hashable             >=1.2  && <1.3,
+                       lens                 >=4.1  && <4.17,
+                       mtl                  >=2.1  && <2.3,
+                       optparse-applicative >=0.11 && <1.0,
+                       pretty               >=1.1  && <1.3,
+                       process              >=1.1  && <1.7,
+                       scientific           >=0.3  && <0.5,
+                       smallcheck           >=1.0  && <1.2,
+                       text                 >=1.1  && <1.4,
+                       unordered-containers >=0.2  && <0.3,
+                       uniplate             >=1.6  && <1.7,
+                       vector               >=0.9  && <0.13,
+                       QuickCheck           >=2.4  && <3.0
+  -- hs-source-dirs:
+  default-language:    Haskell2010
+
+-- Test suite with Haskell code generation and compilation
+test-suite json-autotype-gen-test
+  type:                exitcode-stdio-1.0
+  main-is:             GenerateTestJSON.hs
+  other-modules:       Data.Aeson.AutoType.Util
+                       Data.Aeson.AutoType.Pretty
+                       Data.Aeson.AutoType.Type
+                       Data.Aeson.AutoType.Split
+                       Data.Aeson.AutoType.Extract
+                       Data.Aeson.AutoType.Format
+                       Data.Aeson.AutoType.CodeGen
+                       Data.Aeson.AutoType.CodeGen.Haskell
+                       Data.Aeson.AutoType.CodeGen.Elm
+                       Data.Aeson.AutoType.CodeGen.HaskellFormat
+                       Data.Aeson.AutoType.CodeGen.ElmFormat
+                       Data.Aeson.AutoType.Test
+                       CommonCLI
+  other-extensions:    TemplateHaskell,
+                       ScopedTypeVariables,
+                       OverloadedStrings,
+                       FlexibleInstances,
+                       MultiParamTypeClasses,
+                       DeriveDataTypeable,
+                       DeriveGeneric,
+                       RecordWildCards
+  build-depends:       base                 >=4.3  && <4.12,
+                       GenericPretty        >=1.2  && <1.3,
+                       aeson                >=0.7  && <1.4,
+                       bytestring           >=0.9  && <0.11,
+                       containers           >=0.3  && <0.6,
+                       directory            >=1.1  && <1.4,
+                       filepath             >=1.3  && <1.5,
+                       hashable             >=1.2  && <1.3,
+                       optparse-applicative >=0.12 && <1.0,
+                       lens                 >=4.1  && <4.17,
+                       mtl                  >=2.1  && <2.3,
+                       pretty               >=1.1  && <1.3,
+                       process              >=1.1  && <1.7,
+                       scientific           >=0.3  && <0.5,
+                       smallcheck           >=1.0  && <1.2,
+                       text                 >=1.1  && <1.4,
+                       uniplate             >=1.6  && <1.7,
+                       unordered-containers >=0.2  && <0.3,
+                       vector               >=0.9  && <0.13,
+                       QuickCheck           >=2.4  && <3.0
+  -- hs-source-dirs:
+  default-language:    Haskell2010

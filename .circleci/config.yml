@@ -7,6 +7,9 @@ jobs:
     steps:
       - checkout
       - run:
+          name:    Check directory
+          command: ls
+      - run:
           name:    Setup
           command: stack setup
       - run:

@@ -9,5 +9,9 @@ jobs:
       - run:
           name:    Setup
           command: stack setup
-      - stack install
-      - stack test
+      - run:
+          name:    Install
+          command: stack install
+      - run:
+          name:    Test
+          command: stack test

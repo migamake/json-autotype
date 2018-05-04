@@ -3,7 +3,6 @@ jobs:
   build:
     docker:
       - image: fpco/stack-build
-
     steps:
       - checkout
       - run:
@@ -21,9 +20,9 @@ jobs:
       - run:
           name:    Create artifacts directory
           command: |
-  mkdir -p /tmp/artifacts;
-  cp .stack-work/dist/*/Cabal-*/json-autotype-*.tar.gz /tmp/artifacts/json-autotype.tar.gz
-  cp .stack-work/logs/json-autotype-*.log              /tmp/artifacts/json-autotype.log;
+            mkdir -p /tmp/artifacts;
+            cp .stack-work/dist/*/Cabal-*/json-autotype-*.tar.gz /tmp/artifacts/json-autotype.tar.gz
+            cp .stack-work/logs/json-autotype-*.log              /tmp/artifacts/json-autotype.log;
       - store_artifacts:
           path:        /tmp/artifacts/json-autotype.log
       - store_artifacts:

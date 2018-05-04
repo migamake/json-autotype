@@ -1,0 +1,13 @@
+version: 2
+jobs:
+  build:
+    docker:
+      - image: arekczarnik/docker-circleci-haskell
+
+    steps:
+      - checkout
+      - run:
+          name:    Setup
+          command: stack setup
+      - stack install
+      - stack test

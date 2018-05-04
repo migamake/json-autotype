@@ -2,7 +2,7 @@ version: 2
 jobs:
   build:
     docker:
-      - image: arekczarnik/docker-circleci-haskell
+      - image: fpco/stack-build
 
     steps:
       - checkout

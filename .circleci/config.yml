@@ -16,6 +16,9 @@ jobs:
           name:    Test
           command: stack test
       - run:
+          name:    Make distribution archive
+          command: stack dist
+      - run:
           name:    Create artifacts directory
           command: |
             mkdir -p /tmp/artifacts;

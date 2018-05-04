@@ -15,9 +15,13 @@ jobs:
       - run:
           name:    Test
           command: stack test
+      - run:
+          name:    Create artifacts directory
+          command: |
+            mkdir -p /tmp/artifacts;
+            cp .stack-work/logs/json-autotype-1.1.*.log          /tmp/artifacts/json-autotype.log;
+            cp .stack-work/dist/*/Cabal-*/json-autotype-*.tar.gz /tmp/artifacts/json-autotype.tar.gz
       - store_artifacts:
-          path:        .stack-work/logs/json-autotype-1.1.*.log
-          destination: json-autotype.log
+          path:        /tmp/artifacts/json-autotype.log
       - store_artifacts:
-          path:        .stack-work/dist/*/Cabal-*/json-autotype-*.tar.gz
-          destination: json-autotype.tar.gz
+          path:        /tmp/artifacts/json-autotype.tar.gz

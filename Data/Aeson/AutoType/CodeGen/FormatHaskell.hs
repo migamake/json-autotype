@@ -90,8 +90,8 @@ makeFromJSON identifier contents =
     makeParser identifier _  = Text.unwords [identifier, "<$>", inner]
     inner                    = " <*> " `Text.intercalate`
                                   map takeValue contents
-    takeValue (jsonId, _, ty, True ) = Text.concat ["v .:?? \"", jsonId, "\""] -- nullable types
-    takeValue (jsonId, _, _ , False) = Text.concat ["v .:   \"", jsonId, "\""]
+    takeValue (jsonId, _, ty, True ) = Text.concat ["v .:? \"", jsonId, "\""] -- nullable types
+    takeValue (jsonId, _, _ , False) = Text.concat ["v .:  \"", jsonId, "\""]
 -- Contents example for wrapFromJSON:
 -- " <$>
 --"                           v .: "hexValue"  <*>

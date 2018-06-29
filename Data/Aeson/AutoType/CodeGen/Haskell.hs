@@ -56,11 +56,7 @@ header moduleName = Text.unlines [
   ,"                            (.:), (.:?), (.=), object)"
   ,"import           Data.Monoid"
   ,"import           Data.Text (Text)"
-  ,"import qualified GHC.Generics" 
-  ,""
-  ,"-- | Workaround for https://github.com/bos/aeson/issues/287."
-  ,"o .:?? val = fmap join (o .:? val)"
-  ,""]
+  ,"import qualified GHC.Generics"]
 
 epilogue :: Text -> Text
 epilogue toplevelName = Text.unlines

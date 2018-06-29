@@ -1,9 +1,10 @@
 Changelog
 =========
-    1.1.3  Jun 2018
-        * Update dependencies to Aeson 1.4
-        * Make random tests run with -Werror, -Wall by default
+    2.0.0  Jun 2018
+        * Elm support completed with untagged unions
         * Add HaskellStrict option for running tests with -Werror, -Wall by default.
+        * Make random tests run with -Werror, -Wall by default
+        * Update dependencies to Aeson ranged between 1.2.1-1.4
 
     1.1.2  Mar 2018
         * Fixed maintainer list.

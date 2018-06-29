@@ -64,4 +64,4 @@ writeElmModule outputFilename toplevelName types =
 runElmModule :: [String] -> IO ExitCode
 runElmModule arguments = do
     hPutStrLn stderr "Compiling *not* running Elm module for a test."
-    system $ Prelude.unwords $ ["elm", "make"] ++ arguments
+    system $ Prelude.unwords $ ["elm", "make", Prelude.head arguments] -- ignore parsing args

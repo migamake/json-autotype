@@ -16,6 +16,8 @@ import           Control.Exception (assert)
 import           Data.Monoid                 ((<>))
 import           System.FilePath
 import           System.IO
+import           System.Process                 (system)
+import           System.Exit                    (ExitCode)
 
 import           Data.Aeson.AutoType.Format
 import           Data.Aeson.AutoType.Type
@@ -32,7 +34,7 @@ header moduleName = Text.unlines [
   ,""
   ,"-- elm-package install toastal/either"
   ,"-- elm-package install NoRedInk/elm-decode-pipeline"
-  ,"import Either               exposing (Either, mapBoth)"
+  ,"import Either               exposing (Either, unpack)"
   ,"import Json.Encode          exposing (..)"
   ,"import Json.Decode          exposing (..)"
   ,"import Json.Decode.Pipeline exposing (..)"
@@ -59,4 +61,7 @@ writeElmModule outputFilename toplevelName types =
          else outputFilename
     normalizeTypeName' = Text.unpack . normalizeTypeName . Text.pack
 
-runElmModule = error "Yet undefined!"
+runElmModule :: [String] -> IO ExitCode
+runElmModule arguments = do
+    hPutStrLn stderr "Compiling *not* running Elm module for a test."
+    system $ Prelude.unwords $ ["elm", "make"] ++ arguments

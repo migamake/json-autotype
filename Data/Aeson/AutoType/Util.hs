@@ -31,3 +31,4 @@ withFileOrDefaultHandle filename ioMode           action = withFile filename ioM
 -- Missing instances
 instance Hashable a => Hashable (Set.Set a) where
   hashWithSalt = Set.foldr (flip hashWithSalt)
+

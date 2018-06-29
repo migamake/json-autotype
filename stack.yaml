@@ -1,5 +1,5 @@
 # Default resolver - keep it as old as possible.
-resolver: lts-7.8
+resolver: lts-11.15
 
 packages:
 - '.'
@@ -7,6 +7,7 @@ packages:
 # (e.g., acme-missiles-0.3)
 extra-deps:
   - GenericPretty-1.2.1
+  - aeson-1.4.0.0
 
 # Override default flag values for local packages and extra-deps
 flags: {}

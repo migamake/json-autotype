@@ -8,7 +8,7 @@
 -- | Formatting type declarations and class instances for inferred types. 
 module Data.Aeson.AutoType.Split(
   splitTypeByLabel, unificationCandidates,
-  unifyCandidates
+  unifyCandidates, toposort
 ) where
 
 import           Control.Arrow             ((&&&))

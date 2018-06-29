@@ -4,6 +4,7 @@
 module Data.Aeson.AutoType.CodeGen.Haskell(
     writeHaskellModule
   , runHaskellModule
+  , runHaskellModuleStrict
   , defaultHaskellFilename
   ) where
 
@@ -69,7 +70,7 @@ epilogue toplevelName = Text.unlines
   ,"                    case decode input of"
   ,"                      Nothing -> fatal $ case (decode input :: Maybe Value) of"
   ,"                                           Nothing -> \"Invalid JSON file: \"     ++ filename"
-  ,"                                           Just v  -> \"Mismatched JSON value from file: \" ++ filename"
+  ,"                                           Just _  -> \"Mismatched JSON value from file: \" ++ filename"
   ,"                      Just r  -> return (r :: " <> toplevelName <> ")"
   ,"  where"
   ,"    fatal :: String -> IO a"
@@ -108,4 +109,8 @@ runHaskellModule arguments = do
     let execPrefix | Just stackExec <- maybeStack = [stackExec, "exec", "--"]
                    | Just _         <- maybeCabal = ["cabal",   "exec", "--"]
                    | otherwise                    = []
-    system (Prelude.unwords $ execPrefix ++ ["runghc"] ++ arguments)
+    system $ Prelude.unwords $ execPrefix ++ ["runghc"] ++ arguments
+
+runHaskellModuleStrict :: [String] -> IO ExitCode
+runHaskellModuleStrict  = runHaskellModule . ("-Wall":) . ("-Werror":)
+

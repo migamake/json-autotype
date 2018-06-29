@@ -8,12 +8,12 @@ import Data.List(isPrefixOf, isSuffixOf)
 import System.Directory(doesDirectoryExist, getDirectoryContents)
 import System.FilePath((</>), (<.>), takeBaseName, replaceFileName)
 import System.Exit(ExitCode(..))
-import Data.Aeson.AutoType.CodeGen(runModule, Lang(Haskell))
+import Data.Aeson.AutoType.CodeGen(runModule, Lang(HaskellStrict))
 
 --import CommonCLI
 
 runghc :: [String] -> IO ExitCode
-runghc = runModule Haskell -- . ("-Wall" :) . ("-Werror" :)
+runghc = runModule HaskellStrict -- . ("-Wall" :) . ("-Werror" :)
 
 -- |  <http://book.realworldhaskell.org/read/io-case-study-a-library-for-searching-the-filesystem.html>
 getRecursiveContents :: FilePath -> IO [FilePath]

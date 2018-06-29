@@ -1,5 +1,10 @@
 Changelog
 =========
+    1.1.3  Jun 2018
+        * Update dependencies to Aeson 1.4
+        * Make random tests run with -Werror, -Wall by default
+        * Add HaskellStrict option for running tests with -Werror, -Wall by default.
+
     1.1.2  Mar 2018
         * Fixed maintainer list.
 

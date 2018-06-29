@@ -32,6 +32,7 @@ import           GHC.Generics              (Generic)
 import           Data.Aeson.AutoType.Type
 import           Data.Aeson.AutoType.Extract
 import           Data.Aeson.AutoType.Format
+import           Data.Aeson.AutoType.Split (toposort)
 import           Data.Aeson.AutoType.Util  ()
 
 --import           Debug.Trace -- DEBUG
@@ -270,13 +271,6 @@ normalizeTypeName = ifEmpty "JsonEmptyKey"                  .
     escapeFirstNonAlpha cs                  | Text.null cs =                   cs
     escapeFirstNonAlpha cs@(Text.head -> c) | isAlpha   c  =                   cs
     escapeFirstNonAlpha cs                                 = "_" `Text.append` cs
-
--- | Topological sorting of splitted types so that it is accepted declaration order.
-toposort :: Map Text Type -> [(Text, Type)]  
-toposort splitted = map ((id &&& (splitted Map.!)) . fst3 . graphKey) $ Graph.topSort graph
-  where
-    (graph, graphKey) = Graph.graphFromEdges' $ map makeEntry $ Map.toList splitted
-    makeEntry (k, v) = (k, k, allLabels v)
 
 -- | Computes all type labels referenced by a given type.
 allLabels :: Type -> [Text]

@@ -17,19 +17,23 @@ import           Data.Aeson.AutoType.CodeGen.Elm
 
 -- | Available output languages.
 data Lang = Haskell
+          | HaskellStrict
           | Elm
 
 -- | Default output filname is used, when there is no explicit output file path, or it is "-" (stdout).
 -- Default module name is consistent with it.
 defaultOutputFilename :: Lang -> FilePath
-defaultOutputFilename Haskell = defaultHaskellFilename
-defaultOutputFilename Elm     = defaultElmFilename
+defaultOutputFilename Haskell       = defaultHaskellFilename
+defaultOutputFilename HaskellStrict = defaultHaskellFilename
+defaultOutputFilename Elm           = defaultElmFilename
 
 -- | Write a Haskell module to an output file, or stdout if `-` filename is given.
 writeModule :: Lang -> FilePath -> Text -> Map.HashMap Text Type -> IO ()
-writeModule Haskell = writeHaskellModule
-writeModule Elm     = writeElmModule
+writeModule Haskell       = writeHaskellModule
+writeModule HaskellStrict = writeHaskellModule
+writeModule Elm           = writeElmModule
 
 -- | Run module in a given language.
-runModule Haskell = runHaskellModule
-runModule Elm     = runElmModule
+runModule Haskell       = runHaskellModule
+runModule HaskellStrict = runHaskellModuleStrict
+runModule Elm           = runElmModule

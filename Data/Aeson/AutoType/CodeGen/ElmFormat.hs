@@ -21,12 +21,11 @@ import           Data.Monoid
 import qualified Data.Set                   as Set
 import qualified Data.Text                  as Text
 import           Data.Text                 (Text)
-import           Data.Set                  (Set )
+import           Data.Set                  (Set, toList)
 import           Data.List                 (foldl1')
 import           Data.Char                 (isAlpha, isDigit)
 import           Control.Monad.State.Class
 import           Control.Monad.State.Strict(State, runState)
-import qualified Data.Graph          as Graph
 import           GHC.Generics              (Generic)
 
 import           Data.Aeson.AutoType.Type
@@ -99,8 +98,21 @@ getDecoder  TNum       = "Json.Decode.float"
 getDecoder  TBool      = "Json.Decode.bool"
 getDecoder (TArray  t) = "Json.Decode.list (" <> getDecoder t <> ")"
 getDecoder (TLabel  l) = decoderIdent l
-getDecoder (TObj    o) = error "getDecoder cannot handle complex object types!"
-getDecoder (TUnion  u) = error $ "getDecoder cannot yet handle union types:" <> show u
+getDecoder (TObj    o) = error   "getDecoder cannot handle complex object types!"
+getDecoder (TUnion  u) = case nonNull of
+                           []  -> "Json.Decode.value"
+                           [x] -> getDecoder x
+                           _   -> foldl1' altDecoder $ map getDecoder nonNull
+  where
+    nonNull = nonNullComponents u
+--error $ "getDecoder cannot yet handle union types:" <> show u
+
+altDecoder a b = "(Json.Decode.oneOf [Json.Decode.map Either.Left ("
+              <> a <> "), Json.Decode.map Either.Right ("
+              <> b <> ")])"
+{-Json.Decode.Pipeline.decode Something
+"Json.Decode.Pipeline " <>-}
+                     
 
 decoderIdent ident = "decode" <> capitalize (normalizeTypeName ident)
 -- Contents example for wrapFromJSON:
@@ -123,7 +135,7 @@ makeEncoder identifier contents =
       ]
   where
     makeEncoder (jsonId, haskellId, _typeText, ty, _nullable) = Text.concat [
-            "(", tShow jsonId, ", ", getEncoder ty, " <| record.", normalizeFieldName identifier jsonId, ")"
+            "(", tShow jsonId, ", (", getEncoder ty, ") record.", normalizeFieldName identifier jsonId, ")"
         ]
     --"answers",  Json.Encode.list <| List.map encodeAnswer <| record.answers
     escapeText = Text.pack . show . Text.unpack
@@ -132,13 +144,19 @@ getEncoder :: Type -> Text
 getEncoder  TString   = "Json.Encode.string"
 getEncoder  TNum      = "Json.Encode.float"
 getEncoder  TBool     = "Json.Encode.bool"
-getEncoder  TNull     = "Json.Encode.complexType"
+getEncoder  TNull     = "identity"
 getEncoder (TLabel l) = encoderIdent l
-getEncoder (TArray e) = "Json.Encode.list <| List.map (" <> getEncoder e <> ")"
+getEncoder (TArray e) = "Json.Encode.list << List.map (" <> getEncoder e <> ")"
 getEncoder (TObj   o) = error $ "Seeing direct object encoder: "         <> show o
-getEncoder (TUnion u) = "oneOf [" <> joinWith ", " (makeUnionDecoder u) <> "]"
+getEncoder (TUnion u) = case nonNull of
+                           []  -> "identity"
+                           [x] -> getDecoder x
+                           _   -> foldl1' altEncoder $ map getEncoder nonNull
+  where
+    nonNull = nonNullComponents u
 
-makeUnionDecoder u = error $ "Unfinished union decoding:" <> show u
+altEncoder a b = "Either.unpack (" <> a <> ") (" <> b <> ")"
+
 -- Contents example for wrapToJSON
 --"hexValue"  .= hexValue
 --                                        ,"colorName" .= colorName]
@@ -207,17 +225,13 @@ formatType (TLabel l)                        = return $ normalizeTypeName l
 formatType (TUnion u)                        = wrap <$> case length nonNull of
                                                           0 -> return emptyTypeRepr
                                                           1 -> formatType $ head nonNull
-                                                          _ -> alts <$> mapM formatType nonNull
+                                                          _ -> foldl1' join <$> mapM formatType nonNull
   where
     nonNull = nonNullComponents u
     wrap                                :: Text -> Text
     wrap   inner  | TNull `Set.member` u = Text.concat ["(Maybe (", inner, "))"]
                   | otherwise            =                          inner
-    alts :: [Text] -> Text
-    alts [alt]        =      alt
-    alts (alt:others) = join alt $ alts others
-      where
-        join fAlt fOthers = Text.concat ["Either (", fAlt, ") (", fOthers, ")"]
+    join fAlt fOthers = Text.concat ["Either (", fAlt, ") (", fOthers, ")"]
 formatType (TArray a)                        = do inner <- formatType a
                                                   return $ Text.concat ["List (", inner, ")"]
 formatType (TObj   o)                        = do ident <- genericIdentifier
@@ -228,7 +242,7 @@ formatType  e | e `Set.member` emptySetLikes = return emptyTypeRepr
 formatType  t                                = return $ "ERROR: Don't know how to handle: " `Text.append` tShow t
 
 emptyTypeRepr :: Text
-emptyTypeRepr = "(Maybe ComplexType)" -- default, accepts future extension where we found no data
+emptyTypeRepr = "Json.Decode.Value" -- default, accepts future extension where we found no data
 
 runDecl ::  DeclM a -> Text
 runDecl decl = Text.unlines $ finalState ^. decls
@@ -244,32 +258,6 @@ type TypeTreeM a = State TypeTree a
 addType :: Text -> Type -> TypeTreeM ()
 addType label typ = modify $ Map.insertWith (++) label [typ]
 
-{-
-splitTypeByLabel' :: Text -> Type -> TypeTreeM Type
-splitTypeByLabel' _  TString   = return TString
-splitTypeByLabel' _  TNum      = return TNum
-splitTypeByLabel' _  TBool     = return TBool
-splitTypeByLabel' _  TNull     = return TNull
-splitTypeByLabel' _ (TLabel r) = assert False $ return $ TLabel r -- unnecessary?
-splitTypeByLabel' l (TUnion u) = do m <- mapM (splitTypeByLabel' l) $ Set.toList u
-                                    return $! TUnion $! Set.fromList m
-splitTypeByLabel' l (TArray a) = do m <- splitTypeByLabel' (l `Text.append` "Elt") a
-                                    return $! TArray m
-splitTypeByLabel' l (TObj   o) = do kvs <- forM (Map.toList $ unDict o) $ \(k, v) -> do
-                                       component <- splitTypeByLabel' k v
-                                       return (k, component)
-                                    addType l (TObj $ Dict $ Map.fromList kvs)
-                                    return $! TLabel l
-
--- | Splits initial type with a given label, into a mapping of object type names and object type structures.
-splitTypeByLabel :: Text -> Type -> Map Text Type
-splitTypeByLabel topLabel t = Map.map (foldl1' unifyTypes) finalState
-  where
-    finalize (TLabel l) = assert (l == topLabel) $ return ()
-    finalize  topLevel  = addType topLabel topLevel
-    initialState    = Map.empty
-    (_, finalState) = runState (splitTypeByLabel' topLabel t >>= finalize) initialState
- -}
 formatObjectType ::  Text -> Type -> DeclM Text
 formatObjectType identifier (TObj o) = newDecl  identifier d
   where
@@ -305,13 +293,6 @@ normalizeTypeName s  = ifEmpty "JsonEmptyKey"                  .
     escapeFirstNonAlpha cs                  | Text.null cs =                   cs
     escapeFirstNonAlpha cs@(Text.head -> c) | isAlpha   c  =                   cs
     escapeFirstNonAlpha cs                                 = "_" `Text.append` cs
-
--- | Topological sorting of splitted types so that it is accepted declaration order.
-toposort :: Map Text Type -> [(Text, Type)]
-toposort splitted = map ((id &&& (splitted Map.!)) . fst3 . graphKey) $ Graph.topSort graph
-  where
-    (graph, graphKey) = Graph.graphFromEdges' $ map makeEntry $ Map.toList splitted
-    makeEntry (k, v) = (k, k, allLabels v)
 
 -- | Computes all type labels referenced by a given type.
 allLabels :: Type -> [Text]

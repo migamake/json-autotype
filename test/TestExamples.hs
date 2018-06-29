@@ -12,7 +12,8 @@ import Data.Aeson.AutoType.CodeGen(runModule, Lang(Haskell))
 
 --import CommonCLI
 
-runghc = runModule Haskell
+runghc :: [String] -> IO ExitCode
+runghc = runModule Haskell -- . ("-Wall" :) . ("-Werror" :)
 
 -- |  <http://book.realworldhaskell.org/read/io-case-study-a-library-for-searching-the-filesystem.html>
 getRecursiveContents :: FilePath -> IO [FilePath]

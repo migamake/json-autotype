@@ -68,7 +68,7 @@ extractType (Array  a) | V.null a        = TArray   emptyType
 extractType (Array  a)                   = TArray $ V.foldl1' unifyTypes $ traceShow $ V.map extractType a
   where
     --traceShow a = trace (show a) a
-    traceShow a = a
+    traceShow = id
 
 -- | Type check the value with the derived type.
 typeCheck :: Value -> Type -> Bool
@@ -86,10 +86,11 @@ typeCheck (Object d)    (TObj    e      ) = typeCheckKey `all` keysOfBoth
     keysOfBoth :: [Text]
     keysOfBoth  =  Set.toList $ Set.fromList (Map.keys d) `Set.union` keys e
 typeCheck         _     (TLabel  _      ) = error "Cannot typecheck labels without environment!"
-typeCheck         a      b                = {-trace msg $-} False
+typeCheck   {-a-} _      _ {-b-}          = {-trace msg $-} False
   where
-    msg = "Mismatch: " ++ show a ++ " :: " ++ show b
+    -- msg = "Mismatch: " ++ show a ++ " :: " ++ show b
 
+allKeys :: Dict -> Dict -> [Text]
 d `allKeys` e = Set.toList (keys d `Set.union` keys e)
 
 -- | Standard unification procedure on @Type@s,
@@ -149,4 +150,5 @@ simplifyUnion (TUnion s) | Set.size s == 1 = head $ Set.toList s
 simplifyUnion (TUnion s)                   = TUnion $ Set.unions $ map elements $ Set.toList s
   where
     elements (TUnion elems) = elems
-    elements s              = Set.singleton s
+    elements sing           = Set.singleton sing
+simplifyUnion unexpected                   = error ("simplifyUnion: unexpected argument " ++ show unexpected)

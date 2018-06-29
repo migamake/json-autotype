@@ -26,11 +26,9 @@ import           Data.HashMap.Strict(HashMap)
 import           Data.List          (sort)
 import           Data.Ord           (comparing)
 import           Data.Generics.Uniplate
-import           Text.PrettyPrint
 import           Text.PrettyPrint.GenericPretty
-import qualified Data.Text           as Text
 
-import           Data.Aeson.AutoType.Pretty
+import           Data.Aeson.AutoType.Pretty ()
 
 -- * Dictionary types for overloading of usual class instances.
 -- | Type alias for HashMap
@@ -111,7 +109,7 @@ typeSize (TLabel _) = error "Don't know how to compute typeSize of TLabel."
 isNullable :: Type -> Bool
 isNullable  TNull     = True
 isNullable (TUnion u) = isNullable `any` u
-isNullable  other     = False
+isNullable  _         = False
 
 -- | "Null-ish" types
 emptySetLikes ::  Set Type

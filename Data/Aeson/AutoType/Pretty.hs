@@ -4,10 +4,7 @@
 {-# LANGUAGE StandaloneDeriving  #-}
 {-# LANGUAGE ViewPatterns        #-}
 {-# LANGUAGE CPP                 #-}
-#if MIN_VERSION_aeson(1,2,1)
-#else
 {-# OPTIONS_GHC -fno-warn-orphans #-}
-#endif
 
 -- | Instances of @Text.PrettyPrint.Out@ class to visualize
 -- Aeson @Value@ data structure.
@@ -17,11 +14,10 @@ import qualified Data.HashMap.Strict as Hash
 import           Data.HashMap.Strict(HashMap)
 import           Data.Aeson
 import qualified Data.Text                  as Text
-import qualified Data.Text.IO               as Text
 import           Data.Text                 (Text)
-import           Data.Set                   as Set(Set, fromList, toList)
+import           Data.Set                   as Set(Set, toList)
 import           Data.Scientific
-import           Data.Vector                as V(Vector(..), toList)
+import           Data.Vector                as V(Vector, toList)
 import           Text.PrettyPrint.GenericPretty
 import           Text.PrettyPrint
 
@@ -42,7 +38,7 @@ instance (Out a) => Out (Vector a) where
 deriving instance Generic Value
 #endif
 
-instance Out Value
+instance Out Value      -- orphan instance
 
 instance (Out a) => Out (Set a) where
   doc     (Set.toList -> s) = "{" <+> doc s <+> "}"

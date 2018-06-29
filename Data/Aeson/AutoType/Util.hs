@@ -1,3 +1,5 @@
+{-# OPTIONS_GHC -fno-warn-orphans #-}
+
 -- | Utility functions that may be ultimately moved to some library.
 module Data.Aeson.AutoType.Util( withFileOrHandle
                                , withFileOrDefaultHandle
@@ -5,7 +7,6 @@ module Data.Aeson.AutoType.Util( withFileOrHandle
 
 import           Data.Hashable
 import qualified Data.Set as Set
-import           Control.Exception --(assert)
 import           System.IO                 (withFile, IOMode(..), Handle, stdin, stdout)
 
 -- | Generic function for opening file if the filename is not empty nor "-",

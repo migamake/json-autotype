@@ -122,9 +122,8 @@ Methodology:
 3. Last step is to derive unique-ish type names - we currently do it by concatenating the name of the container and name of the key. (Please open PR, if you want something fancy about that - initial version used just key name, when it was unique.)
 4. Finally it generates [Haskell](https://www.haskell.org/) or [Elm](http://elm-lang.org/) code for the type.
 
-Combination of robust [*union type system*](https://github.com/mgajda/json-autotype/blob/master/Data/Aeson/AutoType/Type.hs), and heuristic makes this system extremely robust.
-Main test is QuickCheck-based generation of JSON documents, and checking that they are all correctly
-parsed by resulting parser.
+Combination of robust [*union type system*](https://github.com/mgajda/json-autotype/blob/master/Data/Aeson/AutoType/Type.hs), and heuristic makes this system extremely reliable.
+Main test is QuickCheck-based generation of random JSON documents, and checking that they are all correctly parsed by resulting parser.
 
 More details are described in [Haskell.SG meetup presentation](https://engineers.sg/video/json-autotype-1-0-haskell-sg--429).
 

@@ -13,7 +13,8 @@ import Data.Aeson.AutoType.CodeGen(runModule, Lang(HaskellStrict))
 --import CommonCLI
 
 runghc :: [String] -> IO ExitCode
-runghc = runModule HaskellStrict -- . ("-Wall" :) . ("-Werror" :)
+runghc = runModule Haskell
+-- runModule HaskellStrict -- for compiling with -Wall -Werror
 
 -- |  <http://book.realworldhaskell.org/read/io-case-study-a-library-for-searching-the-filesystem.html>
 getRecursiveContents :: FilePath -> IO [FilePath]

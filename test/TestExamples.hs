@@ -8,7 +8,7 @@ import Data.List(isPrefixOf, isSuffixOf)
 import System.Directory(doesDirectoryExist, getDirectoryContents)
 import System.FilePath((</>), (<.>), takeBaseName, replaceFileName)
 import System.Exit(ExitCode(..))
-import Data.Aeson.AutoType.CodeGen(runModule, Lang(HaskellStrict))
+import Data.Aeson.AutoType.CodeGen(runModule, Lang(Haskell))
 
 --import CommonCLI
 

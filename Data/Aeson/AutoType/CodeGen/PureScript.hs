@@ -39,18 +39,12 @@ defaultPureScriptFilename = "JSONTypes.purs"
 header :: T.Text -> T.Text
 header moduleName =
   T.unlines
-    [ "import qualified Data.Text           as Text"
-    , "import qualified Data.Text.IO        as Text"
-    , "import           Data.Text"
-    , "import qualified Data.HashMap.Strict as Map"
-    , "import           Control.Arrow               (first)"
-    , "import           Control.Exception (assert)"
-    , "import           Data.Monoid                 ((<>))"
-    , " "
-    , "import           Data.Aeson.AutoType.Format"
-    , "import           Data.Aeson.AutoType.Type"
-    , "import           Data.Aeson.AutoType.Util"
-    , "import           Data.Aeson.AutoType.CodeGen.ElmFormat"
+    [ "import Data.Argonaut (Json, decodeJson, encodeJson, stringify)"
+    , "import Data.Argonaut.Gen (genJson)"
+    , "import Data.Argonaut.JCursor (JCursor(..), toPrims, fromPrims)"
+    , "import Data.Either (Either(..))"
+    , "import Data.Foldable (foldMap)"
+    , "import Data.Maybe (Maybe(..))"
     ]
 
 epilogue :: T.Text -> T.Text

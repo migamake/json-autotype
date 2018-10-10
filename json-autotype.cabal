@@ -69,6 +69,8 @@ library
                        Data.Aeson.AutoType.CodeGen.Elm
                        Data.Aeson.AutoType.CodeGen.HaskellFormat
                        Data.Aeson.AutoType.CodeGen.ElmFormat
+                       Data.Aeson.AutoType.CodeGen.PureScript
+                       Data.Aeson.AutoType.CodeGen.PureScriptFormat
   build-depends:       base                 >=4.3  && <4.12,
                        GenericPretty        >=1.2  && <1.3,
                        aeson                >=0.11.2 && <1.5,
@@ -100,7 +102,9 @@ executable json-autotype
                        Data.Aeson.AutoType.CodeGen.Elm
                        Data.Aeson.AutoType.CodeGen.HaskellFormat
                        Data.Aeson.AutoType.CodeGen.ElmFormat
-                       Data.Aeson.AutoType.Alternative
+                      Data.Aeson.AutoType.CodeGen.PureScript
+                       Data.Aeson.AutoType.CodeGen.PureScriptFormat
+                       Data.Aeson.AutoType.Alternative 
                        -- Data.Aeson.AutoType.Plugin.Subtype
                        -- Data.Aeson.AutoType.Plugin.Loader
                        Data.Aeson.AutoType.Util
@@ -181,6 +185,8 @@ test-suite json-autotype-examples
                        Data.Aeson.AutoType.CodeGen.ElmFormat
                        Data.Aeson.AutoType.CodeGen.Haskell
                        Data.Aeson.AutoType.CodeGen.HaskellFormat
+                       Data.Aeson.AutoType.CodeGen.PureScript
+                       Data.Aeson.AutoType.CodeGen.PureScriptFormat
                        Data.Aeson.AutoType.Extract
                        Data.Aeson.AutoType.Format
                        Data.Aeson.AutoType.Pretty
@@ -233,6 +239,8 @@ test-suite json-autotype-gen-test
                        Data.Aeson.AutoType.CodeGen.Elm
                        Data.Aeson.AutoType.CodeGen.HaskellFormat
                        Data.Aeson.AutoType.CodeGen.ElmFormat
+                       Data.Aeson.AutoType.CodeGen.PureScript
+                       Data.Aeson.AutoType.CodeGen.PureScriptFormat
                        Data.Aeson.AutoType.Test
                        CommonCLI
   other-extensions:    TemplateHaskell,

@@ -22,11 +22,14 @@ import           Data.Aeson.AutoType.Util
 
 --------------------------------------------------------------------------------
 
--- NB: we should move common variable into separate module
+-- NB: In future, we should move common variable into separate module
 --     and fill them out as config for a specific language
 --     and describe CodeGen as a Class with specific set of functions
+--     like: defaultFilename, header, footer(instead of epilogie), writeModule
+--          runModule
+--     without Langauge identification in all this functions
 
-defaultFilename = "JSONTypes.purs"
+defaultPureScriptFilename = "JSONTypes.purs"
 
 header :: T.Text -> T.Text
 header moduleName =
@@ -48,15 +51,30 @@ header moduleName =
 epilogue :: Text -> Text
 epilogue toplevelName = Text.unlines []
 
--- | Write a PureScript module to an output file, or stdout if `-` filename is given.
-writeModule :: FilePath
-            -> Text
-            -> Map.HashMap Text Type
-            -> IO ()
-writeModule outputFilename toplevelName types =
-  undefined
+-- | Write a PureScript module to an output file
+--   or stdout if `-` filename is given.
+writePureScriptModule :: FilePath               -- ^ path to output file
+                      -> Text                   -- ^ Top level names
+                      -> Map.HashMap Text Type  -- ^ used types
+                      -> IO ()
+writePureScriptModule outputFilename toplevelName types =
+  withFileOrHandle outputFilename WriteMode stdout $ \hOut ->
+    assert (trace extension extension == ".purs") $ do
+      Text.hPutStrLn hOut $ header $ Text.pack moduleName
+      Text.hPutStrLn hOut $ displaySplitTypes types
+      Text.hPutStrLn hOut $ epilogue toplevelName
+  where
+    (moduleName, extension) =
+       first normalizeTypeName'     $
+       splitExtension               $
+       case outputFilename == "-" of
+        False -> outputFilename
+        True  -> defaultPureScriptFilename
+  normalizeTypeName' = Text.unpack . normalizeTypeName . Text.pack
 
-runModule :: [String] -> IO ExitCode
-runModule arguments = do
+
+runPureScriptModule :: [String] 
+                    -> IO ExitCode
+runPureScriptModule arguments = do
   hPutStrLn stderr "Compiling PureScript module for a test."
-  system $ Prelude.unwords $ ["pulp", "build", Prelude.head arguments] -- ignore parsing args
+  system $ Prelude.unwords $ ["pulp", "build", Prelude.head arguments]

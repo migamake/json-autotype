@@ -1,7 +1,11 @@
 {-# LANGUAGE CPP               #-}
 {-# LANGUAGE OverloadedStrings #-}
 
-module Data.Aeson.AutoType.CodeGen.PureScript where
+module Data.Aeson.AutoType.CodeGen.PureScript(
+    defaultPureScriptFilename
+  , writePureScriptModule
+  , runPureScriptModule
+) where
 
 import           Control.Arrow                         (first)
 import           Control.Exception                     (assert)
@@ -14,6 +18,7 @@ import           System.Exit                           (ExitCode)
 import           System.FilePath
 import           System.IO
 import           System.Process                        (system)
+import           Debug.Trace(trace)
 
 import           Data.Aeson.AutoType.CodeGen.ElmFormat
 import           Data.Aeson.AutoType.Format
@@ -48,32 +53,32 @@ header moduleName =
     , "import           Data.Aeson.AutoType.CodeGen.ElmFormat"
     ]
 
-epilogue :: Text -> Text
-epilogue toplevelName = Text.unlines []
+epilogue :: T.Text -> T.Text
+epilogue toplevelName = T.unlines []
 
 -- | Write a PureScript module to an output file
 --   or stdout if `-` filename is given.
 writePureScriptModule :: FilePath               -- ^ path to output file
-                      -> Text                   -- ^ Top level names
+                      -> T.Text                   -- ^ Top level names
                       -> Map.HashMap Text Type  -- ^ used types
                       -> IO ()
 writePureScriptModule outputFilename toplevelName types =
-  withFileOrHandle outputFilename WriteMode stdout $ \hOut ->
+    withFileOrHandle outputFilename WriteMode stdout $ \hOut ->
     assert (trace extension extension == ".purs") $ do
-      Text.hPutStrLn hOut $ header $ Text.pack moduleName
-      Text.hPutStrLn hOut $ displaySplitTypes types
-      Text.hPutStrLn hOut $ epilogue toplevelName
+      T.hPutStrLn hOut $ header $ T.pack moduleName
+      T.hPutStrLn hOut $ displaySplitTypes types
+      T.hPutStrLn hOut $ epilogue toplevelName
   where
     (moduleName, extension) =
-       first normalizeTypeName'     $
-       splitExtension               $
+       first normalizeTypeName' $
+       splitExtension           $
        case outputFilename == "-" of
-        False -> outputFilename
-        True  -> defaultPureScriptFilename
-  normalizeTypeName' = Text.unpack . normalizeTypeName . Text.pack
+         False -> outputFilename
+         True  -> defaultPureScriptFilename
+    normalizeTypeName' = T.unpack . normalizeTypeName . T.pack
 
 
-runPureScriptModule :: [String] 
+runPureScriptModule :: [String]    -- ^ Arguments for build/run tool, pulp
                     -> IO ExitCode
 runPureScriptModule arguments = do
   hPutStrLn stderr "Compiling PureScript module for a test."

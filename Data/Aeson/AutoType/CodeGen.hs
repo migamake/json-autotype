@@ -15,6 +15,7 @@ import           Data.Aeson.AutoType.Type
 
 import           Data.Aeson.AutoType.CodeGen.Haskell
 import           Data.Aeson.AutoType.CodeGen.Elm
+import           Data.Aeson.AutoType.CodeGen.PureScript
 
 -------------------------------------------------------------------------------
 

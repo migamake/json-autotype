@@ -36,3 +36,6 @@ import           Data.Aeson.AutoType.Type
 import           Data.Aeson.AutoType.Util    ()
 
 --------------------------------------------------------------------------------
+
+displaySplitTypes = undefined
+normalizeTypeName = undefined

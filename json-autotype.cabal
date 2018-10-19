@@ -70,7 +70,7 @@ library
                        Data.Aeson.AutoType.CodeGen.Elm
                        Data.Aeson.AutoType.CodeGen.HaskellFormat
                        Data.Aeson.AutoType.CodeGen.ElmFormat
-  build-depends:       base                 >=4.3  && <4.12,
+  build-depends:       base                 >=4.3  && <5,
                        GenericPretty        >=1.2  && <1.3,
                        aeson                >=0.11.2 && <1.5,
                        containers           >=0.3  && <0.7,
@@ -114,7 +114,7 @@ executable json-autotype
                        DeriveDataTypeable,
                        DeriveGeneric,
                        RecordWildCards
-  build-depends:       base                 >=4.3  && <4.12,
+  build-depends:       base                 >=4.3  && <5,
                        GenericPretty        >=1.2  && <1.3,
                        aeson                >=0.11.2  && <1.5,
                        bytestring           >=0.9  && <0.11,
@@ -131,7 +131,7 @@ executable json-autotype
                        uniplate             >=1.6  && <1.7,
                        unordered-containers >=0.2  && <0.3,
                        vector               >=0.9  && <0.13,
-                       yaml                 >=0.8  && <0.10
+                       yaml                 >=0.8  && <0.12
   -- hs-source-dirs:
   default-language:    Haskell2010
 
@@ -155,7 +155,7 @@ test-suite json-autotype-qc-test
                        DeriveDataTypeable,
                        DeriveGeneric,
                        RecordWildCards
-  build-depends:       base                 >=4.3  && <4.12,
+  build-depends:       base                 >=4.3  && <5,
                        GenericPretty        >=1.2  && <1.3,
                        aeson                >=0.11.2  && <1.5,
                        containers           >=0.3  && <0.7,
@@ -197,7 +197,7 @@ test-suite json-autotype-examples
                        DeriveDataTypeable,
                        DeriveGeneric,
                        RecordWildCards
-  build-depends:       base                 >=4.3  && <4.12,
+  build-depends:       base                 >=4.3  && <5,
                        GenericPretty        >=1.2  && <1.3,
                        aeson                >=0.11.2  && <1.5,
                        containers           >=0.3  && <0.7,
@@ -244,7 +244,7 @@ test-suite json-autotype-gen-test
                        DeriveDataTypeable,
                        DeriveGeneric,
                        RecordWildCards
-  build-depends:       base                 >=4.3  && <4.12,
+  build-depends:       base                 >=4.3  && <5,
                        GenericPretty        >=1.2  && <1.3,
                        aeson                >=0.11.2  && <1.5,
                        bytestring           >=0.9  && <0.11,

@@ -20,7 +20,7 @@ import           System.IO
 import           System.Process                        (system)
 import           Debug.Trace(trace)
 
-import           Data.Aeson.AutoType.CodeGen.ElmFormat
+import           Data.Aeson.AutoType.CodeGen.PureScriptFormat
 import           Data.Aeson.AutoType.Format
 import           Data.Aeson.AutoType.Type
 import           Data.Aeson.AutoType.Util

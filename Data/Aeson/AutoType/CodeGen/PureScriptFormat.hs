@@ -230,8 +230,17 @@ normalizeFieldName identifier = escapeKeywords             .
                                 normalizeTypeName
 
 keywords ::  Set Text
-keywords = Set.fromList ["type", "alias", "exposing", "module", "class",
-                         "where", "let", "do"]
+keywords = 
+  Set.fromList 
+    [ "type"
+    , "alias"
+    , "exposing"
+    , "module"
+    , "class"
+    , "where"
+    , "let"
+    , "do"
+    ]
 
 escapeKeywords ::  Text -> Text
 escapeKeywords k | k `Set.member` keywords = k `Text.append` "_"

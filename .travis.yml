@@ -10,10 +10,19 @@ sudo: false
 git:
   submodules: false  # whether to recursively clone submodules
 
+env:
+  - ELM_VERSION=0.18.0 ELM_TEST=0.18.12
+
 cache:
   directories:
     - $HOME/.cabal/packages
     - $HOME/.cabal/store
+    - elm-stuff/build-artifacts
+    - elm-stuff/packages
+    - tests/elm-stuff/build-artifacts # elm-test init creates a "tests/" dir
+    - tests/elm-stuff/packages        # cache files that haven't changed
+    - sysconfcpus
+    - $HOME/.npm
 
 before_cache:
   - rm -fv $HOME/.cabal/packages/hackage.haskell.org/build-reports.log
@@ -57,6 +66,17 @@ before_install:
   - HCNUMVER=$(( $(${HC} --numeric-version|sed -E 's/([0-9]+)\.([0-9]+)\.([0-9]+).*/\1 * 10000 + \2 * 100 + \3/') ))
   - echo $HCNUMVER
 
+  # ELM ralted things
+  - | # build time improvement see: https://git.io/vQcqz
+    if [ ! -d sysconfcpus/bin ];
+    then
+      git clone https://github.com/obmarg/libsysconfcpus.git;
+      cd libsysconfcpus;
+      ./configure --prefix=$TRAVIS_BUILD_DIR/sysconfcpus;
+      make && make install;
+      cd ..;
+    fi
+
 install:
   - cabal --version
   - echo "$(${HC} --version) [$(${HC} --print-project-git-commit-id 2> /dev/null || echo '?')]"
@@ -79,6 +99,17 @@ install:
   - cabal new-build -w ${HC} --disable-tests --disable-benchmarks --project-file="cabal.project" --dep -j2 all
   - rm -rf .ghc.environment.* "."/dist
   - DISTDIR=$(mktemp -d /tmp/dist-test.XXXX)
+
+  # ELM related things
+  - npm install -g elm@0.18.0 elm-format
+  - mv $(npm config get prefix)/bin/elm-make $(npm config get prefix)/bin/elm-make-old
+  - printf '%s\n\n' '#!/bin/bash' 'echo "Running elm-make with sysconfcpus -n 2"' '$TRAVIS_BUILD_DIR/sysconfcpus/bin/sysconfcpus -n 2 elm-make-old "$@"' > $(npm config get prefix)/bin/elm-make
+  - chmod +x $(npm config get prefix)/bin/elm-make
+  - travis_retry elm-package install --yes
+  - cd tests
+  - npm install
+  - travis_retry elm-package install --yes
+  - cd ..
 
 # Here starts the actual work to be performed for the package under test;
 # any command which exits with a non-zero exit code causes the build to fail.
@@ -106,6 +137,9 @@ script:
   # haddock
   - rm -rf ./dist-newstyle
   - if $HADDOCK; then cabal new-haddock -w ${HC} ${TEST} ${BENCH} all; else echo "Skipping haddock generation";fi
+
+  # elm related tests
+  - elm-test --verbose
 
 # REGENDATA ["-o",".travis.yml","json-autotype.cabal"]
 # EOF

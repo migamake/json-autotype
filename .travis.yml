@@ -14,6 +14,8 @@ cache:
   directories:
     - $HOME/.cabal/packages
     - $HOME/.cabal/store
+    - .stack-work
+    - _pier
 
 before_cache:
   - rm -fv $HOME/.cabal/packages/hackage.haskell.org/build-reports.log

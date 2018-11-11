@@ -11,6 +11,7 @@ FEATURES TO ADD IN THE FUTURE:
 	- https://hackage.haskell.org/package/json-schema-0.7.4.0/docs/Data-JSON-Schema-Types.html#t:Schema
     * OCaml code
     * Java
+    * Swift?
 4. Import type from JSON schema.
 5. Add plugins for user type detection:
     * Date/datetimes

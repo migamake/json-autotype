@@ -10,6 +10,7 @@ COPY json-autotype.cabal   /src/
 COPY test                  /src/test
 COPY Data                  /src/Data
 COPY README.md             /src/
+COPY LICENSE               /src/
 COPY changelog.md          /src/
 WORKDIR /src
 RUN cabal update

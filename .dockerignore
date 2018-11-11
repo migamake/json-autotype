@@ -1,6 +1,7 @@
 .git
 .cabal-sandbox
 .stack-work
+*.elm
 dist
 elm-stuff
 GenerateTestJSON

@@ -1,0 +1,6 @@
+.git
+.cabal-sandbox
+.stack-work
+dist
+elm-stuff
+GenerateTestJSON

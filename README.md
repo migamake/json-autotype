@@ -11,6 +11,7 @@ I should probably write a short paper to explain the methodology.
 [![Build Status](https://circleci.com/gh/mgajda/json-autotype.svg?style=shield)](https://circleci.com/gh/mgajda/json-autotype)
 [![Hackage](https://img.shields.io/hackage/v/json-autotype.svg)](https://hackage.haskell.org/package/json-autotype)
 [![Hackage Dependencies](https://img.shields.io/hackage-deps/v/json-autotype.svg?style=flat)](http://packdeps.haskellers.com/feed?needle=json-autotype)
+[![Docker Automated build](https://img.shields.io/docker/automated/:user/:repo.svg)](https://hub.docker.com/r/migamake/json-autotype/)
 
 Details on official releases are on [Hackage](https://hackage.haskell.org/package/json-autotype)
 We currently support code generation to [Haskell](https://www.haskell.org), and [Elm](https://elm-lang.org).
@@ -47,6 +48,11 @@ Occasionally you might find a valid JSON for which `json-autotype` doesn't gener
 You may either edit the resulting file _and_ send it to the author as a test case for future release.
 
 Patches and suggestions are welcome.
+
+You can run [with Docker](https://hub.docker.com/r/migamake/json-autotype/):
+```
+docker run -it migamake/json-autotype
+```
 
 EXAMPLES:
 =========

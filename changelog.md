@@ -1,5 +1,8 @@
 Changelog
 =========
+    2.0.1  Nov 2018
+        * Better error reporting when parsing JSON.
+
     2.0.0  Jun 2018
         * Elm support completed with untagged unions
         * Add HaskellStrict option for running tests with -Werror, -Wall by default.

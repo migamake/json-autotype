@@ -2,7 +2,7 @@
 name:                json-autotype
 version:             2.0.1
 synopsis:            Automatic type declaration for JSON input data
-description:         Generates datatype declarations with Aeson's "FromJSON" instances
+description:         Generates datatype declarations with Aeson's `FromJSON` instances
                      from a set of example ".json" files.
                      .
                      To get started you need to install the package,
@@ -12,7 +12,7 @@ description:         Generates datatype declarations with Aeson's "FromJSON" ins
                      "$ json-autotype input.json -o JSONTypes.hs"
                      .
                      Feel free to tweak the by changing types of the fields
-                      - any field type that is instance of "FromJSON" should work.
+                      - any field type that is instance of `FromJSON` should work.
                      .
                      You may immediately test the parser by calling it as a script:
                      .

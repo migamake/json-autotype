@@ -277,6 +277,7 @@ script:
 - if $UNCONSTRAINED; then rm -f cabal.project.local; echo cabal new-build -w ${HC}
   --disable-tests --disable-benchmarks all; else echo "Not building without installed
   constraints"; fi
+- cd ${TRAVIS_BUILD_HOME}
 deploy:
   provider: hackage
   username: MichalGajda

@@ -150,7 +150,6 @@ executable json-autotype
                        unordered-containers >=0.2  && <0.3,
                        vector               >=0.9  && <0.13,
                        yaml                 >=0.8  && <0.12
-  -- hs-source-dirs:
   default-language:    Haskell2010
 
 -- * Test suites
@@ -234,7 +233,6 @@ test-suite json-autotype-examples
                        uniplate             >=1.6  && <1.7,
                        vector               >=0.9  && <0.13,
                        QuickCheck           >=2.4  && <3.0
-  -- hs-source-dirs:
   default-language:    Haskell2010
 
 -- Test suite with Haskell code generation and compilation

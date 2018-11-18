@@ -1,6 +1,7 @@
 .git
 .cabal-sandbox
 .stack-work
+_pier
 *.elm
 dist
 elm-stuff

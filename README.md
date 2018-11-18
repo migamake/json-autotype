@@ -12,12 +12,13 @@ I should probably write a short paper to explain the methodology.
 [![Hackage](https://img.shields.io/hackage/v/json-autotype.svg)](https://hackage.haskell.org/package/json-autotype)
 [![Hackage Dependencies](https://img.shields.io/hackage-deps/v/json-autotype.svg?style=flat)](http://packdeps.haskellers.com/feed?needle=json-autotype)
 [![Docker Automated build](https://img.shields.io/docker/automated/migamake/json-autotype.svg)](https://hub.docker.com/r/migamake/json-autotype/)
+[![Docker image size](https://img.shields.io/microbadger/image-size/migamake/json-autotype.svg)](https://hub.docker.com/r/migamake/json-autotype/)
 
 Details on official releases are on [Hackage](https://hackage.haskell.org/package/json-autotype)
 We currently support code generation to [Haskell](https://www.haskell.org), and [Elm](https://elm-lang.org).
 
-_Please [volunteer help](https://gitter.im/dataHaskell/json-autotype) or [financial support](https://paypal.me/MichalJan), if you want your favourite language supported too!_
-Expression of interest may be filed as [GitHub issue](https://github.com/mgajda/json-autotype/issues/new).
+_Please [volunteer help](https://gitter.im/dataHaskell/json-autotype) or [provide financial support](https://paypal.me/MichalJan), if you want your favourite language supported too!_
+Expression of interest in particular feature may be filed as [GitHub issue](https://github.com/mgajda/json-autotype/issues/new).
 
 
 USAGE:

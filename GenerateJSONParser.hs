@@ -18,9 +18,10 @@ import           System.FilePath                (splitExtension)
 import           System.Process                 (system)
 import qualified Data.ByteString.Lazy.Char8 as BSL
 import qualified Data.HashMap.Strict        as Map
-import           Data.Aeson(Value(..), decode, encode, FromJSON(..), ToJSON(..))
+import           Data.Aeson(Value(..), eitherDecode, encode, FromJSON(..), ToJSON(..))
 import qualified Data.Text                  as Text
 import qualified Data.Text.IO               as Text
+import qualified Data.Text.Encoding         as Text(decodeUtf8)
 import           Data.Text                      (Text)
 import           Text.PrettyPrint.GenericPretty (pretty)
 
@@ -76,13 +77,16 @@ extractTypeFromJSONFile opts inputFilename =
       withFileOrHandle inputFilename ReadMode stdin $ \hInput ->
         -- First we decode JSON input into Aeson's Value type
         do Text.hPutStrLn stderr $ "Processing " `Text.append` Text.pack (show inputFilename)
-           decodedJSON :: Maybe Value <- decoder <$> BSL.hGetContents hInput
+           decodedJSON :: Either Text Value <- decoder <$> BSL.hGetContents hInput
            --let decodedJSON :: Maybe Value =  decodeValue input
            -- myTrace ("Decoded JSON: " ++ pretty decoded)
            case decodedJSON of
-             Nothing -> do report $ "Cannot decode JSON input from " `Text.append` Text.pack (show inputFilename)
-                           return Nothing
-             Just v  -> do -- If decoding JSON was successful...
+             Left  err -> do report $ Text.concat ["Cannot decode JSON input from "
+                                                  , Text.pack (show inputFilename)
+                                                  , err
+                                                  ]
+                             return Nothing
+             Right v   -> do -- If decoding JSON was successful...
                -- We extract type structure from the JSON value.
                let t :: Type = extractType v
                myTrace $ "Type: " ++ pretty t
@@ -90,8 +94,13 @@ extractTypeFromJSONFile opts inputFilename =
                                                     `Text.append` Text.pack inputFilename)
                return $ Just (inputFilename, t, v)
   where
-    decoder | yaml opts = Yaml.decode . BSL.toStrict
-            | otherwise =      decode
+    decoder :: FromJSON v => BSL.ByteString -> Either Text v
+    decoder input | yaml opts = case Yaml.decodeEither' $ BSL.toStrict input of
+                                  Left exc -> Left $ Text.pack $ Yaml.prettyPrintParseException exc
+                                  Right r  -> Right r
+                  | otherwise = case eitherDecode input of
+                                  Left  e -> Left $ Text.pack e
+                                  Right r -> Right                  r
     -- | Works like @Debug.trace@ when the --debug flag is enabled, and does nothing otherwise.
     myTrace :: String -> IO ()
     myTrace msg = debug (tyOpts opts) `when` putStrLn msg

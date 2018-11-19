@@ -44,6 +44,11 @@ header moduleName =
   T.unlines
     [ T.unwords ["module ", capitalize moduleName, " where"]
     ,""
+    , "import Prelude"
+    , "import Control.Monad.Eff"
+    , "import Control.Monad.Eff.Console"
+    , "import qualified Data.String as String"
+    , "import qualified Node.Process as Process"
     , "import Data.Argonaut (Json, decodeJson, encodeJson, stringify) as A"
     , "import Data.Argonaut.Gen (genJson) as A"
     , "import Data.Argonaut.JCursor (JCursor(..), toPrims, fromPrims) as A"
@@ -53,10 +58,25 @@ header moduleName =
     , ""
     ]
 
--- | 
+-- | Additional top level functions that needed for autonomous execution
 -- 
 epilogue :: T.Text -> T.Text
-epilogue toplevelName = T.unlines []
+epilogue toplevelName = 
+  T.unlines 
+    [ "doWithArgv :: forall e. (Array String -> Eff (e) Unit) -> Eff (process :: Process.PROCESS | e) Unit"
+    , "doWithArgv f = do"
+    , "  args <- Process.argv"
+    , "  (f args)"
+    , "  return unit"
+    , " "
+    , "printSplitArgs :: forall e. Array String -> Eff (console :: CONSOLE | e) Unit"
+    , "printSplitArgs argv = do"
+    , "  print (String.joinWith “,” argv)"
+    , " "
+    , "main :: forall e. Eff (console :: CONSOLE, process :: Process.PROCESS | e) Unit"
+    , "main = do"
+    , "  doWithArgv printSplitArgs"
+    ]
 
 -- | Write a PureScript module to an output file
 --   or stdout if `-` filename is given.

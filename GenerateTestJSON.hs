@@ -138,10 +138,11 @@ instance Ord Value where
   _          `compare` (Array  b) = GT
   (Object a) `compare` (Object b) = Map.toList a `compare` Map.toList b
 
--- | Take a set of JSON input filenames, Haskell output filename, and generate module parsing these JSON files.
+-- | Take a set of JSON input filenames
+--   and Haskell output filename, 
+--   and generate module parsing these JSON files.
 generateTestJSONs :: Options -> IO ()
-generateTestJSONs Options {tyOpts=TyOptions {..},
-                           ..}= do
+generateTestJSONs Options {tyOpts=TyOptions {..}, ..} = do
     testValues :: [Value] <- generate $
                                resize size $
                                  vectorWithoutDuplicates 100 arbitraryTopValue

@@ -88,7 +88,7 @@ writePureScriptModule outputFilename toplevelName types =
     withFileOrHandle outputFilename WriteMode stdout $ \hOut ->
       assert (trace extension extension == ".purs") $ do
         T.hPutStrLn hOut $ header $ T.pack moduleName
-        --T.hPutStrLn hOut $ displaySplitTypes types
+        T.hPutStrLn hOut $ displaySplitTypes types
         T.hPutStrLn hOut $ epilogue toplevelName
   where
     (moduleName, extension) =

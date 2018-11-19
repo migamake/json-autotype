@@ -3,7 +3,8 @@ module Data.Aeson.AutoType.CodeGen.Common(writeRunningCommandComment) where
 import System.Environment(getArgs, getProgName)
 import System.IO
 
--- | Write a comment with urrently running command (for documentation of generated code.)
+-- | Write a comment with currently running command 
+--  , documenting generated code
 writeRunningCommandComment :: Handle -> String -> IO ()
 writeRunningCommandComment outHandle commentString = do
   prog <- getProgName

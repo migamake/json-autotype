@@ -81,15 +81,15 @@ epilogue toplevelName =
 -- | Write a PureScript module to an output file
 --   or stdout if `-` filename is given.
 writePureScriptModule :: FilePath               -- ^ path to output file
-                      -> T.Text                 -- ^ top level names
+                      -> T.Text                 -- ^ top level name
                       -> Map.HashMap Text Type  -- ^ used types
                       -> IO ()
 writePureScriptModule outputFilename toplevelName types =
     withFileOrHandle outputFilename WriteMode stdout $ \hOut ->
-    assert (trace extension extension == ".purs") $ do
-      T.hPutStrLn hOut $ header $ T.pack moduleName
-      --T.hPutStrLn hOut $ displaySplitTypes types
-      T.hPutStrLn hOut $ epilogue toplevelName
+      assert (trace extension extension == ".purs") $ do
+        T.hPutStrLn hOut $ header $ T.pack moduleName
+        --T.hPutStrLn hOut $ displaySplitTypes types
+        T.hPutStrLn hOut $ epilogue toplevelName
   where
     (moduleName, extension) =
        first normalizeTypeName' $

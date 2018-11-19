@@ -1,3 +1,4 @@
+
 {-# LANGUAGE CPP               #-}
 {-# LANGUAGE OverloadedStrings #-}
 
@@ -27,48 +28,55 @@ import           Data.Aeson.AutoType.Util
 
 --------------------------------------------------------------------------------
 
--- NB: In future, we should move common variable into separate module
+-- NB: SB: In future, we should move common variable into separate module
 --     and fill them out as config for a specific language
 --     and describe CodeGen as a Class with specific set of functions
---     like: defaultFilename, header, footer(instead of epilogie), writeModule
---          runModule
+--     like: defaultFilename, header, footer(instead of epilogie), 
+--     writeModule, runModule
 --     without Langauge identification in all this functions
 
 defaultPureScriptFilename = "JSONTypes.purs"
 
+-- | Top level declarations that imports 3rd party libraries
+-- 
 header :: T.Text -> T.Text
 header moduleName =
   T.unlines
-    [ "import Data.Argonaut (Json, decodeJson, encodeJson, stringify)"
-    , "import Data.Argonaut.Gen (genJson)"
-    , "import Data.Argonaut.JCursor (JCursor(..), toPrims, fromPrims)"
+    [ T.unwords ["module ", capitalize moduleName, " where"]
+    ,""
+    , "import Data.Argonaut (Json, decodeJson, encodeJson, stringify) as A"
+    , "import Data.Argonaut.Gen (genJson) as A"
+    , "import Data.Argonaut.JCursor (JCursor(..), toPrims, fromPrims) as A"
     , "import Data.Either (Either(..))"
     , "import Data.Foldable (foldMap)"
     , "import Data.Maybe (Maybe(..))"
+    , ""
     ]
 
+-- | 
+-- 
 epilogue :: T.Text -> T.Text
 epilogue toplevelName = T.unlines []
 
 -- | Write a PureScript module to an output file
 --   or stdout if `-` filename is given.
 writePureScriptModule :: FilePath               -- ^ path to output file
-                      -> T.Text                   -- ^ Top level names
+                      -> T.Text                 -- ^ top level names
                       -> Map.HashMap Text Type  -- ^ used types
                       -> IO ()
 writePureScriptModule outputFilename toplevelName types =
     withFileOrHandle outputFilename WriteMode stdout $ \hOut ->
     assert (trace extension extension == ".purs") $ do
       T.hPutStrLn hOut $ header $ T.pack moduleName
-      T.hPutStrLn hOut $ displaySplitTypes types
+      --T.hPutStrLn hOut $ displaySplitTypes types
       T.hPutStrLn hOut $ epilogue toplevelName
   where
     (moduleName, extension) =
        first normalizeTypeName' $
-       splitExtension           $
-       case outputFilename == "-" of
-         False -> outputFilename
-         True  -> defaultPureScriptFilename
+         splitExtension         $
+           (case outputFilename == "-" of
+             False -> outputFilename
+             True  -> defaultPureScriptFilename)
     normalizeTypeName' = T.unpack . normalizeTypeName . T.pack
 
 

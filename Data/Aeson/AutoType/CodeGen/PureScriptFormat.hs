@@ -9,7 +9,7 @@
 -- | Formatting type declarations and class instances for inferred types.
 
 module Data.Aeson.AutoType.CodeGen.PureScriptFormat(
-  -- displaySplitTypes,
+  displaySplitTypes,
   normalizeTypeName) where
 import           Control.Arrow             ((&&&))
 import           Control.Applicative       ((<$>), (<*>))
@@ -125,8 +125,8 @@ formatType (TUnion u)                        = wrap <$> case length nonNull of
     wrap                                :: Text -> Text
     wrap   inner  | TNull `Set.member` u = T.concat ["(Maybe (", inner, "))"]
                   | otherwise            =                          inner
-formatType (TArray a)                        = do inner <- formatType a
-                                                  return $ T.concat ["[", inner, "]"]
+formatType (TArray a)                        = do ftype <- formatType a
+                                                  return $ T.concat ["Array ", ftype]
 formatType (TObj   o)                        = do ident <- genericIdentifier
                                                   newDecl ident d
   where
@@ -202,6 +202,7 @@ wrapDecl identifier contents =
   T.unlines 
     [ header
     , contents
+    , "} "
     , " "
     , wrapDeriver identifier
     ]
@@ -214,7 +215,9 @@ wrapDecl identifier contents =
 wrapDeriver :: Text -> Text
 wrapDeriver identifier = 
   T.concat
-    [ "derive instance name :: Generic "
+    [ "derive instance generic"
+    , identifier
+    , " :: Generic "
     ,  identifier
     ]
 
@@ -283,16 +286,16 @@ makeDecoder identifier contents = ""
 
 -------------------------------------------------------------------------------
 
-
 -- | Display an environment of types split by name.
 -- 
 displaySplitTypes ::  Map Text Type -> Text
 displaySplitTypes dict = 
-  trace ("displaySplitTypes: " ++ show (toposort dict)) $ runDecl declarations
-    where
-      declarations =
-        forM (toposort dict) $ \(name, typ) ->
-          formatObjectType (normalizeTypeName name) typ
+  trace ("displaySplitTypes: " ++ show (toposort dict)) $ 
+    runDecl declarations
+      where
+        declarations =
+          forM (toposort dict) $ \(name, typ) ->
+            formatObjectType (normalizeTypeName name) typ
 
 -- | Normalize type name by:
 --   1. Treating all characters that are not acceptable in Haskell variable name as end of word.

@@ -49,13 +49,17 @@ header moduleName =
     , "import Control.Monad.Eff.Console"
     , "import Data.String as String"
     , "import Node.Process as Process"
+    , "import Data.Argonaut.Encode as A"
+    , "import Data.Argonaut.Decode as A"
     , "import Data.Argonaut (Json, decodeJson, encodeJson, stringify) as A"
     , "import Data.Argonaut.Gen (genJson) as A"
     , "import Data.Argonaut.JCursor (JCursor(..), toPrims, fromPrims) as A"
     , "import Data.Either (Either(..))"
     , "import Data.Foldable (foldMap)"
     , "import Data.Maybe (Maybe(..))"
-    , ""
+    , " "
+    , "-------------------------------------------------------------------------------"
+    , " "
     ]
 
 -- | Additional top level functions that needed for autonomous execution
@@ -63,7 +67,9 @@ header moduleName =
 epilogue :: T.Text -> T.Text
 epilogue toplevelName = 
   T.unlines 
-    [ "doWithArgv :: forall e. (Array String -> Eff (e) Unit) -> Eff (process :: Process.PROCESS | e) Unit"
+    [ "-------------------------------------------------------------------------------"
+    , ""
+    , "doWithArgv :: forall e. (Array String -> Eff (e) Unit) -> Eff (process :: Process.PROCESS | e) Unit"
     , "doWithArgv f = do"
     , "  args <- Process.argv"
     , "  (f args)"

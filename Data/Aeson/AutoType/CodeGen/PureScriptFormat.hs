@@ -36,13 +36,12 @@ import           Data.Aeson.AutoType.Type
 import           Data.Aeson.AutoType.Util    ()
 
 --------------------------------------------------------------------------------
-trace _ x = x
 
 -- | Explanatory type alias for making declarations
 -- First element of the triple is original JSON identifier,
 -- second element of the triple is the mapped identifier name in Haskell.
 -- third element of the triple shows the type in a formatted way
-type MappedKey = (Text, Text, Text, Bool)
+type MappedKey = (Text, Text, Text, Type, Bool)
 
 data DeclState = 
   DeclState 
@@ -108,13 +107,12 @@ escapeKeywords ::  Text -> Text
 escapeKeywords k | k `Set.member` keywords = k `T.append` "_"
 escapeKeywords k                           = k
 
-
 -- | Format the type within DeclM monad, that records
 -- the separate declarations on which this one is dependent.
 formatType :: Type -> DeclM Text
-formatType  TString                          = return "Text"
-formatType  TNum                             = return "Double"
-formatType  TBool                            = return "Bool"
+formatType  TString                          = return "String"
+formatType  TNum                             = return "Number"
+formatType  TBool                            = return "Boolean"
 formatType (TLabel l)                        = return $ normalizeTypeName l
 formatType (TUnion u)                        = wrap <$> case length nonNull of
                                                           0 -> return emptyTypeRepr
@@ -145,23 +143,35 @@ genericIdentifier = do
 
 -- | Printing a single data type declaration
 newDecl :: Text -> [(Text, Type)] -> DeclM Text
-newDecl identifier kvs = do attrs <- forM kvs $ \(k, v) -> do
-                              formatted <- formatType v
-                              return (k, normalizeFieldName identifier k, formatted, isNullable v)
-                            let decl = T.unlines 
-                                         [ wrapDecl identifier $ fieldDecls attrs
-                                         , ""
-                                         , makeEncoder identifier attrs
-                                         ,""
-                                         , makeDecoder identifier attrs
-                                         ]
-                            addDecl decl
-                            return identifier
-  where
-    fieldDecls attrList = T.intercalate ",\n" $ map fieldDecl attrList
-    fieldDecl :: (Text, Text, Text, Bool) -> Text
-    fieldDecl (_jsonName, haskellName, fType, _nullable) = T.concat [
-                                                             "    ", haskellName, " :: ", fType]
+newDecl identifier kvs = do 
+  attrs <- forM kvs $ \(k, v) -> do
+    formatted <- formatType v
+    return (k, normalizeFieldName identifier k, formatted, v, isNullable v)
+  let decl = T.unlines 
+               [ wrapDecl identifier $ fieldDecls attrs
+               , ""
+               , makeEncoder identifier attrs
+               , ""
+               , makeDecoder identifier attrs
+               ]
+  addDecl decl
+  return identifier
+    where
+      fieldDecls attrList =
+          T.concat 
+            [ fieldDecl True (head attrList)
+            , T.concat $ map (\x -> fieldDecl False x) (tail attrList)
+            ]
+
+      fieldDecl :: Bool -> (Text, Text, Text, Type, Bool) -> Text
+      fieldDecl frst (_jsonName, haskellName, fType, _type, _nullable) = 
+        T.concat 
+          [ if frst then "      " else "\n    , "
+          , haskellName
+          , " :: "
+          , fType
+          ]
+
 -- | Adds declaration
 addDecl decl = decls %%= (\ds -> ((), decl:ds))
 
@@ -202,18 +212,25 @@ wrapDecl identifier contents =
   T.unlines 
     [ header
     , contents
-    , "} "
+    , "    }"
     , " "
-    , wrapDeriver identifier
+    , wrapGenericDeriver identifier
     ]
   where
-    header = T.concat ["data ", identifier, " = ", identifier, " { "]
+    header = 
+      T.concat 
+        [ "data "
+        , identifier
+        , "\n"
+        , "  = "
+        , identifier
+        , " { "]
 
 -- | There is no easy deriving we need actually
 --   declare instnaces, like `derive instance name :: Generic MyType`
 --   for automatic derivation
-wrapDeriver :: Text -> Text
-wrapDeriver identifier = 
+wrapGenericDeriver :: Text -> Text
+wrapGenericDeriver identifier = 
   T.concat
     [ "derive instance generic"
     , identifier
@@ -221,67 +238,83 @@ wrapDeriver identifier =
     ,  identifier
     ]
 
-makeEncoder :: Text -> [MappedKey] -> Text
-makeEncoder identifier contents = ""
+-------------------------------------------------------------------------------
+-- Functiona to support encoding/decoding
+
+-- Contents example for wrapToJSON
+--"hexValue"  .= hexValue
+--                                        ,"colorName" .= colorName]
+-- | Join text with other as separator.
+joinWith :: Text -> [Text] -> Text
+joinWith _      []            = ""
+joinWith joiner (aFirst:rest) = aFirst <> T.concat (map (joiner <>) rest)
+
+nonNullComponents = Set.toList . Set.filter (TNull /=)
+
+getEncoder :: Type -> Text
+getEncoder  TString   = "A.encodeJsonJString"
+getEncoder  TNum      = "A.encodeJsonJNumber"
+getEncoder  TBool     = "A.encodeJsonJBoolean"
+getEncoder  TNull     = "A.encodeJsonUnit"
+getEncoder (TLabel l) = encoderIdent l
+getEncoder (TArray e) = "A.encodeJsonArray"
+getEncoder (TObj   o) = error $ "Seeing direct object encoder: "         <> show o
+getEncoder (TUnion u) = 
+  case nonNull of
+    []  -> "encodeJsonUnit"
+    --[x] -> getDecoder x
+    _   -> foldl1' altEncoder $ map getEncoder nonNull
+  where
+    nonNull = nonNullComponents u
+
+-- | 
+encoderIdent ident = 
+  "encodeJson" <> capitalize (normalizeTypeName ident)
+
+-- | Make Encoder declaration, given identifier (object name in Haskell) 
+--   and mapping of its keys from JSON to Haskell identifiers in the same
+--   order as in declaration
+makeEncoder :: Text         -- ^
+            -> [MappedKey]  -- ^
+            -> Text
+makeEncoder identifier contents =
+  T.unlines  
+    [ T.unwords 
+        [ "instance"
+        , encoderIdent identifier
+        , "::"
+        , "EncodeJson"
+        , identifier
+        , "where"
+        ]
+    , "  " <> encoderIdent identifier <> " v ="
+    , "    case v of "
+    , "      " <> identifier <> " record ->"
+    , "        " <> (joinWith "\n        " (makeEncoderSub <$> contents))
+    , "        jsonEmptyObject"
+    ]
+  where
+    makeEncoderSub (jsonId, haskellId, _typeText, ty, _nullable) = 
+      T.concat 
+        [ tShow jsonId
+        , " := "
+        -- , getEncoder ty
+        , " record."
+        , normalizeFieldName identifier jsonId
+        , " ~> "
+        ]
+    escapeText = T.pack . show . T.unpack
+
+
+
+altEncoder a b = "Either.unpack (" <> a <> ") (" <> b <> ")"
 
 makeDecoder :: Text -> [MappedKey] -> Text
 makeDecoder identifier contents = ""
 
---------------------------------------------------------------------------------
--- -- | 
--- encoderIdent ident = 
---   "encodeJson" <> capitalize (normalizeTypeName ident)
 
--- -- | Make Encoder declaration, given identifier (object name in Haskell) 
--- --   and mapping of its keys from JSON to Haskell identifiers in the same
--- --   order as in declaration
--- makeEncoder :: Text         -- ^
---             -> [MappedKey]  -- ^
---             -> Text
--- makeEncoder identifier contents =
---   ext.unlines 
---     [ T.unwords [ encoderIdent identifier
---                 , ":"
---                 , identifier
---                 , "->"
---                 , "Json.Encode.Value"
---                 ]
---     , encoderIdent identifier <> " record ="
---     , "    Json.Encode.object ["
---     , "        " <> (joinWith "\n      , " (makeEncoder <$> contents))
---     , "    ]"
---     ]
---   where
---     makeEncoder (jsonId, haskellId, _typeText, ty, _nullable) = 
---       T.concat 
---         [ "("
---         , tShow jsonId
---         , ", ("
---         , getEncoder ty
---         , ") record."
---         , normalizeFieldName identifier jsonId
---         , ")"
---         ]
---     --"answers",  Json.Encode.list <| List.map encodeAnswer <| record.answers
---     escapeText = T.pack . show . T.unpack
 
--- getEncoder :: Type -> Text
--- getEncoder  TString   = "A.encodeJsonJString"
--- getEncoder  TNum      = "A.encodeJsonJNumber"
--- getEncoder  TBool     = "A.encodeJsonJBoolean"
--- getEncoder  TNull     = "A.encodeJsonUnit"
--- getEncoder (TLabel l) = encoderIdent l
--- getEncoder (TArray e) = "A.encodeJsonArray"
--- getEncoder (TObj   o) = error $ "Seeing direct object encoder: "         <> show o
--- getEncoder (TUnion u) = 
---   case nonNull of
---     []  -> "encodeJsonUnit"
---     [x] -> getDecoder x
---     _   -> foldl1' altEncoder $ map getEncoder nonNull
---   where
---     nonNull = nonNullComponents u
 
--- altEncoder a b = "Either.unpack (" <> a <> ") (" <> b <> ")"
 
 
 -------------------------------------------------------------------------------
@@ -290,12 +323,11 @@ makeDecoder identifier contents = ""
 -- 
 displaySplitTypes ::  Map Text Type -> Text
 displaySplitTypes dict = 
-  trace ("displaySplitTypes: " ++ show (toposort dict)) $ 
-    runDecl declarations
-      where
-        declarations =
-          forM (toposort dict) $ \(name, typ) ->
-            formatObjectType (normalizeTypeName name) typ
+  runDecl declarations
+    where
+      declarations =
+        forM (toposort dict) $ \(name, typ) ->
+          formatObjectType (normalizeTypeName name) typ
 
 -- | Normalize type name by:
 --   1. Treating all characters that are not acceptable in Haskell variable name as end of word.

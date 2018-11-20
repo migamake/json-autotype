@@ -112,8 +112,8 @@ extractTypeFromJSONFile opts inputFilename =
 -- and return a list of filenames for files that passed the check.
 typeChecking :: Type -> [FilePath] -> [Value] -> IO [FilePath]
 typeChecking ty inputFilenames values = do
-    unless (null failures) $ report $ Text.unwords $ "Failed to typecheck with unified type: ":
-                                                          (Text.pack `map` failures)
+    unless (null failures) $ report $ 
+      Text.unwords $ "Failed to typecheck with unified type: " : (Text.pack `map` failures)
     when (      null successes) $ fatal    "No files passed the typecheck."
     return successes
   where
@@ -128,24 +128,6 @@ generateParserFromJSONs :: Options
                         -> FilePath 
                         -> IO ()
 generateParserFromJSONs opts inputFilenames outputFilename = do
-  case lang $ tyOpts $ opts of 
-    Haskell    -> generateHaskellFromJSONs    opts inputFilenames outputFilename
-    Elm        -> generateElmFromJSONs        opts inputFilenames outputFilename
-    PureScript -> generatePureScriptFromJSONs opts inputFilenames outputFilename
-
-
--- | Drop initial pragma.
-dropPragma :: BSL.ByteString -> BSL.ByteString
-dropPragma input | "{-#" `BSL.isPrefixOf` input = BSL.dropWhile (/='\n') input
-                 | otherwise                    = input
-
--- | Everything related to Haskell module generation
-generateHaskellFromJSONs :: Options    -- ^
-                         -> [FilePath] -- ^ 
-                         -> FilePath   -- ^
-                         -> IO ()
-generateHaskellFromJSONs opts inputFilenames outputFilename = do
-
   let tyopts    = tyOpts opts
       toplevel' = toplevel tyopts
       lang'     = lang tyopts
@@ -154,7 +136,9 @@ generateHaskellFromJSONs opts inputFilenames outputFilename = do
 -- Read type from each file
   (filenames,
    typeForEachFile,
-   valueForEachFile) <- unzip3 . catMaybes <$> mapM (extractTypeFromJSONFile opts) inputFilenames
+   valueForEachFile) <- unzip3 . 
+                          catMaybes <$> 
+                            mapM (extractTypeFromJSONFile opts) inputFilenames
   
 -- Unify all input types
   when (null typeForEachFile) $ do
@@ -163,9 +147,9 @@ generateHaskellFromJSONs opts inputFilenames outputFilename = do
 
   let finalType = foldr1 unifyTypes typeForEachFile
   passedTypeCheck <-
-   case typecheck opts of
-     False -> return filenames
-     True  -> typeChecking finalType filenames valueForEachFile
+    case typecheck opts of
+      False -> return filenames
+      True  -> typeChecking finalType filenames valueForEachFile
 
 -- We split different dictionary labels to become different type trees (and thus different declarations.)
   let splitted = splitTypeByLabel toplevelName finalType
@@ -195,22 +179,11 @@ generateHaskellFromJSONs opts inputFilenames outputFilename = do
     myTrace :: String -> IO ()
     myTrace msg = debug (tyOpts opts) `when` putStrLn msg
     toplevelName = capitalize $ Text.pack (toplevel $ tyOpts opts)
- 
-
--- | Everything related to Purescript module generation
-generatePureScriptFromJSONs :: Options    -- ^
-                            -> [FilePath] -- ^ 
-                            -> FilePath   -- ^
-                            -> IO ()
-generatePureScriptFromJSONs opts inputFilenames outputFilename = undefined
-
--- | Everything related to Elm module generation
--- TODO
-generateElmFromJSONs :: Options    -- ^
-                     -> [FilePath] -- ^ 
-                     -> FilePath   -- ^
-                     -> IO ()
-generateElmFromJSONs opts inputFilenames outputFilename = undefined
+    
+-- | Drop initial pragma.
+dropPragma :: BSL.ByteString -> BSL.ByteString
+dropPragma input | "{-#" `BSL.isPrefixOf` input = BSL.dropWhile (/='\n') input
+                 | otherwise                    = input
 
 -- | Initialize flags, and run @generateHaskellFromJSONs@.
 main :: IO ()

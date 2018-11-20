@@ -110,4 +110,4 @@ runPureScriptModule :: [String]    -- ^ Arguments for build/run tool, pulp
                     -> IO ExitCode
 runPureScriptModule arguments = do
   hPutStrLn stderr "Compiling PureScript module for a test."
-  system $ Prelude.unwords $ ["pulp", "build", Prelude.head arguments]
+  system $ Prelude.unwords $ ["purs", "compile", Prelude.head arguments]

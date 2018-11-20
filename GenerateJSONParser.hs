@@ -3,6 +3,7 @@
 {-# LANGUAGE NamedFieldPuns       #-}
 {-# LANGUAGE ViewPatterns         #-}
 {-# OPTIONS_GHC -fno-warn-orphans #-}
+
 module Main where
 
 import           Control.Applicative
@@ -13,7 +14,6 @@ import           Data.Monoid
 import           Data.List                      (partition)
 import           System.Exit
 import           System.IO                      (stdin, stderr, IOMode(..))
---import           System.IO.Posix.MMap           (mmapFileByteString)
 import           System.FilePath                (splitExtension)
 import           System.Process                 (system)
 import qualified Data.ByteString.Lazy.Char8 as BSL
@@ -40,12 +40,12 @@ import           CommonCLI
 -- | CLI flags to identify program behaviour 
 data Options = 
   Options 
-    { tyOpts         :: TypeOpts    -- ^ 
+    { tyOpts         :: TypeOpts    -- ^ Types generation options
     , outputFilename :: FilePath    -- ^ Generated file name
     , typecheck      :: Bool        -- ^ Skip typecheck or not
     , yaml           :: Bool        -- ^ parse inputs as Yaml
     , preprocessor   :: Bool        -- ^ wheater skip or not preprocessing phase
-    , filenames      :: [FilePath]  -- ^
+    , filenames      :: [FilePath]  -- ^ 
     }
 
 optParser :: Parser Options
@@ -109,7 +109,7 @@ extractTypeFromJSONFile opts inputFilename =
                | otherwise         = id
 
 -- | Type checking all input files with given type,
--- and return a list of filenames for files that passed the check.
+--   and return a list of filenames for files that passed the check.
 typeChecking :: Type -> [FilePath] -> [Value] -> IO [FilePath]
 typeChecking ty inputFilenames values = do
     unless (null failures) $ report $ 
@@ -123,9 +123,9 @@ typeChecking ty inputFilenames values = do
 
 -- | Take a set of JSON input filenames
 --   Haskell output filename, and generate module parsing these JSON files.
-generateParserFromJSONs :: Options 
-                        -> [FilePath] 
-                        -> FilePath 
+generateParserFromJSONs :: Options     -- ^ CLI options 
+                        -> [FilePath]  -- ^ Paths to files required for derivation
+                        -> FilePath    -- ^ Path to output file
                         -> IO ()
 generateParserFromJSONs opts inputFilenames outputFilename = do
   let tyopts    = tyOpts opts
@@ -179,7 +179,7 @@ generateParserFromJSONs opts inputFilenames outputFilename = do
     myTrace :: String -> IO ()
     myTrace msg = debug (tyOpts opts) `when` putStrLn msg
     toplevelName = capitalize $ Text.pack (toplevel $ tyOpts opts)
-    
+
 -- | Drop initial pragma.
 dropPragma :: BSL.ByteString -> BSL.ByteString
 dropPragma input | "{-#" `BSL.isPrefixOf` input = BSL.dropWhile (/='\n') input

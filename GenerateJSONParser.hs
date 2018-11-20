@@ -3,7 +3,6 @@
 {-# LANGUAGE NamedFieldPuns       #-}
 {-# LANGUAGE ViewPatterns         #-}
 {-# OPTIONS_GHC -fno-warn-orphans #-}
-
 module Main where
 
 import           Control.Applicative
@@ -14,6 +13,7 @@ import           Data.Monoid
 import           Data.List                      (partition)
 import           System.Exit
 import           System.IO                      (stdin, stderr, IOMode(..))
+--import           System.IO.Posix.MMap           (mmapFileByteString)
 import           System.FilePath                (splitExtension)
 import           System.Process                 (system)
 import qualified Data.ByteString.Lazy.Char8 as BSL
@@ -35,36 +35,29 @@ import qualified Data.Yaml as Yaml
 import           Options.Applicative
 import           CommonCLI
 
--------------------------------------------------------------------------------
-
--- | CLI flags to identify program behaviour 
-data Options = 
-  Options 
-    { tyOpts         :: TypeOpts    -- ^ Types generation options
-    , outputFilename :: FilePath    -- ^ Generated file name
-    , typecheck      :: Bool        -- ^ Skip typecheck or not
-    , yaml           :: Bool        -- ^ parse inputs as Yaml
-    , preprocessor   :: Bool        -- ^ wheater skip or not preprocessing phase
-    , filenames      :: [FilePath]  -- ^ 
-    }
+-- * Command line flags
+data Options = Options {
+                 tyOpts :: TypeOpts
+               , outputFilename :: FilePath
+               , typecheck :: Bool
+               , yaml :: Bool
+               , preprocessor :: Bool
+               , filenames :: [FilePath]
+               }
 
 optParser :: Parser Options
 optParser  =
-  Options <$> 
-    tyOptParser
-      <*> strOption (short 'o'             <>
-                     long "output"         <>
-                     long "outputFilename" <> 
-                     value "")
-      <*> unflag    (short 'n'             <>
-                     long "no-typecheck"   <> 
-                     help "Do not typecheck after unification")
-      <*> switch    (long  "yaml"          <> 
-                     help "Parse inputs as YAML instead of JSON")
-      <*> switch    (short 'p'             <>
-                     long "preprocessor"   <>
-                     help "Work as GHC preprocessor (and skip preprocessor pragma)")
-      <*> some (argument str (metavar "FILES..."))
+    Options  <$> tyOptParser
+             <*> strOption (short 'o'             <>
+                            long "output"         <>
+                            long "outputFilename" <> value "")
+             <*> unflag    (short 'n'             <>
+                            long "no-typecheck"   <> help "Do not typecheck after unification")
+             <*> switch    (long  "yaml"          <> help "Parse inputs as YAML instead of JSON")
+             <*> switch    (short 'p'             <>
+                            long "preprocessor"   <>
+                              help "Work as GHC preprocessor (and skip preprocessor pragma)")
+             <*> some (argument str (metavar "FILES..."))
 
 -- | Report an error to error output.
 report   :: Text -> IO ()
@@ -72,9 +65,8 @@ report    = Text.hPutStrLn stderr
 
 -- | Report an error and terminate the program.
 fatal    :: Text -> IO ()
-fatal msg = do 
-  report msg
-  exitFailure
+fatal msg = do report msg
+               exitFailure
 
 -- | Extracts type from JSON file, along with the original @Value@.
 -- In order to facilitate dealing with failures, it returns a triple of
@@ -108,12 +100,13 @@ extractTypeFromJSONFile opts inputFilename =
     preprocess | preprocessor opts = dropPragma
                | otherwise         = id
 
+
 -- | Type checking all input files with given type,
---   and return a list of filenames for files that passed the check.
+-- and return a list of filenames for files that passed the check.
 typeChecking :: Type -> [FilePath] -> [Value] -> IO [FilePath]
 typeChecking ty inputFilenames values = do
-    unless (null failures) $ report $ 
-      Text.unwords $ "Failed to typecheck with unified type: " : (Text.pack `map` failures)
+    unless (null failures) $ report $ Text.unwords $ "Failed to typecheck with unified type: ":
+                                                          (Text.pack `map` failures)
     when (      null successes) $ fatal    "No files passed the typecheck."
     return successes
   where
@@ -121,40 +114,28 @@ typeChecking ty inputFilenames values = do
     (map fst -> successes,
      map fst -> failures) = partition snd checkedFiles
 
--- | Take a set of JSON input filenames
---   Haskell output filename, and generate module parsing these JSON files.
-generateParserFromJSONs :: Options     -- ^ CLI options 
-                        -> [FilePath]  -- ^ Paths to files required for derivation
-                        -> FilePath    -- ^ Path to output file
-                        -> IO ()
-generateParserFromJSONs opts inputFilenames outputFilename = do
-  let tyopts    = tyOpts opts
-      toplevel' = toplevel tyopts
-      lang'     = lang tyopts
-      test'     = test tyopts
-
--- Read type from each file
+-- | Take a set of JSON input filenames, Haskell output filename, and generate module parsing these JSON files.
+generateHaskellFromJSONs :: Options -> [FilePath] -> FilePath -> IO ()
+generateHaskellFromJSONs opts@Options { tyOpts=TyOptions { toplevel
+                                                         , lang
+                                                         , test }
+                                      }
+                         inputFilenames outputFilename = do
+  -- Read type from each file
   (filenames,
    typeForEachFile,
-   valueForEachFile) <- unzip3 . 
-                          catMaybes <$> 
-                            mapM (extractTypeFromJSONFile opts) inputFilenames
-  
--- Unify all input types
+   valueForEachFile) <- unzip3 . catMaybes <$> mapM (extractTypeFromJSONFile opts) inputFilenames
+  -- Unify all input types
   when (null typeForEachFile) $ do
     report "No valid JSON input file..."
     exitFailure
-
   let finalType = foldr1 unifyTypes typeForEachFile
-  passedTypeCheck <-
-    case typecheck opts of
-      False -> return filenames
-      True  -> typeChecking finalType filenames valueForEachFile
-
--- We split different dictionary labels to become different type trees (and thus different declarations.)
+  passedTypeCheck <- if typecheck opts
+                        then typeChecking finalType filenames valueForEachFile
+                        else return                 filenames
+  -- We split different dictionary labels to become different type trees (and thus different declarations.)
   let splitted = splitTypeByLabel toplevelName finalType
   myTrace $ "SPLITTED: " ++ pretty splitted
-
   assert (not $ any hasNonTopTObj $ Map.elems splitted) $ do
     -- We compute which type labels are candidates for unification
     let uCands = unificationCandidates splitted
@@ -162,38 +143,33 @@ generateParserFromJSONs opts inputFilenames outputFilename = do
     when (suggest $ tyOpts opts) $ forM_ uCands $ \cs -> do
                            putStr "-- "
                            Text.putStrLn $ "=" `Text.intercalate` cs
-
     -- We unify the all candidates or only those that have been given as command-line flags.
     let unified = if autounify $ tyOpts opts
                     then unifyCandidates uCands splitted
                     else splitted
     myTrace $ "UNIFIED:\n" ++ pretty unified
-    
     -- We start by writing module header
-    writeModule lang' outputFilename toplevelName unified
-    when test' $
-      exitWith =<< runModule lang' (outputFilename:passedTypeCheck)
-  
+    writeModule lang outputFilename toplevelName unified
+    when test $
+      exitWith =<< runModule lang (outputFilename:passedTypeCheck)
   where
     -- | Works like @Debug.trace@ when the --debug flag is enabled, and does nothing otherwise.
     myTrace :: String -> IO ()
     myTrace msg = debug (tyOpts opts) `when` putStrLn msg
-    toplevelName = capitalize $ Text.pack (toplevel $ tyOpts opts)
+    toplevelName = capitalize $ Text.pack toplevel
 
 -- | Drop initial pragma.
 dropPragma :: BSL.ByteString -> BSL.ByteString
 dropPragma input | "{-#" `BSL.isPrefixOf` input = BSL.dropWhile (/='\n') input
                  | otherwise                    = input
 
+
 -- | Initialize flags, and run @generateHaskellFromJSONs@.
 main :: IO ()
-main = do 
-  opts <- execParser optInfo
-  generateParserFromJSONs opts (filenames opts) (outputFilename opts)
-    where
-      optInfo = 
-        info 
-          (optParser <**> helper)
-          (  fullDesc
-          <> progDesc "Parser JSON or YAML, get its type, and generate appropriate parser."
-          <> header "json-autotype -- automatic type and parser generation from JSON")
+main = do opts <- execParser optInfo
+          generateHaskellFromJSONs opts (filenames opts) (outputFilename opts)
+  where
+    optInfo = info (optParser <**> helper)
+            (  fullDesc
+            <> progDesc "Parser JSON or YAML, get its type, and generate appropriate parser."
+            <> header "json-autotype -- automatic type and parser generation from JSON")

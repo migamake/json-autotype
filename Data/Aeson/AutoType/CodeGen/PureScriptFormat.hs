@@ -309,9 +309,45 @@ makeEncoder identifier contents =
 
 altEncoder a b = "Either.unpack (" <> a <> ") (" <> b <> ")"
 
-makeDecoder :: Text -> [MappedKey] -> Text
-makeDecoder identifier contents = ""
+decoderIdent ident = "decode" <> capitalize (normalizeTypeName ident)
 
+-- instance decodeJsonRange :: DecodeJson Range where
+--   decodeJson json = do
+--     obj <- decodeJson json
+
+makeDecoder :: Text -> [MappedKey] -> Text
+makeDecoder identifier contents = 
+  T.unlines 
+    [ T.concat  ["instance ", decodeIdentifier, " :: DecodeJson ", identifier, " where"]
+    , "  decodeJson json = do"
+    , "    obj <- decodeJson json"
+    , T.unlines (makeParser identifier <$> contents)
+    , T.concat [ "    pure $ ", identifier, " { "]
+    , (makeTypeRow True identifier (head contents))
+    , T.unlines (makeTypeRow False identifier <$> (tail contents))
+    , "     } "
+    ]
+  where
+    decodeIdentifier = decoderIdent identifier
+    makeParser identifier (jsonId, _, _, ty, isOptional) = 
+      T.unwords 
+        [ "   "
+        , jsonId
+        , ""
+        , if isOptional
+             then ""
+             else ""
+        , "<- obj .?" 
+        , T.concat ["\"", jsonId, "\""]
+        ]
+    makeTypeRow isFirst identifier (jsonId, hname, _, ty, isOptional) = 
+      T.unwords
+        [ "    "
+        , if isFirst then " " else ","
+        , hname
+        , ":"
+        , jsonId
+        ] 
 
 
 

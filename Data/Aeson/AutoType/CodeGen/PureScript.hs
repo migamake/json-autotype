@@ -106,8 +106,10 @@ writePureScriptModule outputFilename toplevelName types =
     normalizeTypeName' = T.unpack . normalizeTypeName . T.pack
 
 
-runPureScriptModule :: [String]    -- ^ Arguments for build/run tool, pulp
+runPureScriptModule :: [String]    -- ^ Arguments for purs compiler and build/run tool pulp
                     -> IO ExitCode
 runPureScriptModule arguments = do
   hPutStrLn stderr "Compiling PureScript module for a test."
-  system $ Prelude.unwords $ ["purs", "compile", Prelude.head arguments]
+  system $ Prelude.unwords [ "purs", "compile", Prelude.head arguments]
+  system $ Prelude.unwords [ "pulp", "run -- ", Prelude.head arguments]      -- TODO: requires generation of pulp project with `pulp init` and deps before
+

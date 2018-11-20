@@ -349,10 +349,6 @@ makeDecoder identifier contents =
         , jsonId
         ] 
 
-
-
-
-
 -------------------------------------------------------------------------------
 
 -- | Display an environment of types split by name.

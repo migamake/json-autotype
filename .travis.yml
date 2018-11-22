@@ -278,11 +278,11 @@ script:
   --disable-tests --disable-benchmarks all; else echo "Not building without installed
   constraints"; fi
 - cd ${TRAVIS_BUILD_HOME}
-deploy:
-  provider: hackage
-  username: MichalGajda
-  password:
-    secure: hzCjbYpSFdabzklSRbbV2YIJGuHmznbLgbjlecj3IoncgOpblX3eDdO2r7dihlfB45nBeIBhkSicJ35RN2M1TG2XYJX6WV/obku9nLFSIFJraZ4qCaVjTRz0bnVsiyfQMQW+4vM7BCRBVBGgUOd66tXsNN6Q+6NLhta/bzP6Y8I=
-  on:
-    repo: mgajda/json-autotype
-    tags: true
+#deploy:
+#  provider: hackage
+#  username: MichalGajda
+#  password:
+#    secure: hzCjbYpSFdabzklSRbbV2YIJGuHmznbLgbjlecj3IoncgOpblX3eDdO2r7dihlfB45nBeIBhkSicJ35RN2M1TG2XYJX6WV/obku9nLFSIFJraZ4qCaVjTRz0bnVsiyfQMQW+4vM7BCRBVBGgUOd66tXsNN6Q+6NLhta/bzP6Y8I=
+#  on:
+#    repo: mgajda/json-autotype
+#    tags: true

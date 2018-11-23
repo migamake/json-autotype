@@ -33,11 +33,6 @@ instance (Out a) => Out (Vector a) where
   doc (V.toList -> v) = "<" <+> doc v <+> ">"
   docPrec _ = doc
 
-#if MIN_VERSION_aeson(1,2,1)
-#else
-deriving instance Generic Value
-#endif
-
 instance Out Value
 
 instance (Out a) => Out (Set a) where

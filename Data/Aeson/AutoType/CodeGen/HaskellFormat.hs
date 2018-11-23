@@ -102,9 +102,7 @@ makeToJSON identifier contents =
     Text.unlines [
         Text.concat ["instance ToJSON ", identifier, " where"]
       , Text.concat ["  toJSON     (", identifier, " {", wildcard, "}) = object [", inner ", ", "]"]
-#if MIN_VERSION_aeson(0,11,0)
       , maybeToEncoding
-#endif
       ]
   where
     maybeToEncoding | null contents = ""

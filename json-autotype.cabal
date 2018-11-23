@@ -72,6 +72,7 @@ library
                        Data.Aeson.AutoType.Alternative
                        -- Data.Aeson.AutoType.Plugin.Subtype
                        -- Data.Aeson.AutoType.Plugin.Loader
+
   other-extensions:    TemplateHaskell,
                        ScopedTypeVariables,
                        OverloadedStrings,
@@ -90,7 +91,7 @@ library
                        Data.Aeson.AutoType.CodeGen.ElmFormat
   build-depends:       base                 >=4.3  && <5,
                        GenericPretty        >=1.2  && <1.3,
-                       aeson                >=0.11.2 && <1.5,
+                       aeson                >=1.2.1 && <1.5,
                        containers           >=0.3  && <0.7,
                        filepath             >=1.3  && <1.5,
                        hashable             >=1.2  && <1.3,
@@ -124,6 +125,7 @@ executable json-autotype
                        -- Data.Aeson.AutoType.Plugin.Loader
                        Data.Aeson.AutoType.Util
                        CommonCLI
+                       Paths_json_autotype
   other-extensions:    TemplateHaskell,
                        ScopedTypeVariables,
                        OverloadedStrings,
@@ -134,7 +136,7 @@ executable json-autotype
                        RecordWildCards
   build-depends:       base                 >=4.3  && <5,
                        GenericPretty        >=1.2  && <1.3,
-                       aeson                >=0.11.2  && <1.5,
+                       aeson                >=1.2.1  && <1.5,
                        bytestring           >=0.9  && <0.11,
                        containers           >=0.3  && <0.7,
                        filepath             >=1.3  && <1.5,
@@ -176,7 +178,7 @@ test-suite json-autotype-qc-test
                        RecordWildCards
   build-depends:       base                 >=4.3  && <5,
                        GenericPretty        >=1.2  && <1.3,
-                       aeson                >=0.11.2  && <1.5,
+                       aeson                >=1.2.1   && <1.5,
                        containers           >=0.3  && <0.7,
                        hashable             >=1.2  && <1.3,
                        lens                 >=4.1  && <4.18,
@@ -195,19 +197,7 @@ test-suite json-autotype-qc-test
 test-suite json-autotype-examples
   type:                exitcode-stdio-1.0
   main-is:             test/TestExamples.hs
-  other-modules:       Data.Aeson.AutoType.Util
-                       Data.Aeson.AutoType.CodeGen
-                       Data.Aeson.AutoType.CodeGen.Elm
-                       Data.Aeson.AutoType.CodeGen.ElmFormat
-                       Data.Aeson.AutoType.CodeGen.Haskell
-                       Data.Aeson.AutoType.CodeGen.HaskellFormat
-                       Data.Aeson.AutoType.Extract
-                       Data.Aeson.AutoType.Format
-                       Data.Aeson.AutoType.Pretty
-                       Data.Aeson.AutoType.Split
-                       Data.Aeson.AutoType.Test
-                       Data.Aeson.AutoType.Type
-                       CommonCLI
+  other-modules:       CommonCLI
   other-extensions:    TemplateHaskell,
                        ScopedTypeVariables,
                        OverloadedStrings,
@@ -218,7 +208,7 @@ test-suite json-autotype-examples
                        RecordWildCards
   build-depends:       base                 >=4.3  && <5,
                        GenericPretty        >=1.2  && <1.3,
-                       aeson                >=0.11.2  && <1.5,
+                       aeson                >=1.2.1 && <1.5,
                        containers           >=0.3  && <0.7,
                        directory            >=1.1  && <1.4,
                        filepath             >=1.3  && <1.5,
@@ -241,19 +231,7 @@ test-suite json-autotype-examples
 test-suite json-autotype-gen-test
   type:                exitcode-stdio-1.0
   main-is:             GenerateTestJSON.hs
-  other-modules:       Data.Aeson.AutoType.Util
-                       Data.Aeson.AutoType.Pretty
-                       Data.Aeson.AutoType.Type
-                       Data.Aeson.AutoType.Split
-                       Data.Aeson.AutoType.Extract
-                       Data.Aeson.AutoType.Format
-                       Data.Aeson.AutoType.CodeGen
-                       Data.Aeson.AutoType.CodeGen.Haskell
-                       Data.Aeson.AutoType.CodeGen.Elm
-                       Data.Aeson.AutoType.CodeGen.HaskellFormat
-                       Data.Aeson.AutoType.CodeGen.ElmFormat
-                       Data.Aeson.AutoType.Test
-                       CommonCLI
+  other-modules:       CommonCLI
   other-extensions:    TemplateHaskell,
                        ScopedTypeVariables,
                        OverloadedStrings,
@@ -264,7 +242,7 @@ test-suite json-autotype-gen-test
                        RecordWildCards
   build-depends:       base                 >=4.3  && <5,
                        GenericPretty        >=1.2  && <1.3,
-                       aeson                >=0.11.2  && <1.5,
+                       aeson                >=1.2.1  && <1.5,
                        bytestring           >=0.9  && <0.11,
                        containers           >=0.3  && <0.7,
                        directory            >=1.1  && <1.4,
@@ -281,6 +259,7 @@ test-suite json-autotype-gen-test
                        uniplate             >=1.6  && <1.7,
                        unordered-containers >=0.2  && <0.3,
                        vector               >=0.9  && <0.13,
-                       QuickCheck           >=2.4  && <3.0
+                       QuickCheck           >=2.4  && <3.0,
+                       json-autotype
   -- hs-source-dirs:
   default-language:    Haskell2010

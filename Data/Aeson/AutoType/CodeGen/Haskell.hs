@@ -50,9 +50,7 @@ header moduleName = Text.unlines [
   ,"import           Control.Applicative"
   ,"import           Data.Aeson.AutoType.Alternative"
   ,"import           Data.Aeson(decode, Value(..), FromJSON(..), ToJSON(..),"
-#if MIN_VERSION_aeson(0,11,0)
   ,"                            pairs,"
-#endif
   ,"                            (.:), (.:?), (.=), object)"
   ,"import           Data.Monoid"
   ,"import           Data.Text (Text)"

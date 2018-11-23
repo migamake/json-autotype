@@ -14,8 +14,6 @@ import Data.Aeson.Types ( Parser, parse )
 import Data.Text ( Text, pack )
 import Data.HashMap.Lazy ( singleton, empty )
 
---import CommonCLI
-
 runghc :: [String] -> IO ExitCode
 runghc = runModule Haskell
 -- runModule HaskellStrict -- for compiling with -Wall -Werror
@@ -48,10 +46,11 @@ main  = do
             <$> getRecursiveContents "examples"
   forM_ filenames $ \filename -> do
     let outputFilename = filename `replaceFileName` capitalize (takeBaseName filename <.> "hs")
-    genResult <- runghc ["GenerateJSONParser.hs", filename, "--outputFilename", outputFilename]
+    genResult <- runghc ["-idist/build/autogen",
+                         "GenerateJSONParser.hs", filename, "--outputFilename", outputFilename]
     unless (genResult == ExitSuccess) $
       fail (unwords ["test case", show filename, "failed with", show genResult])
-    parserResult <- runghc [outputFilename, filename]
+    parserResult <- runghc ["-Idist/build/autogen", outputFilename, filename]
     unless (parserResult == ExitSuccess) $
       fail (unwords ["generated parser", show outputFilename, "failed with", show parserResult])
 

@@ -1,5 +1,10 @@
 Changelog
 =========
+    2.0.2  Nov 2018
+        * Clean up the tests.
+        * Remove compatibility with Aeson versions earlier than 1.2.1.
+        * Removed all CPP macros
+
     2.0.1  Nov 2018
         * Better error reporting when parsing JSON.
 

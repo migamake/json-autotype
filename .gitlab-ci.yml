@@ -1,0 +1,90 @@
+image: migamake/haskell-build:8.6.2
+
+stages:
+  - build
+  - test
+  - release
+
+cache:
+  paths:
+    - /
+    - .cabal-sandbox
+
+.build_exe:
+  image: migamake/haskell-build:$GHC_VER
+  stage: build
+  script:
+    - cabal sandbox init
+    - cabal --version
+    - ghc   --version
+    - cabal update
+    - "sed --in-place 's/-- STATIC: //' json-autotype.cabal"
+    - cabal install --verbose --only-dependencies
+    - cabal test
+    - mkdir -p bin sdist
+    - cabal install --bindir=bin/
+    - cabal sdist   --builddir=sdist/
+    - cabal haddock --builddir hackage-docs --for-hackage
+
+build_8_6_2:
+  variables:
+    GHC_VER: 8.6.2
+  extends: .build_exe
+  artifacts:
+    paths:
+      - sdist/json-autotype-*[0-9].tar.gz
+      - hackage-docs/json-autotype-*-docs.tar.gz
+      - bin/json-autotype
+    expire_in: 2 weeks
+
+build_8_4_4:
+  variables:
+    GHC_VER: 8.4.4
+  extends: .build_exe
+
+build_8_2_2:
+  variables:
+    GHC_VER: 8.2.2
+  extends: .build_exe
+
+build_8_0_2:
+  variables:
+    GHC_VER: 8.0.2
+  extends: .build_exe
+  retry: 2
+  allow_failure: true
+
+build_7_10_3:
+  variables:
+    GHC_VER: 7.10.3
+  extends: .build_exe
+
+build_7_8_4:
+  variables:
+    GHC_VER: 7.8.4
+  extends: .build_exe
+
+test_distribution:
+  stage: test
+  script:
+    - cabal update
+    - mkdir -p bin
+    - cabal install sdist/json-autotype*[0-9].tar.gz --bindir=bin/
+    - tar xzf sdist/json-autotype*[0-9].tar.gz
+    - bin/json-autotype json-autotype-*/lib
+  dependencies:
+    - build_8_6_2
+  artifacts:
+    paths:
+      - bin/json-autotype
+
+release_to_hackage:
+  stage: release
+  script:
+    - cabal upload --username="$HACKAGE_USER" --password="$HACKAGE_PASSWORD" sdist/json-autotype-*[0-9].tar.gz
+    - cabal upload --username="$HACKAGE_USER" --password="$HACKAGE_PASSWORD" -d hackage-docs/json-autotype-*-docs.tar.gz
+  dependencies:
+    - build_8_6_2
+  when: manual
+  only:
+    - master

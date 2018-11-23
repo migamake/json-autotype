@@ -18,6 +18,7 @@ elm-stuff/
 GenerateJSONParser
 GenerateTestJSON
 dist/
+.hpc
 tags
 TAGS
 .tags*

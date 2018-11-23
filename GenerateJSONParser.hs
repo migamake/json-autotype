@@ -24,6 +24,7 @@ import qualified Data.Text.IO               as Text
 import qualified Data.Text.Encoding         as Text(decodeUtf8)
 import           Data.Text                      (Text)
 import           Text.PrettyPrint.GenericPretty (pretty)
+import           Data.Version(showVersion)
 
 import           Data.Aeson.AutoType.CodeGen
 import           Data.Aeson.AutoType.Extract
@@ -35,6 +36,7 @@ import qualified Data.Yaml as Yaml
 
 import           Options.Applicative
 import           CommonCLI
+import           Paths_json_autotype
 
 -- * Command line flags
 data Options = Options {
@@ -46,19 +48,26 @@ data Options = Options {
                , filenames :: [FilePath]
                }
 
+versionOption =
+  infoOption
+    (showVersion version)
+    (long "version" <> help "Show version")
+
 optParser :: Parser Options
 optParser  =
-    Options  <$> tyOptParser
-             <*> strOption (short 'o'             <>
-                            long "output"         <>
-                            long "outputFilename" <> value "")
-             <*> unflag    (short 'n'             <>
-                            long "no-typecheck"   <> help "Do not typecheck after unification")
-             <*> switch    (long  "yaml"          <> help "Parse inputs as YAML instead of JSON")
-             <*> switch    (short 'p'             <>
-                            long "preprocessor"   <>
-                              help "Work as GHC preprocessor (and skip preprocessor pragma)")
-             <*> some (argument str (metavar "FILES..."))
+    versionOption <*> (
+      Options  <$> tyOptParser
+               <*> strOption (short 'o'             <>
+                              long "output"         <>
+                              long "outputFilename" <> value "")
+               <*> unflag    (short 'n'             <>
+                              long "no-typecheck"   <> help "Do not typecheck after unification")
+               <*> switch    (long  "yaml"          <> help "Parse inputs as YAML instead of JSON")
+               <*> switch    (short 'p'             <>
+                              long "preprocessor"   <>
+                                help "Work as GHC preprocessor (and skip preprocessor pragma)")
+               <*> some (argument str (metavar "FILES..."))
+    )
 
 -- | Report an error to error output.
 report   :: Text -> IO ()

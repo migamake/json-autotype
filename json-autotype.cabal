@@ -151,6 +151,8 @@ executable json-autotype
                        vector               >=0.9  && <0.13,
                        yaml                 >=0.8  && <0.12
   default-language:    Haskell2010
+  -- STATIC: ld-options: -static
+  -- STATIC: ghc-options: -fPIC
 
 -- * Test suites
 -- Test suite with QuickCheck on random values,

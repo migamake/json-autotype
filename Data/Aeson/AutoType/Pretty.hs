@@ -38,7 +38,7 @@ instance (Out a) => Out (Vector a) where
 deriving instance Generic Value
 #endif
 
-instance Out Value      -- orphan instance
+instance Out Value
 
 instance (Out a) => Out (Set a) where
   doc     (Set.toList -> s) = "{" <+> doc s <+> "}"

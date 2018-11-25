@@ -2,7 +2,9 @@ version: 2
 jobs:
   build:
     docker:
-      - image: fpco/stack-build
+      - image: migamake/haskell-build
+    environment:
+      PATH: $HOME/.local/bin:$PATH
     steps:
       - checkout
       - run:

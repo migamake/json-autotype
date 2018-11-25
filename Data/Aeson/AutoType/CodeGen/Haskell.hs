@@ -35,29 +35,30 @@ defaultHaskellFilename :: FilePath
 defaultHaskellFilename = "JSONTypes.hs"
 
 header :: Text -> Text
-header moduleName = Text.unlines [
-   "{-# LANGUAGE TemplateHaskell     #-}"
-  ,"{-# LANGUAGE ScopedTypeVariables #-}"
-  ,"{-# LANGUAGE RecordWildCards     #-}"
-  ,"{-# LANGUAGE OverloadedStrings   #-}"
-  ,"{-# LANGUAGE TypeOperators       #-}"
-  ,"{-# LANGUAGE DeriveGeneric       #-}"
-  ,""
-  ,Text.concat ["module ", capitalize moduleName, " where"]
-  ,""
-  ,"import           System.Exit        (exitFailure, exitSuccess)"
-  ,"import           System.IO          (stderr, hPutStrLn)"
-  ,"import qualified Data.ByteString.Lazy.Char8 as BSL"
-  ,"import           System.Environment (getArgs)"
-  ,"import           Control.Monad      (forM_, mzero, join)"
-  ,"import           Control.Applicative"
-  ,"import           Data.Aeson.AutoType.Alternative"
-  ,"import           Data.Aeson(eitherDecode, Value(..), FromJSON(..), ToJSON(..),"
-  ,"                            pairs,"
-  ,"                            (.:), (.:?), (.=), object)"
-  ,"import           Data.Monoid((<>))"
-  ,"import           Data.Text (Text)"
-  ,"import qualified GHC.Generics"]
+header moduleName = [src|
+{-# LANGUAGE TemplateHaskell     #-}
+{-# LANGUAGE ScopedTypeVariables #-}
+{-# LANGUAGE RecordWildCards     #-}
+{-# LANGUAGE OverloadedStrings   #-}
+{-# LANGUAGE TypeOperators       #-}
+{-# LANGUAGE DeriveGeneric       #-}
+
+module |] <> capitalize moduleName <> [src| where
+
+import           System.Exit        (exitFailure, exitSuccess)
+import           System.IO          (stderr, hPutStrLn)
+import qualified Data.ByteString.Lazy.Char8 as BSL
+import           System.Environment (getArgs)
+import           Control.Monad      (forM_, mzero, join)
+import           Control.Applicative
+import           Data.Aeson.AutoType.Alternative
+import           Data.Aeson(eitherDecode, Value(..), FromJSON(..), ToJSON(..),
+                            pairs,
+                            (.:), (.:?), (.=), object)
+import           Data.Monoid((<>))
+import           Data.Text (Text)
+import qualified GHC.Generics
+|]
 
 epilogue :: Text -> Text
 epilogue toplevelName = [src|

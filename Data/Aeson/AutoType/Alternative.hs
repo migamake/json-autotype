@@ -34,6 +34,7 @@ fromEither (Right b) = AltRight b
 alt :: (a -> c) -> (b -> c) -> a :|: b -> c
 alt f _ (AltLeft  a) = f a
 alt _ g (AltRight b) = g b
+infixr 5 `alt`
 
 instance (ToJSON a, ToJSON b) => ToJSON (a :|: b) where
     toJSON (AltLeft  a) = toJSON a

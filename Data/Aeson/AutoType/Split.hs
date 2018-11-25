@@ -58,7 +58,8 @@ addType label typ = modify $ Map.insertWith (++) label [typ]
 
 splitTypeByLabel' :: Text -> Type -> TypeTreeM Type
 splitTypeByLabel' _  TString   = return TString
-splitTypeByLabel' _  TNum      = return TNum
+splitTypeByLabel' _  TInt      = return TInt
+splitTypeByLabel' _  TDouble   = return TDouble
 splitTypeByLabel' _  TBool     = return TBool
 splitTypeByLabel' _  TNull     = return TNull
 splitTypeByLabel' _ (TLabel r) = assert False $ return $ TLabel r -- unnecessary?

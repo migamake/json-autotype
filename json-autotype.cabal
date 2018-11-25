@@ -1,6 +1,6 @@
 -- Build information for the package.
 name:                json-autotype
-version:             2.0.2
+version:             3.0.0
 synopsis:            Automatic type declaration for JSON input data
 description:         Generates datatype declarations with Aeson's `FromJSON` instances
                      from a set of example ".json" files.
@@ -64,12 +64,8 @@ source-repository head
   location: https://github.com/mgajda/json-autotype.git
 
 library
-  exposed-modules:     Data.Aeson.AutoType.Type
-                       Data.Aeson.AutoType.Extract
-                       Data.Aeson.AutoType.Format
+  exposed-modules:     Data.Aeson.AutoType.Alternative
                        Data.Aeson.AutoType.Pretty
-                       Data.Aeson.AutoType.CodeGen
-                       Data.Aeson.AutoType.Alternative
                        -- Data.Aeson.AutoType.Plugin.Subtype
                        -- Data.Aeson.AutoType.Plugin.Loader
 
@@ -81,14 +77,6 @@ library
                        DeriveDataTypeable,
                        DeriveGeneric,
                        RecordWildCards
-  other-modules:
-                       -- internal module
-                       Data.Aeson.AutoType.Util
-                       Data.Aeson.AutoType.Split
-                       Data.Aeson.AutoType.CodeGen.Haskell
-                       Data.Aeson.AutoType.CodeGen.Elm
-                       Data.Aeson.AutoType.CodeGen.HaskellFormat
-                       Data.Aeson.AutoType.CodeGen.ElmFormat
   build-depends:       base                 >=4.3  && <5,
                        GenericPretty        >=1.2  && <1.3,
                        aeson                >=1.2.1 && <1.5,
@@ -116,6 +104,7 @@ executable json-autotype
                        Data.Aeson.AutoType.Pretty
                        Data.Aeson.AutoType.Split
                        Data.Aeson.AutoType.CodeGen
+                       Data.Aeson.AutoType.CodeGen.Generic
                        Data.Aeson.AutoType.CodeGen.Haskell
                        Data.Aeson.AutoType.CodeGen.Elm
                        Data.Aeson.AutoType.CodeGen.HaskellFormat
@@ -151,7 +140,8 @@ executable json-autotype
                        uniplate             >=1.6  && <1.7,
                        unordered-containers >=0.2  && <0.3,
                        vector               >=0.9  && <0.13,
-                       yaml                 >=0.8  && <0.12
+                       yaml                 >=0.8  && <0.12,
+                       template-haskell
   default-language:    Haskell2010
   -- STATIC: ld-options: -static
   -- STATIC: ghc-options: -fPIC
@@ -198,6 +188,19 @@ test-suite json-autotype-examples
   type:                exitcode-stdio-1.0
   main-is:             test/TestExamples.hs
   other-modules:       CommonCLI
+                       Data.Aeson.AutoType.CodeGen
+                       Data.Aeson.AutoType.CodeGen.Generic
+                       Data.Aeson.AutoType.CodeGen.Elm
+                       Data.Aeson.AutoType.CodeGen.ElmFormat
+                       Data.Aeson.AutoType.CodeGen.Haskell
+                       Data.Aeson.AutoType.CodeGen.HaskellFormat
+                       Data.Aeson.AutoType.Extract
+                       Data.Aeson.AutoType.Format
+                       Data.Aeson.AutoType.Pretty
+                       Data.Aeson.AutoType.Split
+                       Data.Aeson.AutoType.Type
+                       Data.Aeson.AutoType.Util
+
   other-extensions:    TemplateHaskell,
                        ScopedTypeVariables,
                        OverloadedStrings,
@@ -224,14 +227,29 @@ test-suite json-autotype-examples
                        unordered-containers >=0.2  && <0.3,
                        uniplate             >=1.6  && <1.7,
                        vector               >=0.9  && <0.13,
-                       QuickCheck           >=2.4  && <3.0
+                       QuickCheck           >=2.4  && <3.0,
+                       template-haskell
   default-language:    Haskell2010
 
 -- Test suite with Haskell code generation and compilation
 test-suite json-autotype-gen-test
   type:                exitcode-stdio-1.0
   main-is:             GenerateTestJSON.hs
-  other-modules:       CommonCLI
+  other-modules:        CommonCLI
+                       Data.Aeson.AutoType.CodeGen
+                       Data.Aeson.AutoType.CodeGen.Generic
+                       Data.Aeson.AutoType.CodeGen.Elm
+                       Data.Aeson.AutoType.CodeGen.ElmFormat
+                       Data.Aeson.AutoType.CodeGen.Haskell
+                       Data.Aeson.AutoType.CodeGen.HaskellFormat
+                       Data.Aeson.AutoType.Extract
+                       Data.Aeson.AutoType.Format
+                       Data.Aeson.AutoType.Pretty
+                       Data.Aeson.AutoType.Split
+                       Data.Aeson.AutoType.Test
+                       Data.Aeson.AutoType.Type
+                       Data.Aeson.AutoType.Util
+
   other-extensions:    TemplateHaskell,
                        ScopedTypeVariables,
                        OverloadedStrings,
@@ -260,6 +278,7 @@ test-suite json-autotype-gen-test
                        unordered-containers >=0.2  && <0.3,
                        vector               >=0.9  && <0.13,
                        QuickCheck           >=2.4  && <3.0,
+                       template-haskell,
                        json-autotype
   -- hs-source-dirs:
   default-language:    Haskell2010

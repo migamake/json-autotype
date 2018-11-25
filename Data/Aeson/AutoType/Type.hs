@@ -57,7 +57,8 @@ keys :: Dict -> Set Text
 keys = Set.fromList . Hash.keys . unDict
 
 -- | Union types for JSON values.
-data Type = TNull | TBool | TNum | TString |
+data Type = TNull | TBool | TString        |
+            TInt  | TDouble                |
             TUnion (Set      Type)         |
             TLabel  Text                   |
             TObj    Dict                   |
@@ -97,8 +98,9 @@ get key = Hash.lookupDefault TNull key . unDict
 typeSize           :: Type -> Int
 typeSize TNull      = 1
 typeSize TBool      = 1
-typeSize TNum       = 1
 typeSize TString    = 1
+typeSize TInt       = 1
+typeSize TDouble    = 1
 typeSize (TObj   o) = (1+) . sum     . map typeSize . Hash.elems . unDict $ o
 typeSize (TArray a) = 1 + typeSize a
 typeSize (TUnion u) = (1+) . sum . (0:) . map typeSize . Set.toList $ u

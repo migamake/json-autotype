@@ -58,13 +58,17 @@ valueDepth (String _) = 1
 valueDepth (Array  a) = (1+) . V.foldl' max 0 $ V.map valueDepth a
 valueDepth (Object o) = (1+) . maximum . (0:) . map valueDepth . Map.elems $ o
 
+-- | Check if a number is integral, or floating point
+isIntegral x = x == fromInteger (round x)
+
 -- | Extract @Type@ from the JSON @Value@.
 -- Unifying types of array elements, if necessary.
 extractType                             :: Value -> Type
 extractType (Object o)                   = TObj $ Dict $ Map.map extractType o
 extractType  Null                        = TNull
 extractType (Bool   _)                   = TBool
-extractType (Number _)                   = TNum
+extractType (Number n) | isIntegral n    = TInt
+extractType (Number _)                   = TDouble
 extractType (String _)                   = TString
 extractType (Array  a) | V.null a        = TArray   emptyType
 extractType (Array  a)                   = TArray $ V.foldl1' unifyTypes $ traceShow $ V.map extractType a
@@ -77,8 +81,9 @@ typeCheck :: Value -> Type -> Bool
 typeCheck  Null          TNull            = True
 typeCheck  v            (TUnion  u)       = typeCheck v `any` Set.toList u
 typeCheck (Bool   _)     TBool            = True
-typeCheck (Number _)     TNum             = True
 typeCheck (String _)     TString          = True
+typeCheck (Number n)     TInt             = isIntegral n
+typeCheck (Number _)     TDouble          = True
 typeCheck (Array  elts) (TArray  eltType) = (`typeCheck` eltType) `all` V.toList elts
 typeCheck (Object d)    (TObj    e      ) = typeCheckKey `all` keysOfBoth
   where
@@ -99,7 +104,10 @@ d `allKeys` e = Set.toList (keys d `Set.union` keys e)
 -- with inclusion of @Type@ unions.
 unifyTypes :: Type -> Type -> Type
 unifyTypes  TBool      TBool     = TBool
-unifyTypes  TNum       TNum      = TNum
+unifyTypes  TInt       TInt      = TInt
+unifyTypes  TDouble    TInt      = TDouble
+unifyTypes  TInt       TDouble   = TDouble
+unifyTypes  TDouble    TDouble   = TDouble
 unifyTypes  TString    TString   = TString
 unifyTypes  TNull      TNull     = TNull
 unifyTypes (TObj   d) (TObj   e) = TObj newDict

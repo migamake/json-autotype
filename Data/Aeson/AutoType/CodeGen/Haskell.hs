@@ -1,4 +1,6 @@
 {-# LANGUAGE CPP               #-}
+{-# LANGUAGE TemplateHaskell   #-}
+{-# LANGUAGE QuasiQuotes       #-}
 {-# LANGUAGE OverloadedStrings #-}
 -- | Wrappers for generating prologue and epilogue code in Haskell.
 module Data.Aeson.AutoType.CodeGen.Haskell(
@@ -23,6 +25,7 @@ import           System.Exit                    (ExitCode)
 
 import           Data.Aeson.AutoType.Format
 import           Data.Aeson.AutoType.Type
+import           Data.Aeson.AutoType.CodeGen.Generic(src)
 import           Data.Aeson.AutoType.CodeGen.HaskellFormat
 import           Data.Aeson.AutoType.Util
 
@@ -49,7 +52,7 @@ header moduleName = Text.unlines [
   ,"import           Control.Monad      (forM_, mzero, join)"
   ,"import           Control.Applicative"
   ,"import           Data.Aeson.AutoType.Alternative"
-  ,"import           Data.Aeson(decode, Value(..), FromJSON(..), ToJSON(..),"
+  ,"import           Data.Aeson(eitherDecode, Value(..), FromJSON(..), ToJSON(..),"
   ,"                            pairs,"
   ,"                            (.:), (.:?), (.=), object)"
   ,"import           Data.Monoid"
@@ -61,11 +64,13 @@ epilogue toplevelName = Text.unlines
   [""
   ,"parse :: FilePath -> IO " <> toplevelName
   ,"parse filename = do input <- BSL.readFile filename"
-  ,"                    case decode input of"
-  ,"                      Nothing -> fatal $ case (decode input :: Maybe Value) of"
-  ,"                                           Nothing -> \"Invalid JSON file: \"     ++ filename"
-  ,"                                           Just _  -> \"Mismatched JSON value from file: \" ++ filename"
-  ,"                      Just r  -> return (r :: " <> toplevelName <> ")"
+  ,"                    case eitherDecode input of"
+  ,"                      Left  err -> fatal $ case (eitherDecode input :: Either String Value) of"
+  ,"                                           Left  err -> \"Invalid JSON file: \" ++ filename"
+  ,"                                                     ++ \"\\n\" ++ err" 
+  ,"                                           Right _   -> \"Mismatched JSON value from file: \" ++ filename"
+  ,"                                                     ++ \"\\n\" ++ err"
+  ,"                      Right r   -> return (r :: " <> toplevelName <> ")"
   ,"  where"
   ,"    fatal :: String -> IO a"
   ,"    fatal msg = do hPutStrLn stderr msg"

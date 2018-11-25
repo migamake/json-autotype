@@ -171,7 +171,8 @@ escapeKeywords k                           = k
 -- the separate declarations on which this one is dependent.
 formatType :: Type -> DeclM Text
 formatType  TString                          = return "Text"
-formatType  TNum                             = return "Double"
+formatType  TInt                             = return "Int"
+formatType  TDouble                          = return "Double"
 formatType  TBool                            = return "Bool"
 formatType (TLabel l)                        = return $ normalizeTypeName l
 formatType (TUnion u)                        = wrap <$> case length nonNull of
@@ -211,7 +212,8 @@ addType label typ = modify $ Map.insertWith (++) label [typ]
 
 splitTypeByLabel' :: Text -> Type -> TypeTreeM Type
 splitTypeByLabel' _  TString   = return TString
-splitTypeByLabel' _  TNum      = return TNum
+splitTypeByLabel' _  TInt      = return TInt
+splitTypeByLabel' _  TDouble   = return TDouble
 splitTypeByLabel' _  TBool     = return TBool
 splitTypeByLabel' _  TNull     = return TNull
 splitTypeByLabel' _ (TLabel r) = assert False $ return $ TLabel r -- unnecessary?

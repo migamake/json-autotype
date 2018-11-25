@@ -94,7 +94,8 @@ makeDecoder identifier contents =
         , "(" <> getDecoder ty <> ")"] -- quote
 
 getDecoder  TString    = "Json.Decode.string"
-getDecoder  TNum       = "Json.Decode.float"
+getDecoder  TInt       = "Json.Decode.int"
+getDecoder  TDouble    = "Json.Decode.float"
 getDecoder  TBool      = "Json.Decode.bool"
 getDecoder (TArray  t) = "Json.Decode.list (" <> getDecoder t <> ")"
 getDecoder (TLabel  l) = decoderIdent l
@@ -142,7 +143,8 @@ makeEncoder identifier contents =
 
 getEncoder :: Type -> Text
 getEncoder  TString   = "Json.Encode.string"
-getEncoder  TNum      = "Json.Encode.float"
+getEncoder  TDouble   = "Json.Encode.float"
+getEncoder  TInt      = "Json.Encode.int"
 getEncoder  TBool     = "Json.Encode.bool"
 getEncoder  TNull     = "identity"
 getEncoder (TLabel l) = encoderIdent l
@@ -219,7 +221,8 @@ nonNullComponents = Set.toList . Set.filter (TNull /=)
 -- the separate declarations on which this one is dependent.
 formatType :: Type -> DeclM Text
 formatType  TString                          = return "String"
-formatType  TNum                             = return "Float"
+formatType  TDouble                          = return "Float"
+formatType  TInt                             = return "Int"
 formatType  TBool                            = return "Bool"
 formatType (TLabel l)                        = return $ normalizeTypeName l
 formatType (TUnion u)                        = wrap <$> case length nonNull of

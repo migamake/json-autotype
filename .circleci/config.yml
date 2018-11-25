@@ -2,7 +2,7 @@ version: 2
 jobs:
   build:
     docker:
-      - image: migamake/haskell-build
+      - image: migamake/haskell-build:8.6.2
     environment:
       PATH: $HOME/.local/bin:$PATH
     steps:

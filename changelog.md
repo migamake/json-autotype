@@ -3,6 +3,7 @@ Changelog
     3.0.0  Nov 2018
         * Distinguishing integers and floats.
         * Hide all API beside Alternative (as unused outside generator).
+        * Add fixity for alt (#20)
 
     2.0.2  Nov 2018
         * Clean up the tests.

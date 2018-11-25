@@ -10,6 +10,7 @@ import           Data.Aeson.AutoType.Extract
 import           Data.Aeson.AutoType.Test() -- Arbitrary instance for Value
 
 import           Test.QuickCheck
+--import           Test.QuickCheck.Parallel
 import           Test.SmallCheck
 --import           Test.QuickCheck.Arbitrary
 

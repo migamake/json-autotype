@@ -55,33 +55,32 @@ header moduleName = Text.unlines [
   ,"import           Data.Aeson(eitherDecode, Value(..), FromJSON(..), ToJSON(..),"
   ,"                            pairs,"
   ,"                            (.:), (.:?), (.=), object)"
-  ,"import           Data.Monoid"
+  ,"import           Data.Monoid((<>))"
   ,"import           Data.Text (Text)"
   ,"import qualified GHC.Generics"]
 
 epilogue :: Text -> Text
-epilogue toplevelName = Text.unlines
-  [""
-  ,"parse :: FilePath -> IO " <> toplevelName
-  ,"parse filename = do input <- BSL.readFile filename"
-  ,"                    case eitherDecode input of"
-  ,"                      Left  err -> fatal $ case (eitherDecode input :: Either String Value) of"
-  ,"                                           Left  err -> \"Invalid JSON file: \" ++ filename"
-  ,"                                                     ++ \"\\n\" ++ err" 
-  ,"                                           Right _   -> \"Mismatched JSON value from file: \" ++ filename"
-  ,"                                                     ++ \"\\n\" ++ err"
-  ,"                      Right r   -> return (r :: " <> toplevelName <> ")"
-  ,"  where"
-  ,"    fatal :: String -> IO a"
-  ,"    fatal msg = do hPutStrLn stderr msg"
-  ,"                   exitFailure"
-  ,""
-  ,"main :: IO ()"
-  ,"main = do"
-  ,"  filenames <- getArgs"
-  ,"  forM_ filenames (\\f -> parse f >>= (\\p -> p `seq` putStrLn $ \"Successfully parsed \" ++ f))"
-  ,"  exitSuccess"
-  ,""]
+epilogue toplevelName = [src|
+parse :: FilePath -> IO |] <> toplevelName <> [src|
+parse filename = do
+    input <- BSL.readFile filename
+    case eitherDecode input of
+      Left  err -> fatal $ case (eitherDecode input :: Either String Value) of
+                           Left  err -> "Invalid JSON file: " ++ filename ++ " ++ err"
+                           Right _   -> "Mismatched JSON value from file: " ++ filename
+                                     ++ "\n" ++ err
+      Right r   -> return (r :: |] <> toplevelName <> ")" <> [src|
+  where
+    fatal :: String -> IO a
+    fatal msg = do hPutStrLn stderr msg
+                   exitFailure
+
+main :: IO ()
+main = do
+  filenames <- getArgs
+  forM_ filenames (\f -> parse f >>= (\p -> p `seq` putStrLn $ "Successfully parsed " ++ f))
+  exitSuccess
+|]
 
 -- | Write a Haskell module to an output file, or stdout if `-` filename is given.
 writeHaskellModule :: FilePath -> Text -> Map.HashMap Text Type -> IO ()

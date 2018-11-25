@@ -8,6 +8,7 @@ import Data.List(isPrefixOf, isSuffixOf)
 import System.Directory(doesDirectoryExist, getDirectoryContents)
 import System.FilePath((</>), (<.>), takeBaseName, replaceFileName)
 import System.Exit(ExitCode(..))
+import System.Environment as Env
 import Data.Aeson.AutoType.CodeGen(runModule, Lang(Haskell))
 import Data.Aeson ( Result,  Object, FromJSON, Value(Null,Number), (.:?) )
 import Data.Aeson.Types ( Parser, parse )
@@ -46,8 +47,7 @@ main  = do
             <$> getRecursiveContents "examples"
   forM_ filenames $ \filename -> do
     let outputFilename = filename `replaceFileName` capitalize (takeBaseName filename <.> "hs")
-    genResult <- runghc ["-idist/build/autogen",
-                         "GenerateJSONParser.hs", filename, "--outputFilename", outputFilename]
+    genResult <- runghc ["json-autotype", filename, "--outputFilename", outputFilename]
     unless (genResult == ExitSuccess) $
       fail (unwords ["test case", show filename, "failed with", show genResult])
     parserResult <- runghc ["-Idist/build/autogen", outputFilename, filename]

@@ -21,7 +21,7 @@ import qualified Data.ByteString.Lazy.Char8 as BSL
 import qualified Data.HashMap.Strict        as Map
 import qualified Data.Set                   as Set
 import           Data.Monoid               ((<>))
-import           Data.Aeson                (Value(..), decode, encode, FromJSON(..), ToJSON(..))
+import           Data.Aeson                (Value(..), eitherDecode, encode, FromJSON(..), ToJSON(..))
 import           Data.Function             (on)
 import           Data.List
 import qualified Data.Text                  as Text
@@ -92,14 +92,17 @@ extractTypeFromJSONFile myTrace inputFilename =
         -- First we decode JSON input into Aeson's Value type
         do bs <- BSL.hGetContents hIn
            Text.hPutStrLn stderr $ "Processing " `Text.append` Text.pack (show inputFilename)
-           myTrace ("Decoded JSON: " ++ pretty (decode bs :: Maybe Value))
-           case decode bs of
-             Nothing -> do report $ "Cannot decode JSON input from " `Text.append` Text.pack (show inputFilename)
-                           return Nothing
-             Just v  -> do -- If decoding JSON was successful...
+           case eitherDecode bs of
+             Left  err -> do
+               report $ Text.concat ["Cannot decode JSON input from "
+                                    ,Text.pack (show inputFilename)
+                                    ,"\n"
+                                    , Text.pack err]
+               return Nothing
+             Right v   -> do -- If decoding JSON was successful...
                -- We extract type structure from the JSON value.
                let t        = extractType v
-               myTrace $ "Type: " ++ pretty t
+               --myTrace $ "Type: " ++ pretty t
                return $ Just t
 
 

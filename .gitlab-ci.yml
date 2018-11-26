@@ -19,7 +19,7 @@ cache:
     - ghc   --version
     - cabal update
     - "sed --in-place 's/-- STATIC: //' json-autotype.cabal"
-    - cabal install --verbose --only-dependencies --enable-tests
+    - cabal install --only-dependencies --enable-tests --enable-benchmarks
     - cabal test
     - mkdir -p bin sdist
     - cabal install --bindir=bin/

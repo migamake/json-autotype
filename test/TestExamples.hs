@@ -9,7 +9,7 @@ import System.Directory(doesDirectoryExist, getDirectoryContents)
 import System.FilePath((</>), (<.>), takeBaseName, replaceFileName)
 import System.Exit(ExitCode(..))
 import System.Environment as Env
-import System.Process           (rawSystem)
+import System.Process             (rawSystem)
 import Data.Aeson.AutoType.CodeGen(runModule, Lang(Haskell))
 import Data.Aeson ( Result,  Object, FromJSON, Value(Null,Number), (.:?) )
 import Data.Aeson.Types ( Parser, parse )
@@ -55,18 +55,21 @@ main  = do
 
 runAutotype :: [String] -> IO ExitCode
 runAutotype arguments = do
+    stackEnv <- doesDirectoryExist ".stack-work"
+    cabalEnv <- doesDirectoryExist "dist/build/autogen"
     maybeStack <- Env.lookupEnv "STACK_EXEC"
-    maybeCabal <- Env.lookupEnv "CABAL_SANDBOX_CONFIG"
     let (exec, args) | Just stackExec <- maybeStack = (stackExec, ["run","--"             ])
-                     | Just _         <- maybeCabal = ("cabal",   ["run","--"             ])
-                     | otherwise                    = ("runghc",  ["GenerateJSONParser.hs"])
+                     | stackEnv                     = ("stack",   ["run","--"             ])
+                     | cabalEnv                     = ("cabal",   ["run","--"             ])
+                     | otherwise                    = error "This test must be run either in Stack or Cabal environment."
+    putStrLn $ concat ["Running json-autotype with executable ", show exec, " and arguments ", show args]
     rawSystem exec $ args ++ arguments
 
 verifyAesonOperators :: IO ()
 verifyAesonOperators = do
   parseTest (singleton (pack "foo") (Number 1))
-  parseTest (singleton (pack "foo") Null)
-  parseTest (singleton (pack "bar") Null)
+  parseTest (singleton (pack "foo")  Null     )
+  parseTest (singleton (pack "bar")  Null     )
   parseTest empty
 
 (.:??) :: FromJSON a => Object -> Text -> Parser (Maybe a)

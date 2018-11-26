@@ -9,15 +9,13 @@ import System.Directory(doesDirectoryExist, getDirectoryContents)
 import System.FilePath((</>), (<.>), takeBaseName, replaceFileName)
 import System.Exit(ExitCode(..))
 import System.Environment as Env
+import System.Process           (rawSystem)
 import Data.Aeson.AutoType.CodeGen(runModule, Lang(Haskell))
 import Data.Aeson ( Result,  Object, FromJSON, Value(Null,Number), (.:?) )
 import Data.Aeson.Types ( Parser, parse )
 import Data.Text ( Text, pack )
 import Data.HashMap.Lazy ( singleton, empty )
 
-runghc :: [String] -> IO ExitCode
-runghc = runModule Haskell
--- runModule HaskellStrict -- for compiling with -Wall -Werror
 
 -- |  <http://book.realworldhaskell.org/read/io-case-study-a-library-for-searching-the-filesystem.html>
 getRecursiveContents :: FilePath -> IO [FilePath]
@@ -47,15 +45,22 @@ main  = do
             <$> getRecursiveContents "examples"
   forM_ filenames $ \filename -> do
     let outputFilename = filename `replaceFileName` capitalize (takeBaseName filename <.> "hs")
-    genResult <- runghc ["json-autotype", filename, "--outputFilename", outputFilename]
+    genResult <- runAutotype [filename, "--outputFilename", outputFilename]
     unless (genResult == ExitSuccess) $
       fail (unwords ["test case", show filename, "failed with", show genResult])
-    parserResult <- runghc ["-Idist/build/autogen", outputFilename, filename]
+    parserResult <- runModule Haskell [outputFilename, filename]
+    --            ^ runModule HaskellStrict -- for compiling with -Wall -Werror
     unless (parserResult == ExitSuccess) $
       fail (unwords ["generated parser", show outputFilename, "failed with", show parserResult])
 
--- Verify that aeson's (.:?) operator has the same semantics as our (.:??).
--- See https://github.com/bos/aeson/issues/287 for details.
+runAutotype :: [String] -> IO ExitCode
+runAutotype arguments = do
+    maybeStack <- Env.lookupEnv "STACK_EXEC"
+    maybeCabal <- Env.lookupEnv "CABAL_SANDBOX_CONFIG"
+    let (exec, args) | Just stackExec <- maybeStack = (stackExec, ["run","--"             ])
+                     | Just _         <- maybeCabal = ("cabal",   ["run","--"             ])
+                     | otherwise                    = ("runghc",  ["GenerateJSONParser.hs"])
+    rawSystem exec $ args ++ arguments
 
 verifyAesonOperators :: IO ()
 verifyAesonOperators = do

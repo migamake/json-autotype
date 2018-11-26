@@ -109,7 +109,7 @@ runHaskellModule arguments = do
                    | Just _         <- maybeCabal = ["cabal",   "exec", "--"]
                    | otherwise                    = []
     system $ Prelude.unwords $ execPrefix ++ ["runghc"] ++ arguments
-
+-- Add: -i`stack path --dist-dir`/build/autogen
 runHaskellModuleStrict :: [String] -> IO ExitCode
 runHaskellModuleStrict  = runHaskellModule . ("-Wall":) . ("-Werror":)
 

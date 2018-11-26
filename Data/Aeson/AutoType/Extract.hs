@@ -17,6 +17,7 @@ import           Data.Aeson
 import           Data.Text                       (Text)
 import           Data.Set                        (Set )
 import           Data.List                       (foldl1')
+import           Data.Scientific                 (isInteger)
 
 --import           Debug.Trace
 
@@ -59,19 +60,17 @@ valueDepth (Array  a) = (1+) . V.foldl' max 0 $ V.map valueDepth a
 valueDepth (Object o) = (1+) . maximum . (0:) . map valueDepth . Map.elems $ o
 
 -- | Check if a number is integral, or floating point
-isIntegral x = x == fromInteger (round x)
-
 -- | Extract @Type@ from the JSON @Value@.
 -- Unifying types of array elements, if necessary.
-extractType                             :: Value -> Type
-extractType (Object o)                   = TObj $ Dict $ Map.map extractType o
-extractType  Null                        = TNull
-extractType (Bool   _)                   = TBool
-extractType (Number n) | isIntegral n    = TInt
-extractType (Number _)                   = TDouble
-extractType (String _)                   = TString
-extractType (Array  a) | V.null a        = TArray   emptyType
-extractType (Array  a)                   = TArray $ V.foldl1' unifyTypes $ traceShow $ V.map extractType a
+extractType                            :: Value -> Type
+extractType (Object o)                  = TObj $ Dict $ Map.map extractType o
+extractType  Null                       = TNull
+extractType (Bool   _)                  = TBool
+extractType (Number n) | isInteger n    = TInt
+extractType (Number _)                  = TDouble
+extractType (String _)                  = TString
+extractType (Array  a) | V.null a       = TArray   emptyType
+extractType (Array  a)                  = TArray $ V.foldl1' unifyTypes $ traceShow $ V.map extractType a
   where
     --traceShow a = trace (show a) a
     traceShow = id
@@ -82,7 +81,7 @@ typeCheck  Null          TNull            = True
 typeCheck  v            (TUnion  u)       = typeCheck v `any` Set.toList u
 typeCheck (Bool   _)     TBool            = True
 typeCheck (String _)     TString          = True
-typeCheck (Number n)     TInt             = isIntegral n
+typeCheck (Number n)     TInt             = isInteger n
 typeCheck (Number _)     TDouble          = True
 typeCheck (Array  elts) (TArray  eltType) = (`typeCheck` eltType) `all` V.toList elts
 typeCheck (Object d)    (TObj    e      ) = typeCheckKey `all` keysOfBoth

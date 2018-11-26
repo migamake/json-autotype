@@ -83,7 +83,6 @@ stack_build:
   stage: build
   script:
     - stack --version
-    - "sed --in-place 's/-- STATIC: //' json-autotype.cabal"
     - stack setup
     - stack build
     - stack test

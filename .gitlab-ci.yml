@@ -87,6 +87,7 @@ stack_build:
     - stack setup
     - stack build
     - stack test
+  allow_failure: true
 
 release_to_hackage:
   stage: release

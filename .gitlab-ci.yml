@@ -7,7 +7,7 @@ stages:
 
 cache:
   paths:
-    - /
+    - .stack-work
     - .cabal-sandbox
 
 .build_exe:

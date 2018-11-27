@@ -36,7 +36,7 @@ maintainer:          simons@cryp.to
 copyright:           Copyright by Michal J. Gajda '2014-'2018
 category:            Data, Tools
 build-type:          Simple
-extra-source-files:  README.md changelog.md examples/union.json examples/color.json
+extra-source-files:  README.md changelog.md examples/union.json examples/colors.json
 cabal-version:       >=1.10
 bug-reports:         https://github.com/mgajda/json-autotype/issues
 tested-with:         GHC==7.6.1

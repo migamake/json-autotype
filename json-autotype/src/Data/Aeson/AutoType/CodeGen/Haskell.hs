@@ -105,10 +105,11 @@ runHaskellModule :: [String] -> IO ExitCode
 runHaskellModule arguments = do
     maybeStack <- System.Environment.lookupEnv "STACK_EXEC"
     maybeCabal <- System.Environment.lookupEnv "CABAL_SANDBOX_CONFIG"
-    let execPrefix | Just stackExec <- maybeStack = [stackExec, "exec", "--"]
-                   | Just _         <- maybeCabal = ["cabal",   "exec", "--"]
-                   | otherwise                    = []
-    system $ Prelude.unwords $ execPrefix ++ ["runghc"] ++ arguments
+    let execPrefix | Just stackExec <- maybeStack = [stackExec, "runghc"]
+                   | Just _         <- maybeCabal = ["cabal",   "exec", "runghc"]
+                   | otherwise                    = ["runghc"]
+    print $ execPrefix ++ arguments
+    system $ Prelude.unwords $ execPrefix ++ arguments
 -- Add: -i`stack path --dist-dir`/build/autogen
 runHaskellModuleStrict :: [String] -> IO ExitCode
 runHaskellModuleStrict  = runHaskellModule . ("-Wall":) . ("-Werror":)

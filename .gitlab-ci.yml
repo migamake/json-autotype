@@ -79,7 +79,7 @@ test_distribution:
     - cabal install sdist/json-alt*[0-9].tar.gz --bindir=bin/
     - cabal install sdist/json-autotype*[0-9].tar.gz --bindir=bin/
     - tar xzf sdist/json-autotype*[0-9].tar.gz
-    - bin/json-autotype json-autotype-*/examples/*.json
+    - bin/json-autotype --output parseExamples.hs json-autotype-*/examples/*.json
   dependencies:
     - build_8_6_2
   artifacts:

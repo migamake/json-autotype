@@ -5,6 +5,7 @@ Changelog
         * Hide all API beside Alternative (as unused outside generator).
         * Add fixity for alt (#20)
         * Use `eitherDecode` instead of `decode` to get better error messages.
+        * Split Data.Aeson.AutoType.Alternative to `json-alt`.
 
     2.0.2  Nov 2018
         * Clean up the tests.

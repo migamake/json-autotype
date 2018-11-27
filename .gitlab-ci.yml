@@ -18,13 +18,18 @@ cache:
     - cabal --version
     - ghc   --version
     - cabal update
+    - cd json-alt
+    - cabal install
+    - cabal sdist   --builddir=../sdist/
+    - cabal haddock --builddir=../hackage-docs/ --for-hackage
+    - cd ../json-autotype
     - "sed --in-place 's/-- STATIC: //' json-autotype.cabal"
     - cabal install --only-dependencies --enable-tests --enable-benchmarks
     - cabal test
     - mkdir -p bin sdist
-    - cabal install --bindir=bin/
-    - cabal sdist   --builddir=sdist/
-    - cabal haddock --builddir hackage-docs --for-hackage
+    - cabal install --bindir=../bin/
+    - cabal sdist   --builddir=../sdist/
+    - cabal haddock --builddir=../hackage-docs --for-hackage
 
 build_8_6_2:
   variables:
@@ -32,6 +37,8 @@ build_8_6_2:
   extends: .build_exe
   artifacts:
     paths:
+      - sdist/json-alt-*[0-9].tar.gz
+      - hackage-docs/json-alt-*-docs.tar.gz
       - sdist/json-autotype-*[0-9].tar.gz
       - hackage-docs/json-autotype-*-docs.tar.gz
       - bin/json-autotype
@@ -76,7 +83,7 @@ test_distribution:
     - build_8_6_2
   artifacts:
     paths:
-      - bin/json-autotype
+      - json-autotype/bin/json-autotype
 
 stack_build:
   image: migamake/haskell-build:8.6.2
@@ -88,9 +95,20 @@ stack_build:
     - stack test
   allow_failure: true
 
+pier_build:
+  image: migamake/haskell-build:8.6.2
+  stage: build
+  script:
+    - pier --version
+    - pier build
+    - pier test
+  allow_failure: true
+
 release_to_hackage:
   stage: release
   script:
+    - cabal upload --username="$HACKAGE_USER" --password="$HACKAGE_PASSWORD" sdist/json-alt-*[0-9].tar.gz
+    - cabal upload --username="$HACKAGE_USER" --password="$HACKAGE_PASSWORD" -d hackage-docs/json-alt-*-docs.tar.gz
     - cabal upload --username="$HACKAGE_USER" --password="$HACKAGE_PASSWORD" sdist/json-autotype-*[0-9].tar.gz
     - cabal upload --username="$HACKAGE_USER" --password="$HACKAGE_PASSWORD" -d hackage-docs/json-autotype-*-docs.tar.gz
   dependencies:

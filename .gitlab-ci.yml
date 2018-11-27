@@ -76,6 +76,7 @@ test_distribution:
   script:
     - cabal update
     - mkdir -p bin
+    - cabal install sdist/json-alt*[0-9].tar.gz --bindir=bin/
     - cabal install sdist/json-autotype*[0-9].tar.gz --bindir=bin/
     - tar xzf sdist/json-autotype*[0-9].tar.gz
     - bin/json-autotype json-autotype-*/examples/*.json

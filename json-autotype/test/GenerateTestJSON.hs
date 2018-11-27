@@ -12,8 +12,8 @@ import           Control.Monad.State        as State
 import           Data.Maybe
 import           System.Exit
 import           System.IO                 (stdin, stderr, stdout, IOMode(..))
-import           System.FilePath           (splitExtension, (<.>))
-import           System.Directory          (removeFile)
+import           System.FilePath           (splitExtension, (<.>), (</>))
+import           System.Directory          (removeFile, createDirectoryIfMissing)
 import           System.Process            (system)
 import           Control.Monad             (forM_, forM, when)
 import           Control.Exception         (assert)
@@ -43,19 +43,6 @@ import           Data.Aeson.AutoType.Util
 import           Options.Applicative
 
 import           CommonCLI
-
--- * Command line flags
---defineFlag "z:size"            (10     :: Int)        "Size of generated elements"
---defineFlag "s:stem"            ("Test" :: FilePath)   "Test filename stem"
---defineFlag "c:count"           (100    :: Int)        "Number of test cases to generate."
---defineFlag "o:outputFilename"   defaultOutputFilename "Write output to the given file"
---flags_suggest = True
---defineFlag "suggest"            True                  "Suggest candidates for unification"
---defineFlag "autounify"          True                  "Automatically unify suggested candidates"
---defineFlag "t:test"             True                  "Try to run generated parser after"
---defineFlag "d:debug"            False                 "Set this flag to see more debugging info"
---defineFlag "keep"               False                 "Keep also the successful tests"
---defineFlag "fakeFlag"           True                  "Ignore this flag - it doesn't exist!!! It is workaround for a library problem."
 
 data Options = Options {
                  tyOpts    :: TypeOpts
@@ -145,6 +132,7 @@ instance Ord Value where
 generateTestJSONs :: Options -> IO ()
 generateTestJSONs Options {tyOpts=TyOptions {..},
                            ..}= do
+    createDirectoryIfMissing True "output"
     testValues :: [Value] <- generate $
                                resize size $
                                  vectorWithoutDuplicates 100 arbitraryTopValue
@@ -186,7 +174,7 @@ generateTestJSONs Options {tyOpts=TyOptions {..},
                " JSON files, out of planned " ++ show count  ++ " cases."
   where
     makeInputFilename  = (<.>".json") . (stem ++) . show
-    makeOutputFilename = (<.>".hs")   . (stem ++) . show
+    makeOutputFilename = ("output"</>) . (<.>".hs")   . (stem ++) . show
     inputFilenames     = map makeInputFilename  [1..count]
     outputFilenames    = map makeOutputFilename [1..count]
     myTrace :: String -> IO ()

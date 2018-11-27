@@ -18,6 +18,7 @@ elm-stuff/
 GenerateJSONParser
 GenerateTestJSON
 dist/
+output/
 .hpc
 tags
 TAGS
@@ -42,4 +43,3 @@ GenerateJSONTest
 GenerateJSONParser
 /.*.environment.*
 /dist-newstyle/*
-_pier

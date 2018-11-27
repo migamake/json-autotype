@@ -5,7 +5,7 @@ import Control.Monad(forM, forM_, unless, join)
 import Data.Char(toUpper)
 import Data.Functor ((<$>))
 import Data.List(isPrefixOf, isSuffixOf)
-import System.Directory(doesDirectoryExist, getDirectoryContents)
+import System.Directory(doesDirectoryExist, getDirectoryContents, createDirectoryIfMissing)
 import System.FilePath((</>), (<.>), takeBaseName, replaceFileName)
 import System.Exit(ExitCode(..))
 import System.Environment as Env
@@ -43,8 +43,9 @@ main  = do
   verifyAesonOperators
   filenames <-  filter (isSuffixOf ".json")
             <$> getRecursiveContents "examples"
+  createDirectoryIfMissing True "output"
   forM_ filenames $ \filename -> do
-    let outputFilename = filename `replaceFileName` capitalize (takeBaseName filename <.> "hs")
+    let outputFilename = ("output" </> capitalize (takeBaseName filename <.> "hs"))
     genResult <- runAutotype [filename, "--outputFilename", outputFilename]
     unless (genResult == ExitSuccess) $
       fail (unwords ["test case", show filename, "failed with", show genResult])

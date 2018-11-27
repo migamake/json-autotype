@@ -1,0 +1,5 @@
+.cabal-sandbox
+cabal.sandbox.config
+.hpc
+.stack-work
+_pier

@@ -99,7 +99,6 @@ pier_build:
   image: migamake/haskell-build:8.6.2
   stage: build
   script:
-    - pier --version
     - pier build
     - pier test
   allow_failure: true

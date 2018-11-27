@@ -36,7 +36,7 @@ jenkins.hs
 twitterapi.hs
 youtube.hs
 Test*.json
-Test*.hs
+Test[0-9]*.hs
 TestQC
 GenerateJSONTest
 GenerateJSONParser

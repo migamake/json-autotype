@@ -100,8 +100,8 @@ pier_build:
   image: migamake/haskell-build:8.6.2
   stage: build
   script:
-    - pier build
-    - pier test
+    - pier build --no-shared-cache
+    - pier test  --sandbox
   allow_failure: true
 
 release_to_hackage:

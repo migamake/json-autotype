@@ -90,6 +90,7 @@ stack_build:
   image: migamake/haskell-build:8.6.2
   stage: build
   script:
+    - echo "$CI_ENVIRONMENT_SLUG"
     - stack --version
     - stack setup
     - stack build
@@ -111,6 +112,9 @@ release_to_hackage:
     - cabal upload --username="$HACKAGE_USER" --password="$HACKAGE_PASSWORD" -d hackage-docs/json-alt-*-docs.tar.gz
     - cabal upload --username="$HACKAGE_USER" --password="$HACKAGE_PASSWORD" sdist/json-autotype-*[0-9].tar.gz
     - cabal upload --username="$HACKAGE_USER" --password="$HACKAGE_PASSWORD" -d hackage-docs/json-autotype-*-docs.tar.gz
+  environment:
+    name: release
+    url:  https://hackage.haskell.org/package/json-autotype
   dependencies:
     - build_8_6_2
   when: manual

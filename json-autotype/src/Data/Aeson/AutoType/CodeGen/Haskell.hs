@@ -108,7 +108,7 @@ runHaskellModule arguments = do
     let execPrefix | Just stackExec <- maybeStack = [stackExec, "runghc"]
                    | Just _         <- maybeCabal = ["cabal",   "exec", "runghc"]
                    | otherwise                    = ["runghc"]
-    print $ execPrefix ++ arguments
+    putStrLn $ "Running Haskell module: " ++ show execPrefix ++ show arguments
     system $ Prelude.unwords $ execPrefix ++ arguments
 -- Add: -i`stack path --dist-dir`/build/autogen
 runHaskellModuleStrict :: [String] -> IO ExitCode

@@ -94,7 +94,7 @@ stack_build:
     - stack --version
     - stack setup
     - stack build
-    - stack test
+    - stack test --verbose
   allow_failure: true
 
 pier_build:

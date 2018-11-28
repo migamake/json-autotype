@@ -56,8 +56,8 @@ main  = do
 
 runAutotype :: [String] -> IO ExitCode
 runAutotype arguments = do
-    stackEnv <- doesDirectoryExist ".stack-work"
-    cabalEnv <- doesDirectoryExist "dist/build/autogen"
+    stackEnv   <- doesDirectoryExist ".stack-work"
+    cabalEnv   <- doesDirectoryExist "dist/build/autogen"
     maybeStack <- Env.lookupEnv "STACK_EXEC"
     let (exec, args) | Just stackExec <- maybeStack = (stackExec, ["run","--"             ])
                      | stackEnv                     = ("stack",   ["run","--"             ])

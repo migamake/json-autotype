@@ -65,11 +65,6 @@ source-repository head
 
 library
   exposed-modules:     Data.Aeson.AutoType.CodeGen
-                       Data.Aeson.AutoType.CodeGen.Generic
-                       Data.Aeson.AutoType.CodeGen.Haskell
-                       Data.Aeson.AutoType.CodeGen.Elm
-                       Data.Aeson.AutoType.CodeGen.HaskellFormat
-                       Data.Aeson.AutoType.CodeGen.ElmFormat
                        Data.Aeson.AutoType.Extract
                        Data.Aeson.AutoType.Format
                        Data.Aeson.AutoType.Pretty
@@ -77,6 +72,11 @@ library
                        Data.Aeson.AutoType.Type
                        Data.Aeson.AutoType.Test
                        Data.Aeson.AutoType.Util
+  other-modules:       Data.Aeson.AutoType.CodeGen.Generic
+                       Data.Aeson.AutoType.CodeGen.Haskell
+                       Data.Aeson.AutoType.CodeGen.Elm
+                       Data.Aeson.AutoType.CodeGen.HaskellFormat
+                       Data.Aeson.AutoType.CodeGen.ElmFormat
   hs-source-dirs:      src
 
   other-extensions:    TemplateHaskell,

@@ -105,6 +105,7 @@ runHaskellModule :: [String] -> IO ExitCode
 runHaskellModule arguments = do
     maybeStack <- System.Environment.lookupEnv "STACK_EXEC"
     maybeCabal <- System.Environment.lookupEnv "CABAL_SANDBOX_CONFIG"
+    putStrLn $ concat ["STACK_EXEC=", show maybeStack, " CABAL_SANDBOX_CONFIG=", show maybeCabal]
     let execPrefix | Just stackExec <- maybeStack = [stackExec, "runghc"]
                    | Just _         <- maybeCabal = ["cabal",   "exec", "runghc"]
                    | otherwise                    = ["runghc"]

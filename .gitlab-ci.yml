@@ -103,7 +103,7 @@ pier_build:
   script:
     - mkdir pier; ln -s .pier ~/.pier
     - pier build --no-shared-cache
-    - pier test  --sandbox
+    - pier test  --no-shared-cache --sandbox
   allow_failure: true
 
 release_to_hackage:

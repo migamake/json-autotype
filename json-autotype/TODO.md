@@ -12,6 +12,7 @@ FEATURES TO ADD IN THE FUTURE:
     * OCaml code
     * Java
     * Swift?
+    * Emacs Lisp? https://github.com/SavchenkoValeriy/jeison
 4. Import type from JSON schema.
 5. Add plugins for user type detection:
     * Date/datetimes

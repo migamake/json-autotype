@@ -1,7 +1,7 @@
 Changelog
 =========
     3.0.1  Sep 2019
-        * Relax `lens` version bounds for GHC 8.8.1 update.
+        * Relax `lens`, `hashable` version bounds for GHC 8.8.1 update.
 
     3.0.0  Nov 2018
         * Distinguishing integers and floats.

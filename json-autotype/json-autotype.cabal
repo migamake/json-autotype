@@ -1,6 +1,6 @@
 -- Build information for the package.
 name:                json-autotype
-version:             3.0.0
+version:             3.0.1
 synopsis:            Automatic type declaration for JSON input data
 description:         Generates datatype declarations with Aeson's `FromJSON` instances
                      from a set of example ".json" files.
@@ -33,7 +33,7 @@ stability:           stable
 author:              Michal J. Gajda
 maintainer:          simons@cryp.to
                      mjgajda@gmail.com
-copyright:           Copyright by Michal J. Gajda '2014-'2018
+copyright:           Copyright by Michal J. Gajda '2014-'2019
 category:            Data, Tools
 build-type:          Simple
 extra-source-files:  README.md changelog.md examples/union.json examples/colors.json
@@ -57,6 +57,7 @@ tested-with:         GHC==7.6.1
                    , GHC==8.4.4
                    , GHC==8.6.2
                    , GHC==8.6.1
+                   , GHC==8.8.1
 
 source-repository head
   type:     git

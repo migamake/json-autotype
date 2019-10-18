@@ -141,7 +141,7 @@ newDecl identifier kvs = do attrs <- forM kvs $ \(k, v) -> do
     fieldDecls attrList = Text.intercalate ",\n" $ map fieldDecl attrList
     fieldDecl :: (Text, Text, Text, Bool) -> Text
     fieldDecl (_jsonName, haskellName, fType, _nullable) = Text.concat [
-                                                             "    ", haskellName, " :: ", fType]
+                                                             "    ", (escapeKeywords haskellName), " :: ", fType]
 
 addDecl decl = decls %%= (\ds -> ((), decl:ds))
 
@@ -161,7 +161,7 @@ normalizeFieldName identifier = escapeKeywords             .
                                 normalizeTypeName
 
 keywords ::  Set Text
-keywords = Set.fromList ["type", "data", "module", "class", "where", "let", "do"]
+keywords = Set.fromList ["kind", "type", "data", "module", "class", "where", "let", "do"]
 
 escapeKeywords ::  Text -> Text
 escapeKeywords k | k `Set.member` keywords = k `Text.append` "_"

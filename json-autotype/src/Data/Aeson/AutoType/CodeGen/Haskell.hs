@@ -68,11 +68,11 @@ parse :: FilePath -> IO |] <> toplevelName <> [src|
 parse filename = do
     input <- BSL.readFile filename
     case eitherDecode input of
-      Left  err -> fatal $ case (eitherDecode input :: Either String Value) of
-                           Left  err -> "Invalid JSON file: " ++ filename ++ " ++ err"
+      Left errTop -> fatal $ case (eitherDecode input :: Either String Value) of
+                           Left  err -> "Invalid JSON file: " ++ filename ++ "\n   " ++ err
                            Right _   -> "Mismatched JSON value from file: " ++ filename
-                                     ++ "\n" ++ err
-      Right r   -> return (r :: |] <> toplevelName <> ")" <> [src|
+                                     ++ "\n" ++ errTop
+      Right r     -> return (r :: |] <> toplevelName <> ")" <> [src|
   where
     fatal :: String -> IO a
     fatal msg = do hPutStrLn stderr msg

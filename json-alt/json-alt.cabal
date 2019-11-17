@@ -6,21 +6,21 @@ description:         Parsing JSON with Aeson often requires decoding fields
                      that have more than one Haskell type.
                      .
                      So we have:
-                     ```
-                     data a :|: b = AltLeft a
-                                  | AltLeft b
-
-                     printIt = print . (fromJSON :: ByteString -> Int :|: Bool)
-                     main = do
-                       printIt "1"    -- AltLeft 1
-                       printIt "true" -- AltRight True
-                       printIt "null" -- errors!
-                     ```
+                     .
+                     > data a :|: b = AltLeft a
+                     >              | AltRight b
+                     >
+                     > printIt = print . (fromJSON :: ByteString -> Int :|: Bool)
+                     > main = do
+                     >   printIt "1"    -- AltLeft 1
+                     >   printIt "true" -- AltRight True
+                     >   printIt "null" -- errors!
+                     .
                      To generate types for larger JSON documents,
-                     you might use `json-autotype`.
+                     you might use @json-autotype@.
                      .
                      This is separate package so that users
-                     do not have to keep `json-autotype` as runtime
+                     do not have to keep @json-autotype@ as runtime
                      dependency.
                      .
                      See <https://github.com/mgajda/json-autotype>

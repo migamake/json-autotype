@@ -63,7 +63,7 @@ writeElmModule outputFilename toplevelName types =
          else outputFilename
     normalizeTypeName' = Text.unpack . normalizeTypeName . Text.pack
 
-runElmModule :: [String] -> IO ExitCode
-runElmModule arguments = do
+runElmModule :: FilePath -> [String] -> IO ExitCode
+runElmModule elmModule _arguments = do
     hPutStrLn stderr "Compiling *not* running Elm module for a test."
-    system $ Prelude.unwords $ ["elm", "make", Prelude.head arguments] -- ignore parsing args
+    system $ Prelude.unwords $ ["elm", "make", elmModule] -- ignore parsing args

@@ -40,6 +40,7 @@ capitalize (s:ss) = toUpper s:ss
 
 main :: IO ()
 main  = do
+  putStrLn "****************************************"
   verifyAesonOperators
   filenames <-  filter (isSuffixOf ".json")
             <$> getRecursiveContents "examples"
@@ -49,7 +50,7 @@ main  = do
     genResult <- runAutotype [filename, "--outputFilename", outputFilename]
     unless (genResult == ExitSuccess) $
       fail (unwords ["test case", show filename, "failed with", show genResult])
-    parserResult <- runModule Haskell [outputFilename, filename]
+    parserResult <- runModule Haskell outputFilename [filename]
     --            ^ runModule HaskellStrict -- for compiling with -Wall -Werror
     unless (parserResult == ExitSuccess) $
       fail (unwords ["generated parser", show outputFilename, "failed with", show parserResult])

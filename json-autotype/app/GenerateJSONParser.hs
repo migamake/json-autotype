@@ -169,7 +169,7 @@ generateHaskellFromJSONs opts@Options { tyOpts=TyOptions { toplevel
     -- We start by writing module header
     writeModule lang outputFilename toplevelName unified
     when test $
-      exitWith =<< runModule lang (outputFilename:passedTypeCheck)
+      exitWith =<< runModule lang outputFilename passedTypeCheck
   where
     -- | Works like @Debug.trace@ when the --debug flag is enabled, and does nothing otherwise.
     myTrace :: String -> IO ()

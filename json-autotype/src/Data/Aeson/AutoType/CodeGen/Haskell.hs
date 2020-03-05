@@ -16,6 +16,7 @@ import           Data.Text hiding (unwords)
 import qualified Data.HashMap.Strict as Map
 import           Control.Arrow               (first)
 import           Control.Exception (assert)
+import           Data.Default                (def)
 import           Data.Monoid                 ((<>))
 import           System.FilePath
 import           System.IO
@@ -28,6 +29,8 @@ import           Data.Aeson.AutoType.Type
 import           Data.Aeson.AutoType.CodeGen.Generic(src)
 import           Data.Aeson.AutoType.CodeGen.HaskellFormat
 import           Data.Aeson.AutoType.Util
+
+import qualified RunHaskellModule as Run
 
 -- | Default output filname is used, when there is no explicit output file path, or it is "-" (stdout).
 -- Default module name is consistent with it.
@@ -103,17 +106,11 @@ writeHaskellModule outputFilename toplevelName types =
          else outputFilename
     normalizeTypeName' = Text.unpack . normalizeTypeName . Text.pack
 
-runHaskellModule :: [String] -> IO ExitCode
-runHaskellModule arguments = do
-    maybeStack <- System.Environment.lookupEnv "STACK_EXEC"
-    maybeCabal <- System.Environment.lookupEnv "CABAL_SANDBOX_CONFIG"
-    putStrLn $ Prelude.concat ["STACK_EXEC=", show maybeStack, " CABAL_SANDBOX_CONFIG=", show maybeCabal]
-    let execPrefix | Just stackExec <- maybeStack = [stackExec, "runghc"]
-                   | Just _         <- maybeCabal = ["cabal",   "exec", "runghc"]
-                   | otherwise                    = ["runghc"]
-    putStrLn $ "Running Haskell module: " ++ show execPrefix ++ show arguments
-    system $ Prelude.unwords $ execPrefix ++ arguments
--- Add: -i`stack path --dist-dir`/build/autogen
-runHaskellModuleStrict :: [String] -> IO ExitCode
-runHaskellModuleStrict  = runHaskellModule . ("-Wall":) . ("-Werror":)
+runHaskellModule :: FilePath -> [String] -> IO ExitCode
+runHaskellModule = Run.runHaskellModule
+
+runHaskellModuleStrict :: FilePath -> [String] -> IO ExitCode
+runHaskellModuleStrict = Run.runHaskellModule' opts
+  where
+      opts = def { Run.compileArgs = ["-Wall", "-Werror"] }
 

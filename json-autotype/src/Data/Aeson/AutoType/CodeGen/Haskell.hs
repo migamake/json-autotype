@@ -16,7 +16,6 @@ import           Data.Text hiding (unwords)
 import qualified Data.HashMap.Strict as Map
 import           Control.Arrow               (first)
 import           Control.Exception (assert)
-import           Data.Default                (def)
 import           Data.Monoid                 ((<>))
 import           System.FilePath
 import           System.IO

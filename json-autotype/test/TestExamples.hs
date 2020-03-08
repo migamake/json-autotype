@@ -56,13 +56,13 @@ main  = do
 
 runAutotype :: [String] -> IO ExitCode
 runAutotype arguments = do
-    stackEnv   <- doesDirectoryExist ".stack-work"
+    stackEnv   <- doesDirectoryExist "../.stack-work"
     cabalEnv   <- doesDirectoryExist "dist/build/autogen"
     maybeStack <- Env.lookupEnv "STACK_EXEC"
     let (exec, args) | Just stackExec <- maybeStack = (stackExec, ["run","--"             ])
                      | stackEnv                     = ("stack",   ["run","--"             ])
                      | cabalEnv                     = ("cabal",   ["run","--"             ])
-                     | otherwise                    = error "This test must be run either in Stack or Cabal environment."
+                     | otherwise                    = error "This test must be run either in either Stack or Cabal environment."
     putStrLn $ concat ["Running json-autotype with executable ", show exec, " and arguments ", show args]
     rawSystem exec $ args ++ arguments
 

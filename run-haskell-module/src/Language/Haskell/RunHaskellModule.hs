@@ -3,7 +3,7 @@
 {-# LANGUAGE LambdaCase           #-}
 {-# LANGUAGE RecordWildCards      #-}
 {-# LANGUAGE ScopedTypeVariables  #-}
-module RunHaskellModule
+module Language.Haskell.RunHaskellModule
     ( RunOptions(..)
     , compileHaskellModule
     , runHaskellModule

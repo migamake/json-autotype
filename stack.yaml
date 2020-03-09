@@ -3,6 +3,7 @@ resolver: lts-11.2
 packages:
 - json-autotype
 - json-alt
+- run-haskell-module
 
 extra-deps:
   - GenericPretty-1.2.2

@@ -1,3 +1,4 @@
 packages:
   json-alt
   json-autotype
+  run-haskell-module

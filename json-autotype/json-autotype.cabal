@@ -76,9 +76,7 @@ library
                        Data.Aeson.AutoType.CodeGen.Elm
                        Data.Aeson.AutoType.CodeGen.HaskellFormat
                        Data.Aeson.AutoType.CodeGen.ElmFormat
-                       RunHaskellModule
-  hs-source-dirs:      src,
-                       run-haskell-module
+  hs-source-dirs:      src
 
   other-extensions:    TemplateHaskell,
                        ScopedTypeVariables,
@@ -107,7 +105,8 @@ library
                        smallcheck           >=1.0  && <1.2,
                        QuickCheck           >=2.4  && <3.0,
                        json-alt,
-                       template-haskell
+                       template-haskell,
+                       run-haskell-module
   default-language:    Haskell2010
 
 executable json-autotype

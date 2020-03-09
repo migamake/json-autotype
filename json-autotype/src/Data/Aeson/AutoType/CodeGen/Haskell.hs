@@ -30,7 +30,7 @@ import           Data.Aeson.AutoType.CodeGen.Generic(src)
 import           Data.Aeson.AutoType.CodeGen.HaskellFormat
 import           Data.Aeson.AutoType.Util
 
-import qualified RunHaskellModule as Run
+import qualified Language.Haskell.RunHaskellModule as Run
 
 -- | Default output filname is used, when there is no explicit output file path, or it is "-" (stdout).
 -- Default module name is consistent with it.

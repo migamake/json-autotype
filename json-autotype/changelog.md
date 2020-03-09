@@ -1,5 +1,8 @@
 Changelog
 =========
+    3.0.3  Mar 2020
+        * Separate running Haskell modules in `run-haskell-module` package.
+
     3.0.2  Sep 2019
         * Relax `lens`, `hashable` version bounds for GHC 8.8.1 update.
 

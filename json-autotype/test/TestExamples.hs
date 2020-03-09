@@ -4,7 +4,8 @@ module Main(main) where
 import Control.Monad(forM, forM_, unless, join)
 import Data.Char(toUpper)
 import Data.Functor ((<$>))
-import Data.List(isPrefixOf, isSuffixOf)
+import Data.List(isPrefixOf, isSuffixOf, isInfixOf)
+import Data.Maybe(isJust)
 import System.Directory(doesDirectoryExist, getDirectoryContents, createDirectoryIfMissing)
 import System.FilePath((</>), (<.>), takeBaseName, replaceFileName)
 import System.Exit(ExitCode(..))
@@ -46,7 +47,7 @@ main  = do
   createDirectoryIfMissing True "output"
   forM_ filenames $ \filename -> do
     let outputFilename = ("output" </> capitalize (takeBaseName filename <.> "hs"))
-    genResult <- runAutotype [filename, "--outputFilename", outputFilename]
+    genResult <- runAutotype filename ["--outputFilename", outputFilename]
     unless (genResult == ExitSuccess) $
       fail (unwords ["test case", show filename, "failed with", show genResult])
     parserResult <- runModule Haskell [outputFilename, filename]
@@ -54,14 +55,26 @@ main  = do
     unless (parserResult == ExitSuccess) $
       fail (unwords ["generated parser", show outputFilename, "failed with", show parserResult])
 
-runAutotype :: [String] -> IO ExitCode
-runAutotype arguments = do
-    stackEnv   <- doesDirectoryExist "../.stack-work"
-    cabalEnv   <- doesDirectoryExist "dist/build/autogen"
-    maybeStack <- Env.lookupEnv "STACK_EXEC"
-    let (exec, args) | Just stackExec <- maybeStack = (stackExec, ["run","--"             ])
-                     | stackEnv                     = ("stack",   ["run","--"             ])
-                     | cabalEnv                     = ("cabal",   ["run","--"             ])
+runAutotype ::    String
+            ->   [String]
+            -> IO ExitCode
+runAutotype source arguments = do
+    stackEnvUpDir  <- doesDirectoryExist "../.stack-work"
+    stackEnvCurDir <- doesDirectoryExist ".stack-work"
+    cabalEnv       <- doesDirectoryExist "dist/build/autogen"
+    maybeStack     <- Env.lookupEnv "STACK_EXEC"
+    maybeSandbox   <- Env.lookupEnv "CABAL_SANDBOX_PACKAGE_PATH"
+    maybePkgPath   <- Env.lookupEnv "GHC_PACKAGE_PATH"
+    let isStack = maybe False ("stack" `isInfixOf`) maybePkgPath
+               || isJust maybeStack
+               || stackEnvUpDir
+               || stackEnvCurDir
+        isCabal = maybe False ("cabal" `isInfixOf`) maybePkgPath
+               || cabalEnv
+               || isJust maybeSandbox
+        (exec, args) | Just stackExec <- maybeStack = (stackExec, ["run", source, "--"])
+                     | isStack                      = ("stack",   ["run", source, "--"])
+                     | isCabal                      = ("cabal",   ["run", source, "--"])
                      | otherwise                    = error "This test must be run either in either Stack or Cabal environment."
     putStrLn $ concat ["Running json-autotype with executable ", show exec, " and arguments ", show args]
     rawSystem exec $ args ++ arguments

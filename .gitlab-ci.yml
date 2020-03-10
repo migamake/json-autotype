@@ -28,6 +28,7 @@ stack_build:
   script:
     - ci/stack-build.sh
   allow_failure: true
+  retry: 2
 
 # Build for images up to 8.6, with `cabal-install` 2.x
 
@@ -36,6 +37,7 @@ stack_build:
   stage: build
   script:
     - ci/old-cabal-build.sh
+  retry: 2
 
 # Build for images 8.8 and above with `cabal-install` v3.x
 
@@ -44,6 +46,7 @@ stack_build:
   stage: build
   script:
     - ci/new-cabal-build.sh
+  retry: 2
 
 ghc_8_6:
   variables:

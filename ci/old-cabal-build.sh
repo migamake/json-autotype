@@ -15,13 +15,14 @@ for PKG in json-alt run-haskell-module; do
   )
 done;
 
+mkdir -p hackage-docs bin sdist
 for PKG in json-alt run-haskell-module; do
   (cd ${PKG};
    message "Prepare release artifacts for ${PKG}"
    mkdir -p bin sdist
-   cabal install --bindir=../bin/
-   cabal sdist   --builddir=../sdist/
-   cabal haddock --builddir ../hackage-docs --for-hackage
+   cabal v1-install --bindir=../bin/
+   cabal v1-sdist   --builddir=../sdist/
+   cabal v1-haddock --builddir=../hackage-docs --for-hackage
   )
 done;
 

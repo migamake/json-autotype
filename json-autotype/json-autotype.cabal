@@ -4,34 +4,49 @@ cabal-version: 1.12
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: 6837d5aab80791821691b8310598a0e047ebbbe041e788aa59bf69f05424e100
+-- hash: 445223ce1ad4c1cd5d1445e3d17a3aee4d997a8ffc7bdbeb0b916312f4875625
 
 name:                json-autotype
 version:             3.0.3
 synopsis:            Automatic type declaration for JSON input data
-description:         Generates datatype declarations with Aeson's 'Data.Aeson.FromJSON'
+description:         Generates datatype declarations with Aeson''s ''Data.Aeson.FromJSON''
+                     .
                      instances from a set of example @.json@ files.
                      .
+                     .
                      To get started you need to install the package,
+                     .
                      and run @json-autotype@ binary on an input @.json@ file.
+                     .
                      That will generate a new Aeson-based JSON parser.
+                     .
                      .
                      > $ json-autotype input.json -o JSONTypes.hs
                      .
+                     .
                      Feel free to tweak the by changing types of the fields
-                     — any field type that is instance of 'Data.Aeson.FromJSON' should work.
+                     .
+                     — any field type that is instance of ''Data.Aeson.FromJSON'' should work.
+                     .
                      .
                      You may immediately test the parser by calling it as a script:
                      .
+                     .
                      > $ runghc JSONTypes.hs input.json
+                     .
                      .
                      One can now use multiple input files to generate better type description.
                      .
+                     .
                      Now with Elm code generation support!
+                     .
                      (If you want your favourite programming language supported too —
+                     .
                      name your price and mail the author.)
                      .
-                     See introduction on <https://github.com/mgajda/json-autotype> for details.
+                     .
+                     See introduction on <https://github.com/mgajda/json-autotype> for details.'
+                     .
 homepage:            https://github.com/mgajda/json-autotype.git#readme
 license:             BSD3
 license-file:        LICENSE
@@ -137,8 +152,6 @@ test-suite json-autotype-examples
   type: exitcode-stdio-1.0
   main-is: TestExamples.hs
   other-modules:
-      GenerateTestJSON
-      TestQC
       CommonCLI
       Paths_json_autotype
   hs-source-dirs:
@@ -174,11 +187,9 @@ test-suite json-autotype-gen-test
   type: exitcode-stdio-1.0
   main-is: GenerateTestJSON.hs
   hs-source-dirs:
-      test
+      test/gen
       common
   other-modules:
-      TestExamples
-      TestQC
       CommonCLI
       Paths_json_autotype
   other-extensions: TemplateHaskell ScopedTypeVariables OverloadedStrings FlexibleInstances MultiParamTypeClasses DeriveDataTypeable DeriveGeneric RecordWildCards
@@ -212,12 +223,10 @@ test-suite json-autotype-qc-test
   type: exitcode-stdio-1.0
   main-is: TestQC.hs
   other-modules:
-      GenerateTestJSON
-      TestExamples
       CommonCLI
       Paths_json_autotype
   hs-source-dirs:
-      test
+      test/qc
       common
   other-extensions: TemplateHaskell ScopedTypeVariables OverloadedStrings FlexibleInstances MultiParamTypeClasses DeriveDataTypeable DeriveGeneric RecordWildCards
   build-depends:
@@ -232,6 +241,7 @@ test-suite json-autotype-qc-test
     , json-autotype
     , lens >=4.1 && <4.19
     , mtl >=2.1 && <2.3
+    , optparse-applicative >=0.12 && <1.0
     , pretty >=1.1 && <1.3
     , process >=1.1 && <1.7
     , scientific >=0.3 && <0.5

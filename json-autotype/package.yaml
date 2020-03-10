@@ -1,7 +1,8 @@
 name: json-autotype
 version: '3.0.3'
 synopsis: Automatic type declaration for JSON input data
-description: ! 'Generates datatype declarations with Aeson''s ''Data.Aeson.FromJSON''
+description: |
+  Generates datatype declarations with Aeson''s ''Data.Aeson.FromJSON''
 
   instances from a set of example @.json@ files.
 
@@ -38,6 +39,7 @@ description: ! 'Generates datatype declarations with Aeson''s ''Data.Aeson.FromJ
 
 
   See introduction on <https://github.com/mgajda/json-autotype> for details.'
+  .
 category: Data, Tools
 author: Michal J. Gajda
 maintainer:
@@ -121,16 +123,17 @@ tests:
   json-autotype-qc-test:
     main: TestQC.hs
     source-dirs:
-    - test
+    - test/qc
     - common
     dependencies:
     - smallcheck >=1.0 && <1.2
+    - optparse-applicative >=0.12 && <1.0
     - QuickCheck >=2.4 && <3.0
     - json-autotype
   json-autotype-gen-test:
     main: GenerateTestJSON.hs
     source-dirs:
-    - test
+    - test/gen
     - common
     dependencies:
     - bytestring >=0.9 && <0.11

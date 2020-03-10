@@ -9,6 +9,7 @@ variables:
   PACKAGE_NAME:       json-autotype
   EXEC_NAME:          json-autotype
   DOCKER_TLS_CERTDIR: "/certs"
+  PACKAGE_VER: "3.0.3"
 
 services:
   - docker:19.03.1-dind
@@ -104,8 +105,6 @@ docker_image:
       - ${PACKAGE_NAME}.docker
 
 candidate_hackage:
-  variables:
-    PACKAGE_VER: "0.4.8.0"
   stage: test
   script:
     - ci/release.sh

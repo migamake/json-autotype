@@ -1,5 +1,8 @@
 Changelog
 =========
+    3.0.4  Mar 2020
+        * Do not try to test compilation when module is written to stdout.
+
     3.0.3  Mar 2020
         * Separate running Haskell modules in `run-haskell-module` package.
 

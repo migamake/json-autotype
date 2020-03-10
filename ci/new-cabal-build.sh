@@ -2,18 +2,19 @@
 
 source ci/common.sh
 
-message "Dependencies"
-cabal update
 
-message "Build"
-cabal new-build --enable-tests --allow-newer
-cabal new-test --allow-newer
+mkdir -p hackage-docs bin sdist
+for PKG in json-alt run-haskell-module; do
+  (cd ${PKG};
+   message "Prepare release artifacts for ${PKG}"
+   mkdir -p bin sdist
+   cabal new-install --bindir=../bin/
+   cabal new-sdist   --builddir=../
+   cabal new-haddock --builddir=../hackage-docs --for-hackage
+  )
+done;
 
-message "Prepare artifacts"
-mkdir -p bin sdist
-cabal new-install --bindir=bin/ --allow-newer --overwrite-policy=always
-cabal new-sdist   --builddir=sdist/
-cabal new-haddock --builddir hackage-docs --haddock-for-hackage
+message "Run on example"
+cabal new-exec json-autotype -- json-autotype/test/colors.json
 
-message "Test on own source"
-cabal new-exec -- homplexity-cli lib/ # path is dist/build/homplexity-cli
+

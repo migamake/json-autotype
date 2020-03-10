@@ -8,7 +8,8 @@ mkdir -p hackage-docs bin sdist
 message "Build and installation"
 # This is still buggy in Cabal 2.4.x
 #cabal new-install --bindir=bin/ json-autotype
-cabal new-install --symlink-bindir=bin/ json-autotype
+# Should work for Cabal 3.2
+cabal new-install --installdir=bin/ json-autotype
 ls -lR bin
 
 message "Preparing source distribution"

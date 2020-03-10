@@ -11,6 +11,7 @@ for PKG in "${PKGS[@]}"; do
    if [ "$PKG" == "json-autotype" ]; then
      message "Installing executables"
      cabal new-install --bindir=../bin/
+     ls -lR ../bin
    else
      message "Installing package ${PKG}"
      cabal new-install

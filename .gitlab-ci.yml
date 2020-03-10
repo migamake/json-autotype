@@ -1,123 +1,143 @@
-image: migamake/haskell-build:8.6.2
+image: migamake/haskell-build:8.6
 
 stages:
   - build
   - test
   - release
 
+variables:
+  PACKAGE_NAME:       json-autotype
+  EXEC_NAME:          json-autotype
+  DOCKER_TLS_CERTDIR: "/certs"
+
+services:
+  - docker:19.03.1-dind
+
 cache:
   paths:
     - .stack-work
     - .cabal-sandbox
+    - /root/.cabal
+    - /root/.stack
 
-.build_exe:
-  image: migamake/haskell-build:$GHC_VER
-  stage: build
-  script:
-    - cabal sandbox init
-    - cabal --version
-    - ghc   --version
-    - cabal update
-    - cd json-alt
-    - cabal install
-    - cabal sdist   --builddir=../sdist/
-    - cabal haddock --builddir=../hackage-docs/ --for-hackage
-    - cd ../json-autotype
-    - "sed --in-place 's/-- STATIC: //' json-autotype.cabal"
-    - cabal install --only-dependencies --enable-tests --enable-benchmarks
-    - cabal test
-    - mkdir -p bin sdist
-    - cabal install --bindir=../bin/
-    - cabal sdist   --builddir=../sdist/
-    - cabal haddock --builddir=../hackage-docs --for-hackage
-
-build_8_6_2:
-  variables:
-    GHC_VER: 8.6.2
-  extends: .build_exe
-  artifacts:
-    paths:
-      - sdist/json-alt-*[0-9].tar.gz
-      - hackage-docs/json-alt-*-docs.tar.gz
-      - sdist/json-autotype-*[0-9].tar.gz
-      - hackage-docs/json-autotype-*-docs.tar.gz
-      - bin/json-autotype
-    expire_in: 2 weeks
-
-build_8_4_4:
-  variables:
-    GHC_VER: 8.4.4
-  extends: .build_exe
-
-build_8_2_2:
-  variables:
-    GHC_VER: 8.2.2
-  extends: .build_exe
-
-build_8_0_2:
-  variables:
-    GHC_VER: 8.0.2
-  extends: .build_exe
-  retry: 2
-  allow_failure: true
-
-build_7_10_3:
-  variables:
-    GHC_VER: 7.10.3
-  extends: .build_exe
-
-build_7_8_4:
-  variables:
-    GHC_VER: 7.8.4
-  extends: .build_exe
-
-test_distribution:
-  stage: test
-  script:
-    - cabal update
-    - mkdir -p bin
-    - cabal install sdist/json-alt*[0-9].tar.gz --bindir=bin/
-    - cabal install sdist/json-autotype*[0-9].tar.gz --bindir=bin/
-    - tar xzf sdist/json-autotype*[0-9].tar.gz
-    - bin/json-autotype --output parseExamples.hs json-autotype-*/examples/*.json
-  dependencies:
-    - build_8_6_2
-  artifacts:
-    paths:
-      - json-autotype/bin/json-autotype
 
 stack_build:
   image: migamake/haskell-build:8.6.2
   stage: build
   script:
-    - echo "$CI_ENVIRONMENT_SLUG"
-    - stack --version
-    - stack setup
-    - stack build
-    - stack test --verbose
+    - ci/stack-build.sh
   allow_failure: true
 
-pier_build:
-  image: migamake/haskell-build:8.6.2
+# Build for images up to 8.6, with `cabal-install` 2.x
+
+.build_exe:
+  image: migamake/haskell-build:$GHC_VER
   stage: build
   script:
-    - mkdir pier; ln -s $PWD/.pier ~/.pier
-    - pier build --no-shared-cache
-    - pier test  --no-shared-cache --sandbox
+    - ci/old-cabal-build.sh
+
+# Build for images 8.8 and above with `cabal-install` v3.x
+
+.new_build_exe:
+  image: migamake/haskell-build:$GHC_VER
+  stage: build
+  script:
+    - ci/new-cabal-build.sh
+
+ghc_8_6:
+  variables:
+    GHC_VER: "8.6"
+  extends: .build_exe
+  artifacts:
+    paths:
+      - sdist/*[0-9].tar.gz
+      - hackage-docs/*-docs.tar.gz
+      - bin/${EXEC_NAME}
+    expire_in: 2 weeks
+  allow_failure: false
+
+ghc_8_4:
+  variables:
+    GHC_VER: "8.4"
+  extends: .build_exe
+
+ghc_8_10:
+  variables:
+    GHC_VER: "8.10"
+  extends: .new_build_exe
+  retry: 2
   allow_failure: true
 
-release_to_hackage:
+ghc_8_8:
+  variables:
+    GHC_VER: "8.8"
+  extends: .new_build_exe
+  retry: 2
+  allow_failure: true
+
+tar_package:
+  stage: test
+  script:
+    - cabal update
+    - mkdir -p bin
+    - cabal install sdist/$PACKAGE_NAME*[0-9].tar.gz --bindir=bin/
+    - tar xzf sdist/$PACKAGE_NAME*[0-9].tar.gz
+    - bin/${EXEC_NAME} json-autotype/test/colors.json
+  dependencies:
+    - ghc_8_6
+  artifacts:
+    paths:
+      - bin/${EXEC_NAME}
+  allow_failure: false
+
+docker_image:
+  image: docker
+  stage: build
+  script:
+    - mkdir -p workdir
+    - docker build . -t migamake/${PACKAGE_NAME} -f Dockerfile
+    - docker run migamake/${PACKAGE_NAME} -v $PWD/lib:/workdir
+    - docker save --output ${PACKAGE_NAME}.docker migamake/${PACKAGE_NAME}:latest
+    - ls -alth ${PACKAGE_NAME}.docker
+  artifacts:
+    paths:
+      - ${PACKAGE_NAME}.docker
+
+candidate_hackage:
+  variables:
+    PACKAGE_VER: "0.4.8.0"
+  stage: test
+  script:
+    - ci/release.sh
+  dependencies:
+    - ghc_8_6
+  environment:
+    name: "hackage-candidate-${PACKAGE_VER}"
+    url:  "https://hackage.haskell.org/package/homplexity-${PACKAGE_VER}/candidate"
+  only:
+    - master
+  allow_failure: true
+
+hackage:
   stage: release
   script:
-    - cabal upload --username="$HACKAGE_USER" --password="$HACKAGE_PASSWORD" sdist/json-alt-*[0-9].tar.gz
-    - cabal upload --username="$HACKAGE_USER" --password="$HACKAGE_PASSWORD" -d hackage-docs/json-alt-*-docs.tar.gz
-    - cabal upload --username="$HACKAGE_USER" --password="$HACKAGE_PASSWORD" sdist/json-autotype-*[0-9].tar.gz
-    - cabal upload --username="$HACKAGE_USER" --password="$HACKAGE_PASSWORD" -d hackage-docs/json-autotype-*-docs.tar.gz
-  environment:
-    name: release
-    url:  https://hackage.haskell.org/package/json-autotype
+    - ci/release.sh --publish
   dependencies:
-    - build_8_6_2
+    - ghc_8_6
   when: manual
   only:
     - master
+
+dockerhub:
+  image: docker
+  stage: release
+  script:
+    - docker load -i ${PACKAGE_NAME}.docker
+    - echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin;
+    - docker push migamake/json-autotype;
+  dependencies:
+    - docker_image
+  when: manual
+  only:
+    - master
+

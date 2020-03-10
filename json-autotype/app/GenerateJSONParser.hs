@@ -168,7 +168,7 @@ generateHaskellFromJSONs opts@Options { tyOpts=TyOptions { toplevel
     myTrace $ "UNIFIED:\n" ++ pretty unified
     -- We start by writing module header
     writeModule lang outputFilename toplevelName unified
-    when test $
+    when (test && (outputFilename /= "")) $
       exitWith =<< runModule lang outputFilename passedTypeCheck
   where
     -- | Works like @Debug.trace@ when the --debug flag is enabled, and does nothing otherwise.

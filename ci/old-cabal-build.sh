@@ -12,7 +12,8 @@ for PKG in "${PKGS[@]}"; do
    cabal v1-install --dependencies-only
    cabal v1-configure --enable-tests --allow-newer;
    cabal v1-build;
-   cabal v1-test
+   cabal v1-test;
+   cabal v1-install;
   )
 done;
 

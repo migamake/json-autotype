@@ -6,7 +6,7 @@ source ci/common.sh
 #cabal update
 #cabal install --dependencies-only --enable-tests
 
-for PKG in json-alt run-haskell-module; do
+for PKG in "${PKGS[@]}"; do
   (cd ${PKG};
    message "Build $PKG";
    cabal v1-configure --enable-tests --allow-newer;
@@ -16,7 +16,7 @@ for PKG in json-alt run-haskell-module; do
 done;
 
 mkdir -p hackage-docs bin sdist
-for PKG in json-alt run-haskell-module; do
+for PKG in "${PKGS[@]}"; do
   (cd ${PKG};
    message "Prepare release artifacts for ${PKG}"
    mkdir -p bin sdist

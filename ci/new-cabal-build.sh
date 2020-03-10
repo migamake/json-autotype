@@ -4,7 +4,7 @@ source ci/common.sh
 
 
 mkdir -p hackage-docs bin sdist
-for PKG in json-alt run-haskell-module; do
+for PKG in "${PKGS[@]}"; do
   (cd ${PKG};
    message "Prepare release artifacts for ${PKG}"
    mkdir -p bin sdist

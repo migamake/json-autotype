@@ -14,7 +14,9 @@ cabal --version
 ghc   --version
 hpack --version
 
+PKGS=(json-alt run-haskell-module json-autotype)
+
 message "Run hpack"
-for i in json-autotype json-alt run-haskell-module; do
-  (cd $i; hpack);
+for PKG in "${PKGS[@]}"; do
+  (cd $PKG; hpack);
 done

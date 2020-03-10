@@ -9,6 +9,7 @@ source ci/common.sh
 for PKG in "${PKGS[@]}"; do
   (cd ${PKG};
    message "Build $PKG";
+   cabal v1-install --dependencies-only
    cabal v1-configure --enable-tests --allow-newer;
    cabal v1-build;
    cabal v1-test

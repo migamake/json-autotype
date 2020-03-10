@@ -16,5 +16,5 @@ RUN cabal install -j
 WORKDIR /src/json-autotype
 RUN cabal install -j --dependencies-only
 RUN cabal install -j
-ENTRYPOINT ["cabal", "exec", "json-autotype"]
+ENTRYPOINT ["cabal", "exec", "json-autotype", "--"]
 

@@ -22,7 +22,7 @@ for PKG in "${PKGS[@]}"; do
   (cd ${PKG};
    message "Prepare release artifacts for ${PKG}"
    mkdir -p bin sdist
-   cabal v1-install --bindir=../bin/ --reinstall
+   cabal v1-install --bindir=../bin/ --reinstall --force-reinstalls
    cabal v1-sdist   --builddir=../sdist/
    cabal v1-haddock --builddir=../hackage-docs --for-hackage
   )

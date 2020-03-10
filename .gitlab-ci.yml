@@ -100,7 +100,7 @@ docker_image:
   script:
     - mkdir -p workdir
     - docker build . -t migamake/${PACKAGE_NAME} -f Dockerfile
-    - docker run -v $PWD/lib:/workdir migamake/${PACKAGE_NAME} json-autotype/test/colors.json
+    - docker run -v $PWD/test:/workdir migamake/${PACKAGE_NAME} /workdir/colors.json
     - docker save --output ${PACKAGE_NAME}.docker migamake/${PACKAGE_NAME}:latest
     - ls -alth ${PACKAGE_NAME}.docker
   artifacts:

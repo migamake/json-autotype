@@ -6,10 +6,14 @@ source ci/common.sh
 mkdir -p hackage-docs bin sdist
 for PKG in "${PKGS[@]}"; do
   (cd ${PKG};
-   message "Prepare release artifacts for ${PKG}"
+   message "Prepare release artifacts for '${PKG}'"
    mkdir -p bin sdist
    if [ "$PKG" == "json-autotype" ]; then
+     message "Installing executables"
      cabal new-install --bindir=../bin/
+   else
+     message "Installing package ${PKG}"
+     cabal new-install
    fi;
    cabal new-sdist   --builddir=../
    cabal new-haddock --builddir=../hackage-docs --haddock-for-hackage

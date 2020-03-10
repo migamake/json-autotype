@@ -22,7 +22,7 @@ cache:
 
 
 stack_build:
-  image: migamake/haskell-build:8.6.2
+  image: migamake/haskell-build:8.6
   stage: build
   script:
     - ci/stack-build.sh

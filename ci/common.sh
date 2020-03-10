@@ -14,5 +14,7 @@ cabal --version
 ghc   --version
 hpack --version
 
-#message "Run hpack"
-#hpack
+message "Run hpack"
+for i in json-autotype json-alt run-haskell-module; do
+  cd $i; hpack;
+done

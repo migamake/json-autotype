@@ -1,4 +1,11 @@
--- Build information for the package.
+cabal-version: 1.12
+
+-- This file has been generated from package.yaml by hpack version 0.33.0.
+--
+-- see: https://github.com/sol/hpack
+--
+-- hash: 19e927c68148b07a0870a432d17ad15c8f6f75df71f4e364ddadafb365015dcb
+
 name:                json-alt
 version:             1.0.0
 synopsis:            Union 'alternative' or Either that has untagged JSON encoding.
@@ -24,54 +31,32 @@ description:         Parsing JSON with Aeson often requires decoding fields
                      dependency.
                      .
                      See <https://github.com/mgajda/json-autotype>
-homepage:            https://github.com/mgajda/json-autotype
+homepage:            https://github.com/mgajda/json-autotype.git#readme
 license:             BSD3
 license-file:        LICENSE
 stability:           stable
 author:              Michal J. Gajda
-maintainer:          simons@cryp.to
+maintainer:          simons@cryp.to,
                      mjgajda@gmail.com
 copyright:           Copyright by Michal J. Gajda '2014-'2018
 category:            Data, Tools
 build-type:          Simple
-extra-source-files:  README.md changelog.md
-cabal-version:       >=1.10
-bug-reports:         https://github.com/mgajda/json-autotype/issues
-tested-with:         GHC==7.6.1
-                   , GHC==7.6.2
-                   , GHC==7.6.3
-                   , GHC==7.8.1
-                   , GHC==7.8.2
-                   , GHC==7.8.3
-                   , GHC==7.8.4
-                   , GHC==7.10.1
-                   , GHC==7.10.2
-                   , GHC==7.10.3
-                   , GHC==8.0.1
-                   , GHC==8.0.2
-                   , GHC==8.2.2
-                   , GHC==8.4.1
-                   , GHC==8.4.2
-                   , GHC==8.4.3
-                   , GHC==8.4.4
-                   , GHC==8.6.2
-                   , GHC==8.6.1
+extra-source-files:
+    README.md
+    changelog.md
+bug-reports:         https://github.com/mgajda/json-autotype.git/issues
 
 source-repository head
-  type:     git
+  type: git
   location: https://github.com/mgajda/json-autotype.git
 
 library
-  exposed-modules:     Data.Aeson.AutoType.Alternative
-
-  other-extensions:    TemplateHaskell,
-                       ScopedTypeVariables,
-                       OverloadedStrings,
-                       FlexibleInstances,
-                       MultiParamTypeClasses,
-                       DeriveDataTypeable,
-                       DeriveGeneric,
-                       RecordWildCards
-  build-depends:       base                 >=4.3  && <5,
-                       aeson                >=1.2.1 && <1.5
-  default-language:    Haskell2010
+  exposed-modules:
+      Data.Aeson.AutoType.Alternative
+  other-modules:
+      Paths_json_alt
+  other-extensions: TemplateHaskell ScopedTypeVariables OverloadedStrings FlexibleInstances MultiParamTypeClasses DeriveDataTypeable DeriveGeneric RecordWildCards
+  build-depends:
+      aeson >=1.2.1 && <1.5
+    , base >=4.3 && <5
+  default-language: Haskell2010

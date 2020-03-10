@@ -12,7 +12,7 @@ for PKG in "${PKGS[@]}"; do
      cabal new-install --bindir=../bin/
    fi;
    cabal new-sdist   --builddir=../
-   cabal new-haddock --builddir=../hackage-docs --for-hackage
+   cabal new-haddock --builddir=../hackage-docs --haddock-for-hackage
   )
 done;
 

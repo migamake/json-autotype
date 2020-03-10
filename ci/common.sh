@@ -14,5 +14,5 @@ cabal --version
 ghc   --version
 hpack --version
 
-message "Run hpack"
-hpack
+#message "Run hpack"
+#hpack

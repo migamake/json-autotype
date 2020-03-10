@@ -16,5 +16,5 @@ hpack --version
 
 message "Run hpack"
 for i in json-autotype json-alt run-haskell-module; do
-  cd $i; hpack;
+  (cd $i; hpack);
 done

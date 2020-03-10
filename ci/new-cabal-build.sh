@@ -4,25 +4,23 @@ source ci/common.sh
 
 
 mkdir -p hackage-docs bin sdist
-for PKG in "${PKGS[@]}"; do
-  (cd ${PKG};
-   message "Prepare release artifacts for '${PKG}'"
-   mkdir -p bin sdist
-   if [ "$PKG" == "json-autotype" ]; then
-     message "Installing executables"
-     cabal new-install --bindir=../bin/
-     ls -lR ../bin
-   else
-     message "Installing package ${PKG}"
-     cabal new-install
-   fi;
-   cabal new-sdist   --builddir=../
-   cabal new-haddock --builddir=../hackage-docs --haddock-for-hackage
-  )
-done;
+
+message "Build and installation"
+# This is still buggy in Cabal 2.4.x
+#cabal new-install --bindir=bin/ json-autotype
+cabal new-install --symlink-bindir=bin/ json-autotype
+ls -lR bin
+
+message "Preparing source distribution"
+cabal new-sdist --output-dir=sdist  "${PKGS[@]}"
+
+message "Documenation distribution"
+cabal new-haddock --builddir=hackage-docs --haddock-for-hackage  "${PKGS[@]}"
 
 message "Run on example"
 ls -lR bin/
-bin/json-autotype -- json-autotype/test/colors.json
+# Need working runModule yet!
+#bin/json-autotype json-autotype/test/colors.json --outputFilename=Colors.hs
+bin/json-autotype json-autotype/test/colors.json
 
 

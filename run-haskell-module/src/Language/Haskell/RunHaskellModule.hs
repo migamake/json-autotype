@@ -6,6 +6,7 @@
 module Language.Haskell.RunHaskellModule
     ( RunOptions(..)
     , compileHaskellModule
+    , compileHaskellModule'
     , runHaskellModule
     , runHaskellModule'
     ) where
@@ -139,19 +140,25 @@ passModuleToGhc ro ghcTool moduleFilename args =
         callProcess' ro exe (exeArgs ++ moduleFilename:args)
 
 
--- | Find ghc with cabal or stack and run it with specified arguments
+-- | Find ghc with cabal or stack and compile Haskell module with specified arguments and run options
+--
+compileHaskellModule' :: RunOptions -> FilePath -> [String] -> IO ExitCode
+compileHaskellModule' ro moduleFilename args = passModuleToGhc ro Compiler moduleFilename args
+
+-- | Find ghc with cabal or stack and compile Haskell module with specified arguments
 --
 compileHaskellModule :: FilePath -> [String] -> IO ExitCode
-compileHaskellModule moduleFilename args = passModuleToGhc def Compiler moduleFilename args
+compileHaskellModule = compileHaskellModule' def
 
-
--- | Run Haskell module in specified file with arguments
+-- | Find ghc with cabal or stack and run Haskell module in specified file with arguments and run options
 --
 runHaskellModule' :: RunOptions -> FilePath -> [String] -> IO ExitCode
 runHaskellModule' ro moduleFilename args = passModuleToGhc ro Runner moduleFilename args
 
 
+-- | Find ghc with cabal or stack and run Haskell module in specified file with arguments
+--
 runHaskellModule :: FilePath -> [String] -> IO ExitCode
-runHaskellModule moduleFilename args = runHaskellModule' def moduleFilename args
+runHaskellModule = runHaskellModule' def
 
 

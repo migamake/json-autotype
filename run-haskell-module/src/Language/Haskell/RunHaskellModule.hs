@@ -13,6 +13,7 @@ module Language.Haskell.RunHaskellModule
 
 import           Control.Exception
 import           Control.Monad
+import           Data.Char
 import           Data.Default
 import           System.Environment
 import           System.Exit
@@ -42,41 +43,93 @@ data GhcTool = Runner | Compiler
 --
 callProcess' :: RunOptions -> FilePath -> [String] -> IO ExitCode
 callProcess' RunOptions{..} cmd args = do
+    when verbose $ putStrLn $ "Run \"" ++ cmd ++ "\" with args: " ++ show args
     (_, pstdout, pstderr, p) <- createProcess ((proc cmd args) { std_out = if showStdout then Inherit else CreatePipe, std_err = CreatePipe })
     waitForProcess p >>= \case
         ExitSuccess -> do
-            -- whenMaybe hClose pstdout
+            unless showStdout $ whenMaybe hClose pstdout
             whenMaybe hClose pstderr
             return ExitSuccess
-        e@(ExitFailure r) -> do
+        ExitFailure r -> do
             whenMaybe (dumpHandle stdout) pstdout
             whenMaybe (dumpHandle stderr) pstderr
             fail $ concat ["Running \"", cmd, "\" \"", show args, "\" has failed with \"", show r, "\""]
-            -- return e
   where
     dumpHandle outhndl inhnd = hGetContents inhnd >>= hPutStr outhndl
     whenMaybe a m = maybe (return ()) a m
+
+
+-- | Splits commandline-like strings into "words", i.e.
+--   ```
+--   -O0 --ghc-arg="-package scientific" --ghc-arg="-package xml-typelift"
+--   ```
+--   transformed into 3 "words":
+--   ```
+--   -O0
+--   --ghc-arg="-package scientific"
+--   --ghc-arg="-package xml-typelift"
+--   ```
+splitWithQuotes :: String -> [String]
+splitWithQuotes [] = []
+splitWithQuotes (ch:cs)
+  | isSpace ch = splitWithQuotes $ dropWhile isSpace cs
+  | otherwise = word : splitWithQuotes strrest
+  where
+    (word, strrest) = takeWordOrQuote (ch:cs)
+    takeWordOrQuote :: String -> (String, String)
+    takeWordOrQuote str = let (w', rest) = takeWordOrQuote' "" False str in (reverse w', rest)
+      where
+        takeWordOrQuote' acc _     ""         = (acc, "")
+        takeWordOrQuote' acc True  ('"':"")   = (acc, "")
+        takeWordOrQuote' acc True  ('"':c:rest)
+          | isSpace c = ('"':acc, rest)
+          | otherwise = takeWordOrQuote' ('"':acc) False (c:rest)
+        takeWordOrQuote' acc True  (c  :rest) = takeWordOrQuote' (c:acc) True rest
+        takeWordOrQuote' acc False ('"':rest) = takeWordOrQuote' ('"':acc) True rest
+        takeWordOrQuote' acc False (c  :rest)
+          | isSpace c = (acc, rest)
+          | otherwise = takeWordOrQuote' (c:acc) False rest
 
 
 findGhc :: RunOptions
         -> GhcTool
         -> IO (FilePath, [String]) -- ^ returns (exe, special tool arguments)
 findGhc RunOptions{..} ghcTool = do
-    stack <- lookupEnv "STACK_EXE"
-    cabal <- lookupEnv "CABAL_SANDBOX_CONFIG"
-    when verbose $ putStrLn $ concat ["STACK_EXE=", show stack, "; CABAL_SANDBOX_CONFIG=", show cabal]
-    let res@(exe, exeArgs') | Just stackExec <- stack = (stackExec, [tool] ++ compileArgs ++ ["--"])
-                            | Just _         <- cabal = ("cabal",   ["exec", tool] ++ compileArgs ++ ["--"])
-                            | otherwise               = (tool,      compileArgs)
+    when verbose $ do
+        let showEnv env = lookupEnv env >>= (\e -> putStrLn $ ">>> " ++ show env ++ " = " ++ show e)
+        showEnv "STACK_EXE"
+        showEnv "CABAL_SANDBOX_CONFIG"
+        showEnv "GHC_ENVIRONMENT"
+        showEnv "GHC_PACKAGE_PATH"
+        showEnv "HASKELL_DIST_DIR"
+        showEnv "XML_TYPELIFT_ADDITIONAL_FLAGS"
+        showEnv "XML_TYPELIFT_ADDITIONAL_PACKAGES"
+        -- putStrLn "Environment: -----------"
+        -- getEnvironment >>= (mapM_ $ \(env,val) -> putStrLn $ env ++ " = " ++ val)
+        -- putStrLn "End of environment -----"
+    stack    <- lookupEnv "STACK_EXE"
+    oldCabal <- lookupEnv "CABAL_SANDBOX_CONFIG"
+    newCabal <- lookupEnv "HASKELL_DIST_DIR"
+    additionalFlags    <- (maybe [] splitWithQuotes)                      <$> lookupEnv "XML_TYPELIFT_ADDITIONAL_FLAGS"
+    additionalPackages <- ((additionalPackagesDef ++) . (maybe [] words)) <$> lookupEnv "XML_TYPELIFT_ADDITIONAL_PACKAGES"
+    let additionalPackagesArgs = map mkAdditionalPackagesArg additionalPackages
+    let res@(exe, exeArgs') | Just stackExec <- stack    = (stackExec, additionalFlags ++ [tool, "--"])
+                            | Just _         <- oldCabal = ("cabal", ["exec", tool, "--"])
+                            | Just _         <- newCabal = ("cabal", ["v2-exec", tool, "--"] ++ additionalPackagesArgs)
+                            | otherwise                  = (tool, [])
         exeArgs = case ghcTool of
                     Compiler -> exeArgs' ++ ["-O0"]
-                    Runner   -> exeArgs
-    when verbose $ putStrLn $ concat ["Use exe \"", exe, "\", and additional arguments: \"", show exeArgs]
+                    Runner   -> exeArgs'
+    when verbose $ putStrLn $ "Use exe \"" ++ exe ++ "\", and additional arguments: " ++ show exeArgs
     return res
   where
     tool = case ghcTool of
                Runner   -> "runghc"
                Compiler -> "ghc"
+    mkAdditionalPackagesArg arg = case ghcTool of
+               Runner   -> "--ghc-arg=-package " ++ arg
+               Compiler ->           "-package " ++ arg
+    additionalPackagesDef = ["iso8601-duration", "xeno", "xml-typelift"] -- TODO: try to get from package.yaml via Template Haskell
 
 
 passModuleToGhc :: RunOptions -> GhcTool -> FilePath -> [String] -> IO ExitCode
@@ -86,7 +139,7 @@ passModuleToGhc ro ghcTool moduleFilename args =
         callProcess' ro exe (exeArgs ++ moduleFilename:args)
 
 
--- | Find ghc with cabal/stack and run it with specified arguments
+-- | Find ghc with cabal or stack and run it with specified arguments
 --
 compileHaskellModule :: FilePath -> [String] -> IO ExitCode
 compileHaskellModule moduleFilename args = passModuleToGhc def Compiler moduleFilename args

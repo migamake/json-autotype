@@ -102,16 +102,16 @@ findGhc RunOptions{..} ghcTool = do
         showEnv "GHC_ENVIRONMENT"
         showEnv "GHC_PACKAGE_PATH"
         showEnv "HASKELL_DIST_DIR"
-        showEnv "XML_TYPELIFT_ADDITIONAL_FLAGS"
-        showEnv "XML_TYPELIFT_ADDITIONAL_PACKAGES"
+        showEnv "CI_GHC_ADDITIONAL_FLAGS"
+        showEnv "CI_GHC_ADDITIONAL_PACKAGES"
         -- putStrLn "Environment: -----------"
         -- getEnvironment >>= (mapM_ $ \(env,val) -> putStrLn $ env ++ " = " ++ val)
         -- putStrLn "End of environment -----"
     stack    <- lookupEnv "STACK_EXE"
     oldCabal <- lookupEnv "CABAL_SANDBOX_CONFIG"
     newCabal <- lookupEnv "HASKELL_DIST_DIR"
-    additionalFlags    <- (maybe [] splitWithQuotes)                      <$> lookupEnv "XML_TYPELIFT_ADDITIONAL_FLAGS"
-    additionalPackages <- ((additionalPackagesDef ++) . (maybe [] words)) <$> lookupEnv "XML_TYPELIFT_ADDITIONAL_PACKAGES"
+    additionalFlags    <- (maybe [] splitWithQuotes)                      <$> lookupEnv "CI_GHC_ADDITIONAL_FLAGS"
+    additionalPackages <- ((additionalPackagesDef ++) . (maybe [] words)) <$> lookupEnv "CI_GHC_ADDITIONAL_PACKAGES"
     let additionalPackagesArgs = map mkAdditionalPackagesArg additionalPackages
     let res@(exe, exeArgs') | Just stackExec <- stack    = (stackExec, additionalFlags ++ [tool, "--"])
                             | Just _         <- oldCabal = ("cabal", ["exec", tool, "--"])
@@ -129,7 +129,7 @@ findGhc RunOptions{..} ghcTool = do
     mkAdditionalPackagesArg arg = case ghcTool of
                Runner   -> "--ghc-arg=-package " ++ arg
                Compiler ->           "-package " ++ arg
-    additionalPackagesDef = ["iso8601-duration", "xeno", "xml-typelift"] -- TODO: try to get from package.yaml via Template Haskell
+    additionalPackagesDef = []
 
 
 passModuleToGhc :: RunOptions -> GhcTool -> FilePath -> [String] -> IO ExitCode

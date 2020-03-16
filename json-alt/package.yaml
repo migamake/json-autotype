@@ -1,0 +1,68 @@
+name: json-alt
+version: '1.0.0'
+synopsis: Union 'alternative' or Either that has untagged JSON encoding.
+description: ! 'Parsing JSON with Aeson often requires decoding fields
+
+  that have more than one Haskell type.
+
+
+  So we have:
+
+
+  > data a :|: b = AltLeft a
+
+  >              | AltRight b
+
+  >
+
+  > printIt = print . (fromJSON :: ByteString -> Int :|: Bool)
+
+  > main = do
+
+  >   printIt "1"    -- AltLeft 1
+
+  >   printIt "true" -- AltRight True
+
+  >   printIt "null" -- errors!
+
+
+  To generate types for larger JSON documents,
+
+  you might use @json-autotype@.
+
+
+  This is separate package so that users
+
+  do not have to keep @json-autotype@ as runtime
+
+  dependency.
+
+
+  See <https://github.com/mgajda/json-autotype>'
+category: Data, Tools
+author: Michal J. Gajda
+maintainer:
+  - simons@cryp.to
+  - mjgajda@gmail.com
+copyright: Copyright by Michal J. Gajda '2014-'2018
+license: BSD3
+github: mgajda/json-autotype.git
+extra-source-files:
+- README.md
+- changelog.md
+other-extensions:
+- TemplateHaskell
+- ScopedTypeVariables
+- OverloadedStrings
+- FlexibleInstances
+- MultiParamTypeClasses
+- DeriveDataTypeable
+- DeriveGeneric
+- RecordWildCards
+dependencies:
+- base >=4.3 && <5
+- aeson >=1.2.1 && <1.5
+library:
+  exposed-modules:
+  - Data.Aeson.AutoType.Alternative
+stability: stable

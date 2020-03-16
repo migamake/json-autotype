@@ -1,258 +1,254 @@
--- Build information for the package.
+cabal-version: 1.12
+
+-- This file has been generated from package.yaml by hpack version 0.33.0.
+--
+-- see: https://github.com/sol/hpack
+--
+-- hash: 84501bebdbe7dc6b9b7c5605df545eaae45695e21f180ea3fd68181f878acd0d
+
 name:                json-autotype
-version:             3.0.2
+version:             3.0.4
 synopsis:            Automatic type declaration for JSON input data
-description:         Generates datatype declarations with Aeson's 'Data.Aeson.FromJSON'
+description:         Generates datatype declarations with Aeson''s ''Data.Aeson.FromJSON''
+                     .
                      instances from a set of example @.json@ files.
                      .
+                     .
                      To get started you need to install the package,
+                     .
                      and run @json-autotype@ binary on an input @.json@ file.
+                     .
                      That will generate a new Aeson-based JSON parser.
+                     .
                      .
                      > $ json-autotype input.json -o JSONTypes.hs
                      .
+                     .
                      Feel free to tweak the by changing types of the fields
-                      — any field type that is instance of 'Data.Aeson.FromJSON' should work.
+                     .
+                     — any field type that is instance of ''Data.Aeson.FromJSON'' should work.
+                     .
                      .
                      You may immediately test the parser by calling it as a script:
                      .
+                     .
                      > $ runghc JSONTypes.hs input.json
+                     .
                      .
                      One can now use multiple input files to generate better type description.
                      .
+                     .
                      Now with Elm code generation support!
+                     .
                      (If you want your favourite programming language supported too —
+                     .
                      name your price and mail the author.)
                      .
-                     See introduction on <https://github.com/mgajda/json-autotype> for details.
-homepage:            https://github.com/mgajda/json-autotype
+                     .
+                     See introduction on <https://github.com/mgajda/json-autotype> for details.'
+                     .
+homepage:            https://github.com/mgajda/json-autotype.git#readme
 license:             BSD3
 license-file:        LICENSE
 stability:           stable
 author:              Michal J. Gajda
-maintainer:          simons@cryp.to
+maintainer:          simons@cryp.to,
                      mjgajda@gmail.com
 copyright:           Copyright by Michal J. Gajda '2014-'2019
 category:            Data, Tools
 build-type:          Simple
-extra-source-files:  README.md changelog.md examples/union.json examples/colors.json
-cabal-version:       >=1.10
-bug-reports:         https://github.com/mgajda/json-autotype/issues
-tested-with:         GHC==7.6.1
-                   , GHC==7.6.2
-                   , GHC==7.6.3
-                   , GHC==7.8.2
-                   , GHC==7.8.3
-                   , GHC==7.8.4
-                   , GHC==7.10.1
-                   , GHC==7.10.2
-                   , GHC==7.10.3
-                   , GHC==8.0.1
-                   , GHC==8.0.2
-                   , GHC==8.2.2
-                   , GHC==8.4.1
-                   , GHC==8.4.2
-                   , GHC==8.4.3
-                   , GHC==8.4.4
-                   , GHC==8.6.2
-                   , GHC==8.6.1
-                   , GHC==8.8.1
+extra-source-files:
+    README.md
+    changelog.md
+    examples/union.json
+    examples/colors.json
+bug-reports:         https://github.com/mgajda/json-autotype.git/issues
+tested-with:         GHC==8.0.2 GHC==8.2.2 GHC==8.4.4 GHC==8.6.5 GHC==8.8.2 GHC==8.10.1
 
 source-repository head
-  type:     git
+  type: git
   location: https://github.com/mgajda/json-autotype.git
 
 library
-  exposed-modules:     Data.Aeson.AutoType.CodeGen
-                       Data.Aeson.AutoType.Extract
-                       Data.Aeson.AutoType.Format
-                       Data.Aeson.AutoType.Pretty
-                       Data.Aeson.AutoType.Split
-                       Data.Aeson.AutoType.Type
-                       Data.Aeson.AutoType.Test
-                       Data.Aeson.AutoType.Util
-  other-modules:       Data.Aeson.AutoType.CodeGen.Generic
-                       Data.Aeson.AutoType.CodeGen.Haskell
-                       Data.Aeson.AutoType.CodeGen.Elm
-                       Data.Aeson.AutoType.CodeGen.HaskellFormat
-                       Data.Aeson.AutoType.CodeGen.ElmFormat
-  hs-source-dirs:      src
-
-  other-extensions:    TemplateHaskell,
-                       ScopedTypeVariables,
-                       OverloadedStrings,
-                       FlexibleInstances,
-                       MultiParamTypeClasses,
-                       DeriveDataTypeable,
-                       DeriveGeneric,
-                       RecordWildCards
-  build-depends:       base                 >=4.3  && <5,
-                       GenericPretty        >=1.2  && <1.3,
-                       aeson                >=1.2.1 && <1.5,
-                       containers           >=0.3  && <0.7,
-                       filepath             >=1.3  && <1.5,
-                       hashable             >=1.2  && <1.4,
-                       lens                 >=4.1  && <4.19,
-                       mtl                  >=2.1  && <2.3,
-                       pretty               >=1.1  && <1.3,
-                       process              >=1.1  && <1.7,
-                       scientific           >=0.3  && <0.5,
-                       text                 >=1.1  && <1.4,
-                       uniplate             >=1.6  && <1.7,
-                       unordered-containers >=0.2  && <0.3,
-                       vector               >=0.9  && <0.13,
-                       smallcheck           >=1.0  && <1.2,
-                       QuickCheck           >=2.4  && <3.0,
-                       json-alt,
-                       template-haskell
-  default-language:    Haskell2010
+  exposed-modules:
+      Data.Aeson.AutoType.CodeGen
+      Data.Aeson.AutoType.Extract
+      Data.Aeson.AutoType.Format
+      Data.Aeson.AutoType.Pretty
+      Data.Aeson.AutoType.Split
+      Data.Aeson.AutoType.Type
+      Data.Aeson.AutoType.Test
+      Data.Aeson.AutoType.Util
+  other-modules:
+      Data.Aeson.AutoType.CodeGen.Common
+      Data.Aeson.AutoType.CodeGen.Elm
+      Data.Aeson.AutoType.CodeGen.ElmFormat
+      Data.Aeson.AutoType.CodeGen.Generic
+      Data.Aeson.AutoType.CodeGen.Haskell
+      Data.Aeson.AutoType.CodeGen.HaskellFormat
+      Data.Aeson.AutoType.Plugin.Subtype
+      Paths_json_autotype
+  hs-source-dirs:
+      src
+  other-extensions: TemplateHaskell ScopedTypeVariables OverloadedStrings FlexibleInstances MultiParamTypeClasses DeriveDataTypeable DeriveGeneric RecordWildCards
+  build-depends:
+      GenericPretty >=1.2 && <1.3
+    , QuickCheck >=2.4 && <3.0
+    , aeson >=1.2.1 && <1.5
+    , base >=4.3 && <5
+    , containers >=0.3 && <0.7
+    , data-default >=0.7 && <0.8
+    , filepath >=1.3 && <1.5
+    , hashable >=1.2 && <1.4
+    , json-alt
+    , lens >=4.1 && <4.19
+    , mtl >=2.1 && <2.3
+    , pretty >=1.1 && <1.3
+    , process >=1.1 && <1.7
+    , run-haskell-module
+    , scientific >=0.3 && <0.5
+    , smallcheck >=1.0 && <1.2
+    , template-haskell
+    , text >=1.1 && <1.4
+    , uniplate >=1.6 && <1.7
+    , unordered-containers >=0.2 && <0.3
+    , vector >=0.9 && <0.13
+  default-language: Haskell2010
 
 executable json-autotype
-  main-is:             GenerateJSONParser.hs
-  hs-source-dirs:      app common
-  other-modules:       CommonCLI
-                       Paths_json_autotype
-  other-extensions:    TemplateHaskell,
-                       ScopedTypeVariables,
-                       OverloadedStrings,
-                       FlexibleInstances,
-                       MultiParamTypeClasses,
-                       DeriveDataTypeable,
-                       DeriveGeneric,
-                       RecordWildCards
-  build-depends:       base                 >=4.3  && <5,
-                       GenericPretty        >=1.2  && <1.3,
-                       aeson                >=1.2.1  && <1.5,
-                       bytestring           >=0.9  && <0.11,
-                       containers           >=0.3  && <0.7,
-                       filepath             >=1.3  && <1.5,
-                       hashable             >=1.2  && <1.4,
-                       lens                 >=4.1  && <4.19,
-                       mtl                  >=2.1  && <2.3,
-                       optparse-applicative >=0.12 && <1.0,
-                       pretty               >=1.1  && <1.3,
-                       process              >=1.1  && <1.7,
-                       scientific           >=0.3  && <0.5,
-                       text                 >=1.1  && <1.4,
-                       uniplate             >=1.6  && <1.7,
-                       unordered-containers >=0.2  && <0.3,
-                       vector               >=0.9  && <0.13,
-                       yaml                 >=0.8  && <0.12,
-                       template-haskell,
-                       json-autotype,
-                       json-alt
-  default-language:    Haskell2010
-  -- STATIC: ld-options: -static
-  -- STATIC: ghc-options: -fPIC
-
--- * Test suites
--- Test suite with QuickCheck on random values,
--- and extracted types.
-test-suite json-autotype-qc-test
-  type:                exitcode-stdio-1.0
-  main-is:             TestQC.hs
-  hs-source-dirs:      test common
-  other-extensions:    TemplateHaskell,
-                       ScopedTypeVariables,
-                       OverloadedStrings,
-                       FlexibleInstances,
-                       MultiParamTypeClasses,
-                       DeriveDataTypeable,
-                       DeriveGeneric,
-                       RecordWildCards
-  build-depends:       base                 >=4.3  && <5,
-                       GenericPretty        >=1.2  && <1.3,
-                       aeson                >=1.2.1   && <1.5,
-                       containers           >=0.3  && <0.7,
-                       hashable             >=1.2  && <1.4,
-                       lens                 >=4.1  && <4.19,
-                       mtl                  >=2.1  && <2.3,
-                       pretty               >=1.1  && <1.3,
-                       scientific           >=0.3  && <0.5,
-                       smallcheck           >=1.0  && <1.2,
-                       text                 >=1.1  && <1.4,
-                       uniplate             >=1.6  && <1.7,
-                       unordered-containers >=0.2  && <0.3,
-                       vector               >=0.9  && <0.13,
-                       QuickCheck           >=2.4  && <3.0,
-                       json-autotype,
-                       json-alt
-  default-language:    Haskell2010
+  main-is: GenerateJSONParser.hs
+  hs-source-dirs:
+      app
+      common
+  other-modules:
+      CommonCLI
+      Paths_json_autotype
+  other-extensions: TemplateHaskell ScopedTypeVariables OverloadedStrings FlexibleInstances MultiParamTypeClasses DeriveDataTypeable DeriveGeneric RecordWildCards
+  build-depends:
+      GenericPretty >=1.2 && <1.3
+    , aeson >=1.2.1 && <1.5
+    , base >=4.3 && <5
+    , bytestring >=0.9 && <0.11
+    , containers >=0.3 && <0.7
+    , filepath >=1.3 && <1.5
+    , hashable >=1.2 && <1.4
+    , json-alt
+    , json-autotype
+    , lens >=4.1 && <4.19
+    , mtl >=2.1 && <2.3
+    , optparse-applicative >=0.12 && <1.0
+    , pretty >=1.1 && <1.3
+    , process >=1.1 && <1.7
+    , scientific >=0.3 && <0.5
+    , template-haskell
+    , text >=1.1 && <1.4
+    , uniplate >=1.6 && <1.7
+    , unordered-containers >=0.2 && <0.3
+    , vector >=0.9 && <0.13
+    , yaml >=0.8 && <0.12
+  default-language: Haskell2010
 
 test-suite json-autotype-examples
-  type:                exitcode-stdio-1.0
-  main-is:             TestExamples.hs
-  other-modules:       CommonCLI
-  hs-source-dirs:      test common
+  type: exitcode-stdio-1.0
+  main-is: TestExamples.hs
+  other-modules:
+      CommonCLI
+      Paths_json_autotype
+  hs-source-dirs:
+      test
+      common
+  other-extensions: TemplateHaskell ScopedTypeVariables OverloadedStrings FlexibleInstances MultiParamTypeClasses DeriveDataTypeable DeriveGeneric RecordWildCards
+  build-depends:
+      GenericPretty >=1.2 && <1.3
+    , QuickCheck >=2.4 && <3.0
+    , aeson >=1.2.1 && <1.5
+    , base >=4.3 && <5
+    , containers >=0.3 && <0.7
+    , directory >=1.1 && <1.4
+    , filepath >=1.3 && <1.5
+    , hashable >=1.2 && <1.4
+    , json-alt
+    , json-autotype
+    , lens >=4.1 && <4.19
+    , mtl >=2.1 && <2.3
+    , optparse-applicative >=0.11 && <1.0
+    , pretty >=1.1 && <1.3
+    , process >=1.1 && <1.7
+    , scientific >=0.3 && <0.5
+    , smallcheck >=1.0 && <1.2
+    , template-haskell
+    , text >=1.1 && <1.4
+    , uniplate >=1.6 && <1.7
+    , unordered-containers >=0.2 && <0.3
+    , vector >=0.9 && <0.13
+  default-language: Haskell2010
 
-  other-extensions:    TemplateHaskell,
-                       ScopedTypeVariables,
-                       OverloadedStrings,
-                       FlexibleInstances,
-                       MultiParamTypeClasses,
-                       DeriveDataTypeable,
-                       DeriveGeneric,
-                       RecordWildCards
-  build-depends:       base                 >=4.3  && <5,
-                       GenericPretty        >=1.2  && <1.3,
-                       aeson                >=1.2.1 && <1.5,
-                       containers           >=0.3  && <0.7,
-                       directory            >=1.1  && <1.4,
-                       filepath             >=1.3  && <1.5,
-                       hashable             >=1.2  && <1.4,
-                       lens                 >=4.1  && <4.19,
-                       mtl                  >=2.1  && <2.3,
-                       optparse-applicative >=0.11 && <1.0,
-                       pretty               >=1.1  && <1.3,
-                       process              >=1.1  && <1.7,
-                       scientific           >=0.3  && <0.5,
-                       smallcheck           >=1.0  && <1.2,
-                       text                 >=1.1  && <1.4,
-                       unordered-containers >=0.2  && <0.3,
-                       uniplate             >=1.6  && <1.7,
-                       vector               >=0.9  && <0.13,
-                       QuickCheck           >=2.4  && <3.0,
-                       template-haskell,
-                       json-autotype,
-                       json-alt
-  default-language:    Haskell2010
-
--- Test suite with Haskell code generation and compilation
 test-suite json-autotype-gen-test
-  type:                exitcode-stdio-1.0
-  main-is:             GenerateTestJSON.hs
-  hs-source-dirs:      test common
-  other-modules:       CommonCLI
+  type: exitcode-stdio-1.0
+  main-is: GenerateTestJSON.hs
+  hs-source-dirs:
+      test/gen
+      common
+  other-modules:
+      CommonCLI
+      Paths_json_autotype
+  other-extensions: TemplateHaskell ScopedTypeVariables OverloadedStrings FlexibleInstances MultiParamTypeClasses DeriveDataTypeable DeriveGeneric RecordWildCards
+  build-depends:
+      GenericPretty >=1.2 && <1.3
+    , QuickCheck >=2.4 && <3.0
+    , aeson >=1.2.1 && <1.5
+    , base >=4.3 && <5
+    , bytestring >=0.9 && <0.11
+    , containers >=0.3 && <0.7
+    , directory >=1.1 && <1.4
+    , filepath >=1.3 && <1.5
+    , hashable >=1.2 && <1.4
+    , json-alt
+    , json-autotype
+    , lens >=4.1 && <4.19
+    , mtl >=2.1 && <2.3
+    , optparse-applicative >=0.12 && <1.0
+    , pretty >=1.1 && <1.3
+    , process >=1.1 && <1.7
+    , scientific >=0.3 && <0.5
+    , smallcheck >=1.0 && <1.2
+    , template-haskell
+    , text >=1.1 && <1.4
+    , uniplate >=1.6 && <1.7
+    , unordered-containers >=0.2 && <0.3
+    , vector >=0.9 && <0.13
+  default-language: Haskell2010
 
-  other-extensions:    TemplateHaskell,
-                       ScopedTypeVariables,
-                       OverloadedStrings,
-                       FlexibleInstances,
-                       MultiParamTypeClasses,
-                       DeriveDataTypeable,
-                       DeriveGeneric,
-                       RecordWildCards
-  build-depends:       base                 >=4.3  && <5,
-                       GenericPretty        >=1.2  && <1.3,
-                       aeson                >=1.2.1  && <1.5,
-                       bytestring           >=0.9  && <0.11,
-                       containers           >=0.3  && <0.7,
-                       directory            >=1.1  && <1.4,
-                       filepath             >=1.3  && <1.5,
-                       hashable             >=1.2  && <1.4,
-                       optparse-applicative >=0.12 && <1.0,
-                       lens                 >=4.1  && <4.19,
-                       mtl                  >=2.1  && <2.3,
-                       pretty               >=1.1  && <1.3,
-                       process              >=1.1  && <1.7,
-                       scientific           >=0.3  && <0.5,
-                       smallcheck           >=1.0  && <1.2,
-                       text                 >=1.1  && <1.4,
-                       uniplate             >=1.6  && <1.7,
-                       unordered-containers >=0.2  && <0.3,
-                       vector               >=0.9  && <0.13,
-                       QuickCheck           >=2.4  && <3.0,
-                       template-haskell,
-                       json-autotype,
-                       json-alt
-  default-language:    Haskell2010
+test-suite json-autotype-qc-test
+  type: exitcode-stdio-1.0
+  main-is: TestQC.hs
+  other-modules:
+      CommonCLI
+      Paths_json_autotype
+  hs-source-dirs:
+      test/qc
+      common
+  other-extensions: TemplateHaskell ScopedTypeVariables OverloadedStrings FlexibleInstances MultiParamTypeClasses DeriveDataTypeable DeriveGeneric RecordWildCards
+  build-depends:
+      GenericPretty >=1.2 && <1.3
+    , QuickCheck >=2.4 && <3.0
+    , aeson >=1.2.1 && <1.5
+    , base >=4.3 && <5
+    , containers >=0.3 && <0.7
+    , filepath >=1.3 && <1.5
+    , hashable >=1.2 && <1.4
+    , json-alt
+    , json-autotype
+    , lens >=4.1 && <4.19
+    , mtl >=2.1 && <2.3
+    , optparse-applicative >=0.12 && <1.0
+    , pretty >=1.1 && <1.3
+    , process >=1.1 && <1.7
+    , scientific >=0.3 && <0.5
+    , smallcheck >=1.0 && <1.2
+    , template-haskell
+    , text >=1.1 && <1.4
+    , uniplate >=1.6 && <1.7
+    , unordered-containers >=0.2 && <0.3
+    , vector >=0.9 && <0.13
+  default-language: Haskell2010

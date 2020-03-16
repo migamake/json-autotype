@@ -1,0 +1,45 @@
+cabal-version: 1.12
+
+-- This file has been generated from package.yaml by hpack version 0.33.0.
+--
+-- see: https://github.com/sol/hpack
+--
+-- hash: 0d105f0142c4fbea46fc0f0bd6aaf9f891f5f4b75a748c0bc2d94e68f7ae8005
+
+name:                run-haskell-module
+version:             0.0.1
+synopsis:            Running newly generated Haskell source module.
+description:         To make sure freshly generated code runs,
+                     we need to make it run in Stack/Cabal/GHC environment.
+license:             BSD3
+license-file:        LICENSE
+stability:           beta
+author:              Michal J. Gajda,
+                     Dmitrii Krylov
+maintainer:          simons@cryp.to,
+                     mjgajda@gmail.com
+copyright:           Copyright by Michal J. Gajda '2014-'2020
+category:            Data, Tools
+build-type:          Simple
+extra-source-files:
+    README.md
+    changelog.md
+tested-with:         GHC==8.4.4 GHC==8.6.5 GHC==8.8.2 GHC==8.10.1
+
+source-repository head
+  type: git
+  location: https://gitlab.com/migamake/json-autotype.git
+
+library
+  exposed-modules:
+      Language.Haskell.RunHaskellModule
+  other-modules:
+      Paths_run_haskell_module
+  hs-source-dirs:
+      src
+  build-depends:
+      base >=4.3 && <5
+    , data-default >=0.7 && <0.8
+    , filepath >=1.3 && <1.5
+    , process >=1.1 && <1.7
+  default-language: Haskell2010

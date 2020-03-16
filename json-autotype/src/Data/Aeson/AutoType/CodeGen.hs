@@ -11,6 +11,7 @@ module Data.Aeson.AutoType.CodeGen(
 import           Data.Text(Text)
 import qualified Data.HashMap.Strict as Map
 import           Data.Aeson.AutoType.Type
+import           System.Exit
 
 import           Data.Aeson.AutoType.CodeGen.Haskell
 import           Data.Aeson.AutoType.CodeGen.Elm
@@ -34,6 +35,7 @@ writeModule HaskellStrict = writeHaskellModule
 writeModule Elm           = writeElmModule
 
 -- | Run module in a given language.
+runModule :: Lang -> FilePath -> [String] -> IO ExitCode
 runModule Haskell       = runHaskellModule
 runModule HaskellStrict = runHaskellModuleStrict
 runModule Elm           = runElmModule

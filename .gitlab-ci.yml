@@ -23,7 +23,7 @@ cache:
 
 
 stack_build:
-  image: migamake/haskell-build:8.6
+  image: migamake/stack-build-image:12.26
   stage: build
   script:
     - ci/stack-build.sh
@@ -52,18 +52,13 @@ ghc_8_6:
   variables:
     GHC_VER: "8.6"
   extends: .build_exe
-  artifacts:
-    paths:
-      - sdist/*[0-9].tar.gz
-      - hackage-docs/*-docs.tar.gz
-      - bin/${EXEC_NAME}
-    expire_in: 2 weeks
-  allow_failure: false
+  allow_failure: true
 
 ghc_8_4:
   variables:
     GHC_VER: "8.4"
   extends: .build_exe
+  allow_failure: true
 
 ghc_8_10:
   variables:
@@ -77,7 +72,13 @@ ghc_8_8:
     GHC_VER: "8.8"
   extends: .new_build_exe
   retry: 2
-  allow_failure: true
+  artifacts:
+    paths:
+      - sdist/*[0-9].tar.gz
+      - hackage-docs/*-docs.tar.gz
+      - bin/${EXEC_NAME}
+    expire_in: 2 weeks
+  allow_failure: false
 
 tar_package:
   stage: test
@@ -125,7 +126,7 @@ hackage:
   script:
     - ci/release.sh --publish
   dependencies:
-    - ghc_8_6
+    - ghc_8_8
   when: manual
   only:
     - master
@@ -136,7 +137,7 @@ dockerhub:
   script:
     - docker load -i ${PACKAGE_NAME}.docker
     - echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin;
-    - docker push migamake/json-autotype;
+    - docker push migamake/${PACKAGE_NAME};
   dependencies:
     - docker_image
   when: manual

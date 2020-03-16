@@ -103,6 +103,7 @@ docker_image:
   artifacts:
     paths:
       - ${PACKAGE_NAME}.docker
+  allow_failure: true
 
 candidate_hackage:
   stage: test

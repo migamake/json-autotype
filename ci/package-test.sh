@@ -14,6 +14,6 @@ tar xzf sdist/${PKG}*.tar.gz
 done 
 
 message "Running executable"
-ls bin
-ls -d json-autotype*
-bin/${EXEC_NAME} json-autotype/test/colors.json
+ls -alth bin
+ls -alth json-autotype*
+bin/${EXEC_NAME} json-autotype-*/test/colors.json

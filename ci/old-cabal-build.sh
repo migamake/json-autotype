@@ -1,15 +1,6 @@
 #!/bin/bash
 
-source ci/common.sh
-
-message "Versions"
-cabal --version
-ghc   --version
-hpack --version
-
-message "Dependencies"
-cabal update
-#cabal install --dependencies-only --enable-tests
+source ci/cabal-common.sh
 
 for PKG in "${PKGS[@]}"; do
   (cd ${PKG};

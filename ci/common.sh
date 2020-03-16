@@ -11,7 +11,3 @@ set -o nounset
 
 PKGS=(json-alt run-haskell-module json-autotype)
 
-message "Run hpack"
-for PKG in "${PKGS[@]}"; do
-  (cd $PKG; hpack);
-done

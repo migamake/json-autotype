@@ -1,11 +1,6 @@
 #!/bin/bash
 
-source ci/common.sh
-
-message "Versions"
-cabal --version
-ghc   --version
-hpack --version
+source ci/cabal-common.sh
 
 mkdir -p hackage-docs bin sdist
 

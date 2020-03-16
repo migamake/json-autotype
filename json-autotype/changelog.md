@@ -2,6 +2,7 @@ Changelog
 =========
     3.0.4  Mar 2020
         * Do not try to test compilation when module is written to stdout.
+        * Update lens dependency bounds
 
     3.0.3  Mar 2020
         * Separate running Haskell modules in `run-haskell-module` package.

@@ -15,7 +15,7 @@ ls -lR bin
 message "Preparing source distribution"
 cabal new-sdist --output-dir=sdist  "${PKGS[@]}"
 
-message "Documenation distribution"
+message "Documentation distribution"
 cabal new-haddock --builddir=hackage-docs --haddock-for-hackage  "${PKGS[@]}"
 
 message "Run on example"

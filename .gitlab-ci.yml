@@ -83,13 +83,9 @@ ghc_8_8:
 tar_package:
   stage: test
   script:
-    - cabal update
-    - mkdir -p bin
-    - cabal install sdist/$PACKAGE_NAME*[0-9].tar.gz --bindir=bin/
-    - tar xzf sdist/$PACKAGE_NAME*[0-9].tar.gz
-    - bin/${EXEC_NAME} json-autotype/test/colors.json
+    - ci/package-test.sh
   dependencies:
-    - ghc_8_6
+    - ghc_8_8
   artifacts:
     paths:
       - bin/${EXEC_NAME}
@@ -113,7 +109,7 @@ candidate_hackage:
   script:
     - ci/release.sh
   dependencies:
-    - ghc_8_6
+    - ghc_8_8
   environment:
     name: "hackage-candidate-${PACKAGE_VER}"
     url:  "https://hackage.haskell.org/package/homplexity-${PACKAGE_VER}/candidate"

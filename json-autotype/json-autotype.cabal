@@ -4,10 +4,10 @@ cabal-version: 1.12
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: 445223ce1ad4c1cd5d1445e3d17a3aee4d997a8ffc7bdbeb0b916312f4875625
+-- hash: 84501bebdbe7dc6b9b7c5605df545eaae45695e21f180ea3fd68181f878acd0d
 
 name:                json-autotype
-version:             3.0.3
+version:             3.0.4
 synopsis:            Automatic type declaration for JSON input data
 description:         Generates datatype declarations with Aeson''s ''Data.Aeson.FromJSON''
                      .

@@ -24,7 +24,8 @@ for PKG in "${PKGS[@]}"; do
    mkdir -p bin sdist
    cabal v1-install --bindir=../bin/ --reinstall --force-reinstalls
    cabal v1-sdist   --builddir=../sdist/
-   cabal v1-haddock --builddir=../hackage-docs --for-hackage
+   # Buggy in v1-* port
+   #cabal v1-haddock --builddir=../hackage-docs --for-hackage
   )
 done;
 

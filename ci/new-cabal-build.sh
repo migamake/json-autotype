@@ -2,6 +2,10 @@
 
 source ci/common.sh
 
+message "Versions"
+cabal --version
+ghc   --version
+hpack --version
 
 mkdir -p hackage-docs bin sdist
 

@@ -2,8 +2,13 @@
 
 source ci/common.sh
 
-#message "Dependencies"
-#cabal update
+message "Versions"
+cabal --version
+ghc   --version
+hpack --version
+
+message "Dependencies"
+cabal update
 #cabal install --dependencies-only --enable-tests
 
 for PKG in "${PKGS[@]}"; do

@@ -9,11 +9,6 @@ set -o pipefail
 set -o errexit
 set -o nounset
 
-message "Versions"
-cabal --version
-ghc   --version
-hpack --version
-
 PKGS=(json-alt run-haskell-module json-autotype)
 
 message "Run hpack"

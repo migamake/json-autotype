@@ -8,13 +8,13 @@ COPY run-haskell-module /src/run-haskell-module
 COPY stack.yaml            /src/stack.yaml
 WORKDIR /src/json-alt
 RUN cabal update
-RUN cabal install -j --dependencies-only
+RUN cabal install -j --dependencies-only --keep-going || (sleep 60; cabal install -j --dependencies-only)
 RUN cabal install -j
 WORKDIR /src/run-haskell-module
-RUN cabal install -j --dependencies-only
+RUN cabal install -j --dependencies-only --keep-going || (sleep 60; cabal install -j --dependencies-only)
 RUN cabal install -j
 WORKDIR /src/json-autotype
-RUN cabal install -j --dependencies-only
+RUN cabal install -j --dependencies-only --keep-going || (sleep 60; cabal install -j --dependencies-only)
 RUN cabal install -j
 RUN mkdir /workdir
 WORKDIR /workdir

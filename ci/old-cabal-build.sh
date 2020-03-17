@@ -2,6 +2,7 @@
 
 source ci/cabal-common.sh
 
+export CI_GHC_CABAL_STYLE=v1
 for PKG in "${PKGS[@]}"; do
   (cd ${PKG};
    message "Build $PKG";

@@ -105,6 +105,7 @@ findGhc RunOptions{..} ghcTool = do
         showEnv "HASKELL_DIST_DIR"
         showEnv "CI_GHC_ADDITIONAL_FLAGS"
         showEnv "CI_GHC_ADDITIONAL_PACKAGES"
+        showEnv "CI_GHC_CABAL_STYLE"
         -- putStrLn "Environment: -----------"
         -- getEnvironment >>= (mapM_ $ \(env,val) -> putStrLn $ env ++ " = " ++ val)
         -- putStrLn "End of environment -----"
@@ -113,10 +114,12 @@ findGhc RunOptions{..} ghcTool = do
     newCabal <- lookupEnv "HASKELL_DIST_DIR"
     additionalFlags    <- (maybe [] splitWithQuotes)                      <$> lookupEnv "CI_GHC_ADDITIONAL_FLAGS"
     additionalPackages <- ((additionalPackagesDef ++) . (maybe [] words)) <$> lookupEnv "CI_GHC_ADDITIONAL_PACKAGES"
+    cabalStyle         <- (maybe "v2" id)                                 <$> lookupEnv "CI_GHC_CABAL_STYLE"
+    let cabalExec = cabalStyle ++ "-exec"
     let additionalPackagesArgs = map mkAdditionalPackagesArg additionalPackages
     let res@(exe, exeArgs') | Just stackExec <- stack    = (stackExec, additionalFlags ++ [tool, "--"])
                             | Just _         <- oldCabal = ("cabal", ["exec", tool, "--"])
-                            | Just _         <- newCabal = ("cabal", ["v2-exec", tool, "--"] ++ additionalPackagesArgs)
+                            | Just _         <- newCabal = ("cabal", [cabalExec, tool, "--"] ++ additionalPackagesArgs)
                             | otherwise                  = (tool, [])
         exeArgs = case ghcTool of
                     Compiler -> exeArgs' ++ ["-O0"]

@@ -3,3 +3,11 @@ cabal.sandbox.config
 .hpc
 .stack-work
 _pier
+dist-newstyle
+dist
+sdist
+bin/
+pulp
+.ghc.environment.*
+node_modules/
+hackage-docs

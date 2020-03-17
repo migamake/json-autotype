@@ -19,7 +19,7 @@ RUN  cabal v2-install -j --lib
 WORKDIR /src/json-autotype
 RUN  ls *.cabal
 RUN  cabal v2-install -j --dependencies-only --keep-going || (sleep 60; cabal v2-install -j --dependencies-only)
-RUN  cabal v2-install -j --symlink-bindir=/usr/bin
+RUN  cabal v2-install -j json-autotype --symlink-bindir=/usr/bin
 RUN  mkdir /workdir
 WORKDIR /workdir
 ENTRYPOINT ["/usr/bin/json-autotype"]

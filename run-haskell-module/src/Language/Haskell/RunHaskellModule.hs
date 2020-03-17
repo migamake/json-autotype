@@ -31,7 +31,7 @@ data RunOptions = RunOptions
 
 
 instance Default RunOptions where
-    def = RunOptions { verbose     = True
+    def = RunOptions { verbose     = False
                      , showStdout  = False
                      , compileArgs = []
                      }

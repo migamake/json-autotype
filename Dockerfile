@@ -10,16 +10,16 @@ COPY stack.yaml           /src/stack.yaml
 WORKDIR /src/json-alt
 RUN  ls *.cabal
 RUN  cabal v2-update
-RUN  cabal v2-install -j --dependencies-only --keep-going || (sleep 60; cabal v2-install -j --dependencies-only)
+RUN  cabal v2-install -j --dependencies-only --keep-going --lib || (sleep 60; cabal v2-install -j --dependencies-only --lib)
 RUN  cabal v2-install -j --lib
 WORKDIR /src/run-haskell-module
 RUN  ls *.cabal
-RUN  cabal v2-install -j --dependencies-only --keep-going || (sleep 60; cabal v2-install -j --dependencies-only)
+RUN  cabal v2-install -j --dependencies-only --keep-going --lib || (sleep 60; cabal v2-install -j --dependencies-only --lib)
 RUN  cabal v2-install -j --lib
 WORKDIR /src/json-autotype
 RUN  ls *.cabal
-RUN  cabal v2-install -j --dependencies-only --keep-going || (sleep 60; cabal v2-install -j --dependencies-only)
-RUN  cabal v2-install -j json-autotype --symlink-bindir=/usr/bin
+RUN  cabal v2-install -j --dependencies-only --keep-going --lib || (sleep 60; cabal v2-install -j --dependencies-only --lib)
+RUN  cabal v2-install -j exe:json-autotype --symlink-bindir=/usr/bin
 RUN  mkdir /workdir
 WORKDIR /workdir
 ENTRYPOINT ["/usr/bin/json-autotype"]

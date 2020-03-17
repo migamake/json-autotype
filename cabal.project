@@ -2,3 +2,4 @@ packages:
   json-alt
   json-autotype
   run-haskell-module
+allow-newer: aeson:th-abstraction

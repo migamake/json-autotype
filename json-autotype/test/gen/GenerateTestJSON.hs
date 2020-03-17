@@ -165,7 +165,7 @@ generateTestJSONs Options {tyOpts=TyOptions {..},
           writeModule lang outputFilename toplevelName unified
           if test
             then do
-              r <- (==ExitSuccess) <$> runModule lang outputFilename [inputFilename]
+              r <- (ExitSuccess==) <$> runModule lang outputFilename [inputFilename]
               when r $ mapM_ removeFile [inputFilename, outputFilename]
               return r
             else

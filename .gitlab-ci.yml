@@ -64,7 +64,7 @@ ghc_8_10:
   variables:
     GHC_VER: "8.10"
   extends: .new_build_exe
-  retry: 2
+  retry: 1
   allow_failure: true
 
 ghc_8_8:

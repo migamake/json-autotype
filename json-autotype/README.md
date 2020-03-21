@@ -8,7 +8,6 @@ The program uses union type unification to trim output declarations. The types o
 
 I should probably write a short paper to explain the methodology.
 
-[![Build matrix across GHC compiler versions](https://img.shields.io/travis/mgajda/json-autotype.svg)](https://travis-ci.org/mgajda/json-autotype)
 [![Release build](https://gitlab.com/migamake/json-autotype/badges/master/pipeline.svg)](https://gitlab.com/migamake/json-autotype/commits/master)
 [![Hackage](https://img.shields.io/hackage/v/json-autotype.svg)](https://hackage.haskell.org/package/json-autotype)
 [![Hackage Dependencies](https://img.shields.io/hackage-deps/v/json-autotype.svg?style=flat)](http://packdeps.haskellers.com/feed?needle=json-autotype)

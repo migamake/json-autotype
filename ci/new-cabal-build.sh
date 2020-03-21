@@ -23,6 +23,6 @@ ls -lR bin/
 #bin/json-autotype json-autotype/test/colors.json --outputFilename=Colors.hs
 new-bin/json-autotype json-autotype/test/colors.json
 
-mkdir bin
+mkdir -p bin
 cp --dereference new-bin/json-autotype bin/json-autotype
 

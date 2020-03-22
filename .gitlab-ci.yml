@@ -97,7 +97,7 @@ tar_package:
   script:
     - ci/package-test.sh
   dependencies:
-    - ghc_8_6
+    - ghc_8_8
   artifacts:
     paths:
       - bin/${EXEC_NAME}

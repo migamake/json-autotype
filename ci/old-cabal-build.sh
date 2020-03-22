@@ -14,11 +14,11 @@ for PKG in "${PKGS[@]}"; do
   )
 done;
 
+message "Preparing artifacts..."
 mkdir -p hackage-docs bin sdist
 for PKG in "${PKGS[@]}"; do
   (cd ${PKG};
    message "Prepare release artifacts for ${PKG}"
-   mkdir -p bin sdist
    cabal v1-install --bindir=../bin/ --reinstall --force-reinstalls
    cabal v1-sdist   --builddir=../sdist/
    # Buggy in v1-* port

@@ -18,11 +18,12 @@ message "Documentation distribution"
 cabal new-haddock --builddir=hackage-docs --haddock-for-hackage  "${PKGS[@]}"
 
 message "Run on example"
-ls -lR bin/
 # Need working runModule yet!
 #bin/json-autotype json-autotype/test/colors.json --outputFilename=Colors.hs
 new-bin/json-autotype json-autotype/test/colors.json
 
+message "Copy binary to bin/"
 mkdir -p bin
 cp --dereference new-bin/json-autotype bin/json-autotype
+ls -lR bin/
 

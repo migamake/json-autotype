@@ -73,7 +73,7 @@ other-extensions:
 - DeriveGeneric
 - RecordWildCards
 dependencies:
-- base >=4.3 && <5
+- base >=4.9 && <5
 - GenericPretty >=1.2 && <1.3
 - aeson >=1.2.1 && <1.5
 - containers >=0.3 && <0.7

@@ -54,6 +54,15 @@ extra-source-files:
 - changelog.md
 - examples/union.json
 - examples/colors.json
+- test/colors.json
+- test/events.json
+- test/interop.json
+- test/jenkins.json
+- test/youtube.json
+- test/customerform.json
+- test/facebook.json
+- test/iPhoneMenu.json
+- test/productsdb.json
 other-extensions:
 - TemplateHaskell
 - ScopedTypeVariables

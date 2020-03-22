@@ -38,6 +38,12 @@ stack_build:
   script:
     - ci/old-cabal-build.sh
   retry: 2
+  artifacts:
+    paths:
+      - sdist/*[0-9].tar.gz
+      - hackage-docs/*-docs.tar.gz
+      - bin/${EXEC_NAME}
+    expire_in: 2 weeks
 
 # Build for images 8.8 and above with `cabal-install` v3.x
 
@@ -47,6 +53,12 @@ stack_build:
   script:
     - ci/new-cabal-build.sh
   retry: 2
+  artifacts:
+    paths:
+      - sdist/*[0-9].tar.gz
+      - hackage-docs/*-docs.tar.gz
+      - bin/${EXEC_NAME}
+    expire_in: 2 weeks
 
 ghc_8_6:
   variables:

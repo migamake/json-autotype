@@ -26,5 +26,8 @@ for PKG in "${PKGS[@]}"; do
   )
 done;
 
+message "Check artifacts"
+ls -lR sdist bin hackage-docs
+
 message "Run on example"
 bin/json-autotype json-autotype/test/colors.json

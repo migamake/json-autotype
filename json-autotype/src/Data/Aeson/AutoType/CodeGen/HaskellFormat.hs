@@ -7,7 +7,8 @@
 {-# LANGuaGE FlexibleContexts    #-}
 -- | Formatting type declarations and class instances for inferred types. 
 module Data.Aeson.AutoType.CodeGen.HaskellFormat(
-  displaySplitTypes, normalizeTypeName
+  displaySplitTypes, normalizeTypeName,
+  normalizeFieldName, formatType
 ) where
 
 import           Control.Arrow             ((&&&))
@@ -155,10 +156,10 @@ newAlias identifier content = do formatted <- formatType content
 -- from within a dictionary keyed with first argument,
 -- into a name of Haskell record field (hopefully distinct from other such selectors.)
 normalizeFieldName ::  Text -> Text -> Text
-normalizeFieldName identifier = escapeKeywords             .
-                                uncapitalize               .
+normalizeFieldName identifier =  escapeKeywords             .
+                                 uncapitalize               .
                                 (normalizeTypeName identifier `Text.append`) .
-                                normalizeTypeName
+                                 normalizeTypeName
 
 keywords ::  Set Text
 keywords = Set.fromList ["kind", "type", "data", "module", "class", "where", "let", "do"]

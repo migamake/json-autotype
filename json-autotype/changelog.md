@@ -1,5 +1,10 @@
 Changelog
 =========
+    3.0.5  Mar 2020
+        * Expose commonly used functions for:
+            - normalizing Haskell type names,
+            - formatting JSON Autotype types in Haskell
+
     3.0.4  Mar 2020
         * Do not try to test compilation when module is written to stdout.
         * Update lens dependency bounds

@@ -94,9 +94,9 @@ library:
   source-dirs: src
   exposed-modules:
   - Data.Aeson.AutoType.CodeGen
-  - Data.Aeson.AutoType.HaskellFormat
   - Data.Aeson.AutoType.Extract
   - Data.Aeson.AutoType.Format
+  - Data.Aeson.AutoType.HaskellFormat
   - Data.Aeson.AutoType.Pretty
   - Data.Aeson.AutoType.Split
   - Data.Aeson.AutoType.Type

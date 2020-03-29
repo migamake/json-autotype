@@ -1,6 +1,7 @@
 Changelog
 =========
     3.0.5  Mar 2020
+        * Using package import from `run-haskell-module` by default.
         * Expose commonly used functions for:
             - normalizing Haskell type names,
             - formatting JSON Autotype types in Haskell

@@ -1,5 +1,5 @@
 name: run-haskell-module
-version: '0.0.1'
+version: '0.0.2'
 synopsis: Running newly generated Haskell source module.
 description: ! 'To make sure freshly generated code runs,
 

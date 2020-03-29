@@ -115,13 +115,15 @@ findGhc RunOptions{..} ghcTool = do
     stack    <- lookupEnv "STACK_EXE"
     oldCabal <- lookupEnv "CABAL_SANDBOX_CONFIG"
     newCabal <- lookupEnv "HASKELL_DIST_DIR"
-    additionalFlags    <- (maybe [] splitWithQuotes)                       <$> lookupEnv "CI_GHC_ADDITIONAL_FLAGS"
+    additionalFlags        <- (maybe [] splitWithQuotes)                    <$> lookupEnv "CI_GHC_ADDITIONAL_FLAGS"
     additionalPackagesList <- ((additionalPackages ++) . (maybe [] words))  <$> lookupEnv "CI_GHC_ADDITIONAL_PACKAGES"
-    cabalStyle         <- (maybe "v2" id)                                  <$> lookupEnv "CI_GHC_CABAL_STYLE"
+    cabalStyle             <- (maybe "v2" id)                               <$> lookupEnv "CI_GHC_CABAL_STYLE"
     let cabalExec = cabalStyle ++ "-exec"
     let additionalPackagesArgs = map mkAdditionalPackagesArg additionalPackagesList
 
-    let res@(exe, exeArgs') | Just stackExec <- stack    = (stackExec, additionalFlags ++ [tool, "--"])
+    let res@(exe, exeArgs') | Just stackExec <- stack    = (stackExec, [tool] ++ additionalFlags
+                                                                   ++ (stackPackageArg <$> additionalPackagesList)
+                                                                   ++ ["--"])
                             | Just _         <- oldCabal = ("cabal", ["exec", tool, "--"])
                             | Just _         <- newCabal = ("cabal", [cabalExec, tool, "--"] ++ additionalPackagesArgs)
                             | otherwise                  = (tool, [])
@@ -134,6 +136,7 @@ findGhc RunOptions{..} ghcTool = do
     tool = case ghcTool of
                Runner   -> "runghc"
                Compiler -> "ghc"
+    stackPackageArg arg = "--package=" ++ arg
     mkAdditionalPackagesArg arg = case ghcTool of
                Runner   -> "--ghc-arg=-package=" ++ arg
                Compiler ->           "-package=" ++ arg

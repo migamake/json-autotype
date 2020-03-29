@@ -1,9 +1,9 @@
 name: run-haskell-module
 version: '0.0.2'
 synopsis: Running newly generated Haskell source module.
-description: ! 'To make sure freshly generated code runs,
-
-  we need to make it run in Stack/Cabal/GHC environment.'
+description: |
+  Running generated test code in Stack/Cabal/GHC environment.
+  .
 category: Data, Tools
 author:
 - Michal J. Gajda

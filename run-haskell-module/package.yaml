@@ -11,7 +11,7 @@ author:
 maintainer:
   - simons@cryp.to
   - mjgajda@gmail.com
-copyright: Copyright by Michal J. Gajda '2014-'2020
+copyright: Copyright by Migamake '2014-'2020
 license: BSD3
 git: https://gitlab.com/migamake/json-autotype.git
 tested-with: GHC==8.4.4 GHC==8.6.5 GHC==8.8.2 GHC==8.10.1

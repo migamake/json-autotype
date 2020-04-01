@@ -109,8 +109,12 @@ writeHaskellModule outputFilename toplevelName types =
 runHaskellModule :: FilePath -> [String] -> IO ExitCode
 runHaskellModule = Run.runHaskellModule
 
+defaultHaskellOpts :: Run.RunOptions
+defaultHaskellOpts  = def { Run.additionalPackages = ["json-alt", "aeson"]
+                          }
+
 runHaskellModuleStrict :: FilePath -> [String] -> IO ExitCode
 runHaskellModuleStrict = Run.runHaskellModule' opts
   where
-      opts = def { Run.compileArgs = ["-Wall", "-Werror"] }
+      opts = def { Run.compileArgs = ["-Wall", "-Werror"]}
 

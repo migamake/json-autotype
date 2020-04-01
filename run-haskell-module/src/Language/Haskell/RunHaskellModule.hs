@@ -16,6 +16,7 @@ import           Control.Exception
 import           Control.Monad
 import           Data.Char
 import           Data.Default
+import           Data.Semigroup((<>))
 import           System.Environment
 import           System.Exit
 import           System.FilePath.Posix
@@ -24,16 +25,18 @@ import           System.Process
 
 
 data RunOptions = RunOptions
-        { verbose     :: Bool
-        , showStdout  :: Bool
-        , compileArgs :: [String]
+        { verbose            :: Bool
+        , showStdout         :: Bool
+        , compileArgs        :: [String]
+        , additionalPackages :: [String]
         }
 
 
 instance Default RunOptions where
-    def = RunOptions { verbose     = False
-                     , showStdout  = False
-                     , compileArgs = []
+    def = RunOptions { verbose            = False
+                     , showStdout         = False
+                     , compileArgs        = []
+                     , additionalPackages = []
                      }
 
 
@@ -52,7 +55,7 @@ callProcess' RunOptions{..} cmd args = do
             whenMaybe hClose pstderr
             return ExitSuccess
         ExitFailure r -> do
-            whenMaybe (dumpHandle stdout) pstdout
+            whenMaybe (dumpHandle stderr) pstdout
             whenMaybe (dumpHandle stderr) pstderr
             fail $ concat ["Running \"", cmd, "\" \"", show args, "\" has failed with \"", show r, "\""]
   where
@@ -112,12 +115,15 @@ findGhc RunOptions{..} ghcTool = do
     stack    <- lookupEnv "STACK_EXE"
     oldCabal <- lookupEnv "CABAL_SANDBOX_CONFIG"
     newCabal <- lookupEnv "HASKELL_DIST_DIR"
-    additionalFlags    <- (maybe [] splitWithQuotes)                      <$> lookupEnv "CI_GHC_ADDITIONAL_FLAGS"
-    additionalPackages <- ((additionalPackagesDef ++) . (maybe [] words)) <$> lookupEnv "CI_GHC_ADDITIONAL_PACKAGES"
-    cabalStyle         <- (maybe "v2" id)                                 <$> lookupEnv "CI_GHC_CABAL_STYLE"
+    additionalFlags        <- (maybe [] splitWithQuotes)                    <$> lookupEnv "CI_GHC_ADDITIONAL_FLAGS"
+    additionalPackagesList <- ((additionalPackages ++) . (maybe [] words))  <$> lookupEnv "CI_GHC_ADDITIONAL_PACKAGES"
+    cabalStyle             <- (maybe "v2" id)                               <$> lookupEnv "CI_GHC_CABAL_STYLE"
     let cabalExec = cabalStyle ++ "-exec"
-    let additionalPackagesArgs = map mkAdditionalPackagesArg additionalPackages
-    let res@(exe, exeArgs') | Just stackExec <- stack    = (stackExec, additionalFlags ++ [tool, "--"])
+    let additionalPackagesArgs = map mkAdditionalPackagesArg additionalPackagesList
+
+    let res@(exe, exeArgs') | Just stackExec <- stack    = (stackExec, [tool] ++ additionalFlags
+                                                                   ++ (stackPackageArg <$> additionalPackagesList)
+                                                                   ++ ["--"])
                             | Just _         <- oldCabal = ("cabal", ["exec", tool, "--"])
                             | Just _         <- newCabal = ("cabal", [cabalExec, tool, "--"] ++ additionalPackagesArgs)
                             | otherwise                  = (tool, [])
@@ -130,10 +136,10 @@ findGhc RunOptions{..} ghcTool = do
     tool = case ghcTool of
                Runner   -> "runghc"
                Compiler -> "ghc"
+    stackPackageArg arg = "--package=" ++ arg
     mkAdditionalPackagesArg arg = case ghcTool of
-               Runner   -> "--ghc-arg=-package " ++ arg
-               Compiler ->           "-package " ++ arg
-    additionalPackagesDef = []
+               Runner   -> "--ghc-arg=-package=" ++ arg
+               Compiler ->           "-package=" ++ arg
 
 
 passModuleToGhc :: RunOptions -> GhcTool -> FilePath -> [String] -> IO ExitCode

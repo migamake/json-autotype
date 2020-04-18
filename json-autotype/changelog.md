@@ -1,5 +1,9 @@
 Changelog
 =========
+    3.1.0  Apr 2020
+        * New, experimental interface for nesting
+          generated types by other code generators.
+
     3.0.5  Mar 2020
         * Using package import from `run-haskell-module` by default.
         * Expose commonly used functions for:

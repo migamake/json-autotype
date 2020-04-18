@@ -4,10 +4,10 @@ cabal-version: 1.12
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: fb4adc71d7680a6ad92e8ac005c8302728f695d5a933e624e6b48ffb55d2787e
+-- hash: 69c68aeb21aa0332a50089781cb19f9fb197bb8c6d7d633af4613de8aa4dd367
 
 name:                json-autotype
-version:             3.0.5
+version:             3.1.0
 synopsis:            Automatic type declaration for JSON input data
 description:         Generates datatype declarations with Aeson''s ''Data.Aeson.FromJSON''
                      .
@@ -95,6 +95,7 @@ library
       Data.Aeson.AutoType.CodeGen.ElmFormat
       Data.Aeson.AutoType.CodeGen.Generic
       Data.Aeson.AutoType.CodeGen.Haskell
+      Data.Aeson.AutoType.Nested
       Data.Aeson.AutoType.Plugin.Subtype
       Paths_json_autotype
   hs-source-dirs:

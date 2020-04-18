@@ -23,12 +23,12 @@ import           System.FilePath.Posix
 import           System.IO
 import           System.Process
 
-
+-- | Describes options required for run environment
 data RunOptions = RunOptions
-        { verbose            :: Bool
-        , showStdout         :: Bool
-        , compileArgs        :: [String]
-        , additionalPackages :: [String]
+        { verbose            :: Bool -- ^ Verbose run?
+        , showStdout         :: Bool -- ^ Whether to show `stdout` for debugging
+        , compileArgs        :: [String] -- ^ GHC options
+        , additionalPackages :: [String] -- ^ Packages to expose
         }
 
 

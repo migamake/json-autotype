@@ -62,7 +62,8 @@ splitTypeByLabel' _  TInt      = return TInt
 splitTypeByLabel' _  TDouble   = return TDouble
 splitTypeByLabel' _  TBool     = return TBool
 splitTypeByLabel' _  TNull     = return TNull
-splitTypeByLabel' _ (TLabel r) = error $ "Splitting into labelled types after label " <> r <> " was already given!"
+splitTypeByLabel' _ (TLabel r) = error $ "Splitting into labelled types after label "
+                                      <> show r <> " was already given!"
 splitTypeByLabel' l (TUnion u) = do m <- mapM (splitTypeByLabel' l) $ Set.toList u
                                     return $! TUnion $! Set.fromList m
 splitTypeByLabel' l (TArray a) = do m <- splitTypeByLabel' (l `Text.append` "Elt") a

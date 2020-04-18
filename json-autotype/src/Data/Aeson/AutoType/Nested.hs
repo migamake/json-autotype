@@ -33,7 +33,7 @@ import GHC.Generics
 
 -- FIXME: general type to compose generated types
 -- move to JSON Autotype as library interface?
--- | API Response Structures
+-- * API Response Structures
 type CodeFragment   = Text
 type TypeName       = Text
 type ImportedModule = Text
@@ -46,9 +46,14 @@ type PackageName    = Text
 --   * module imports necessary for declarations
 --     to work
 data DeclaredType = DeclaredType
-  { typeCodeFragment    ::  CodeFragment
+  {
+    -- | Code fragment to be inserted in generated module
+    typeCodeFragment    ::  CodeFragment
+    -- | Toplevel type name to refer to
   , typeName            ::  TypeName
+    -- | List of clauses to add to imports list
   , typeImportedModules :: [ImportedModule]
+    -- | List of packages to add to generated package dependencies
   , typePackages        :: [PackageName]
   }
   deriving
@@ -60,7 +65,7 @@ data DeclaredType = DeclaredType
 
 
 instance Default DeclaredType where
-  -- Placeholder to use in case we cannot infer proper type
+  -- Minimal placeholder to use in case we cannot infer proper type
   def = DeclaredType {
             typeCodeFragment    =  ""
           , typeName            =  "Data.Aeson.Value"
@@ -68,6 +73,7 @@ instance Default DeclaredType where
           , typePackages        = ["aeson"]
           }
 
+-- | List of modules imported for Autotyped declarations
 defaultImportedModules = importedModules
 
 -- | Given intended type name, and a list of

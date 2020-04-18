@@ -4,7 +4,7 @@ cabal-version: 1.12
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: 19e927c68148b07a0870a432d17ad15c8f6f75df71f4e364ddadafb365015dcb
+-- hash: 50882ba4b5afe99b10c863f3ca7ba3aa9a791a89c6bc92313ad570c45122a88a
 
 name:                json-alt
 version:             1.0.0
@@ -38,7 +38,7 @@ stability:           stable
 author:              Michal J. Gajda
 maintainer:          simons@cryp.to,
                      mjgajda@gmail.com
-copyright:           Copyright by Michal J. Gajda '2014-'2018
+copyright:           Copyright by Migamake '2014-'2018
 category:            Data, Tools
 build-type:          Simple
 extra-source-files:

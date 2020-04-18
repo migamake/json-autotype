@@ -4,13 +4,13 @@ cabal-version: 1.12
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: 0d105f0142c4fbea46fc0f0bd6aaf9f891f5f4b75a748c0bc2d94e68f7ae8005
+-- hash: f1d389aa2f37dcbecf3a47435f8585ee46026dc6d891387ac3a677cad60acc6e
 
 name:                run-haskell-module
-version:             0.0.1
+version:             0.0.2
 synopsis:            Running newly generated Haskell source module.
-description:         To make sure freshly generated code runs,
-                     we need to make it run in Stack/Cabal/GHC environment.
+description:         Running generated test code in Stack/Cabal/GHC environment.
+                     .
 license:             BSD3
 license-file:        LICENSE
 stability:           beta
@@ -18,7 +18,7 @@ author:              Michal J. Gajda,
                      Dmitrii Krylov
 maintainer:          simons@cryp.to,
                      mjgajda@gmail.com
-copyright:           Copyright by Michal J. Gajda '2014-'2020
+copyright:           Copyright by Migamake '2014-'2020
 category:            Data, Tools
 build-type:          Simple
 extra-source-files:

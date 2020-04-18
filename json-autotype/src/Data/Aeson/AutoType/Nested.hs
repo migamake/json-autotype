@@ -1,14 +1,6 @@
 {-# language DeriveGeneric     #-}
 {-# language OverloadedStrings #-}
-module Data.Aeson.AutoType.Nested(
-    defaultImportedModules
-  , generateModuleImports
-  , inferType
-  , CodeFragment
-  , TypeName
-  , DeclaredType(..)
-  ) where
--- ^ Simple interface for using AutoType inference
+-- | Simple interface for using AutoType inference
 --   in other code generators.
 --
 --   Simply takes a list of Aeson values,
@@ -20,6 +12,14 @@ module Data.Aeson.AutoType.Nested(
 --   Note that while we can put more code in the module,
 --   it is recommended to avoid multiple automatically
 --   generated types in order to avoid name conflicts.
+module Data.Aeson.AutoType.Nested(
+    defaultImportedModules
+  , generateModuleImports
+  , inferType
+  , CodeFragment
+  , TypeName
+  , DeclaredType(..)
+  ) where
 
 import Data.Aeson
 import Data.Aeson.AutoType.CodeGen.Haskell(generateModuleImports, requiredPackages, importedModules)

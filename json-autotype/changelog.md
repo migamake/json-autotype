@@ -1,5 +1,8 @@
 Changelog
 =========
+    3.1.1  Apr 2020
+        * Expose Data.Aeson.AutoType.Nested
+
     3.1.0  Apr 2020
         * New, experimental interface for nesting
           generated types by other code generators.

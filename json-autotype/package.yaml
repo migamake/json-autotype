@@ -1,5 +1,5 @@
 name: json-autotype
-version: "3.1.0"
+version: "3.1.1"
 synopsis: Automatic type declaration for JSON input data
 description: |
   Generates datatype declarations with Aeson''s ''Data.Aeson.FromJSON''
@@ -96,12 +96,17 @@ library:
   - Data.Aeson.AutoType.CodeGen
   - Data.Aeson.AutoType.Extract
   - Data.Aeson.AutoType.Format
+  - Data.Aeson.AutoType.CodeGen.Haskell
   - Data.Aeson.AutoType.CodeGen.HaskellFormat
+  - Data.Aeson.AutoType.CodeGen.Generic
+  - Data.Aeson.AutoType.CodeGen.Elm
+  - Data.Aeson.AutoType.CodeGen.ElmFormat
   - Data.Aeson.AutoType.Pretty
   - Data.Aeson.AutoType.Split
   - Data.Aeson.AutoType.Type
   - Data.Aeson.AutoType.Test
   - Data.Aeson.AutoType.Util
+  - Data.Aeson.AutoType.Nested
   dependencies:
   - data-default >=0.7 && <0.8
   - smallcheck >=1.0 && <1.2

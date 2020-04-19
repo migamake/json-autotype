@@ -11,6 +11,7 @@ module Data.Aeson.AutoType.CodeGen.Haskell(
   , importedModules
   , requiredPackages
   , generateModuleImports
+  , ModuleImport
   ) where
 
 import qualified Data.Text           as Text

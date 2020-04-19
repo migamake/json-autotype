@@ -1,5 +1,10 @@
 Changelog
 =========
+    3.1.2  Apr 2020
+        * Future-proof nested code gen interface
+          with parametric `CodeFrag`ment that can
+          refer to thing that is not a type.
+
     3.1.1  Apr 2020
         * Expose Data.Aeson.AutoType.Nested
 

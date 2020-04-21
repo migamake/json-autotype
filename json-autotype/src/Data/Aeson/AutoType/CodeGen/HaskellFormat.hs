@@ -5,7 +5,7 @@
 {-# LANGUAGE OverloadedStrings   #-}
 {-# LANGuaGE DeriveGeneric       #-}
 {-# LANGuaGE FlexibleContexts    #-}
--- | Formatting type declarations and class instances for inferred types. 
+-- | Formatting type declarations and class instances for inferred types.
 module Data.Aeson.AutoType.CodeGen.HaskellFormat(
   displaySplitTypes, normalizeTypeName
 ) where
@@ -50,13 +50,13 @@ makeLenses ''DeclState
 
 type DeclM = State DeclState
 
-type Map k v = Map.HashMap k v 
+type Map k v = Map.HashMap k v
 
 stepM :: DeclM Int
 stepM = counter %%= (\i -> (i, i+1))
 
 tShow :: (Show a) => a -> Text
-tShow = Text.pack . show 
+tShow = Text.pack . show
 
 -- | Wrap a type alias.
 wrapAlias :: Text -> Text -> Text
@@ -189,7 +189,7 @@ formatType (TArray a)                        = do inner <- formatType a
 formatType (TObj   o)                        = do ident <- genericIdentifier
                                                   newDecl ident d
   where
-    d = Map.toList $ unDict o 
+    d = Map.toList $ unDict o
 formatType  e | e `Set.member` emptySetLikes = return emptyTypeRepr
 formatType  t                                = return $ "ERROR: Don't know how to handle: " `Text.append` tShow t
 
@@ -258,6 +258,7 @@ displaySplitTypes dict = trace ("displaySplitTypes: " ++ show (toposort dict)) $
 -- 5. If identifier is empty, then substituting "JsonEmptyKey" for its name.
 normalizeTypeName :: Text -> Text
 normalizeTypeName = ifEmpty "JsonEmptyKey"                  .
+                    ensureBeginsWithCapital                 .
                     escapeKeywords                          .
                     escapeFirstNonAlpha                     .
                     Text.concat                             .
@@ -267,6 +268,10 @@ normalizeTypeName = ifEmpty "JsonEmptyKey"                  .
   where
     ifEmpty x ""       = x
     ifEmpty _ nonEmpty = nonEmpty
+    ensureBeginsWithCapital x =
+      if Text.isPrefixOf "_" x
+      then "D" <> x
+      else x
     acceptableInVariable c = isAlpha c || isDigit c
     escapeFirstNonAlpha cs                  | Text.null cs =                   cs
     escapeFirstNonAlpha cs@(Text.head -> c) | isAlpha   c  =                   cs
@@ -281,4 +286,3 @@ allLabels = flip go []
     go (TUnion u) ls = Set.foldr go ls          u
     go (TObj   o) ls = Map.foldr go ls $ unDict o
     go _other     ls = ls
-

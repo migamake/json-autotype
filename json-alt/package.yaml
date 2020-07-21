@@ -61,7 +61,7 @@ other-extensions:
 - RecordWildCards
 dependencies:
 - base >=4.3 && <5
-- aeson >=1.2.1 && <1.5
+- aeson >=1.2.1 && <1.6
 library:
   exposed-modules:
   - Data.Aeson.AutoType.Alternative

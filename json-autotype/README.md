@@ -1,5 +1,8 @@
 json-autotype
 =============
+
+**The project moved to https://gitlab.com/migamake/json-autotype**
+
 Takes a JSON format input, and generates automatic Haskell type declarations.
 
 Parser and printer instances are derived using [Aeson](http://hackage.haskell.org/package/aeson).

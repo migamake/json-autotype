@@ -1,4 +1,5 @@
 {-# OPTIONS_GHC -fno-warn-orphans #-}
+{-# LANGUAGE CPP #-}
 
 -- | Utility functions that may be ultimately moved to some library.
 module Data.Aeson.AutoType.Util( withFileOrHandle
@@ -28,7 +29,9 @@ withFileOrDefaultHandle "-"      otherMode        _      = error $ "Incompatible
                                                                 ++ ") for `-` in withFileOrDefaultHandle."
 withFileOrDefaultHandle filename ioMode           action = withFile filename ioMode action
 
+#if __GLASGOW_HASKELL__ < 810
 -- Missing instances
 instance Hashable a => Hashable (Set.Set a) where
   hashWithSalt = Set.foldr (flip hashWithSalt)
+#endif
 

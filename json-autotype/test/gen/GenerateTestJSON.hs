@@ -4,6 +4,7 @@
 {-# LANGUAGE RecordWildCards      #-}
 {-# LANGUAGE FlexibleInstances    #-}
 {-# LANGUAGE FlexibleContexts     #-}
+{-# LANGUAGE CPP                  #-}
 {-# OPTIONS_GHC -fno-warn-orphans #-}
 module Main where
 
@@ -110,6 +111,7 @@ removeDuplicates list = filterM checkDup list `evalState` Set.empty
                         return True
 
 -- TODO: check for generic Ord?
+#if __GLASGOW_HASKELL__ < 810
 instance Ord Value where
   Null       `compare`  Null      = EQ
   Null       `compare`  _         = LT
@@ -127,6 +129,7 @@ instance Ord Value where
   (Array  a) `compare` _          = LT
   _          `compare` (Array  b) = GT
   (Object a) `compare` (Object b) = Map.toList a `compare` Map.toList b
+#endif
 
 -- | Take a set of JSON input filenames, Haskell output filename, and generate module parsing these JSON files.
 generateTestJSONs :: Options -> IO ()

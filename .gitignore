@@ -11,3 +11,4 @@ pulp
 .ghc.environment.*
 node_modules/
 hackage-docs
+*~

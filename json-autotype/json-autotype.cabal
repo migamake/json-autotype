@@ -81,6 +81,8 @@ library
       Data.Aeson.AutoType.Util
   other-modules:
       Data.Aeson.AutoType.CodeGen.Common
+      Data.Aeson.AutoType.CodeGen.Clang
+      Data.Aeson.AutoType.CodeGen.ClangFormat
       Data.Aeson.AutoType.CodeGen.Elm
       Data.Aeson.AutoType.CodeGen.ElmFormat
       Data.Aeson.AutoType.CodeGen.Generic

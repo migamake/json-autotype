@@ -36,4 +36,5 @@ tyOptParser  = TyOptions
 langOpts :: Parser Lang
 langOpts  =  flag Haskell Haskell (long "haskell")
          <|> flag Haskell Elm     (long "elm")
+         <|> flag Haskell Clang   (long "clang")
 

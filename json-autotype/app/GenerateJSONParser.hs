@@ -174,7 +174,8 @@ generateHaskellFromJSONs opts@Options { tyOpts=TyOptions { toplevel
     -- | Works like @Debug.trace@ when the --debug flag is enabled, and does nothing otherwise.
     myTrace :: String -> IO ()
     myTrace msg = debug (tyOpts opts) `when` putStrLn msg
-    toplevelName = capitalize $ Text.pack toplevel
+    toplevelName = if lang /= Clang then capitalize $ Text.pack toplevel
+                                    else Text.pack toplevel
 
 -- | Drop initial pragma.
 dropPragma :: BSL.ByteString -> BSL.ByteString

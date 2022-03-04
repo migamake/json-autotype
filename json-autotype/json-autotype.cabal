@@ -4,7 +4,6 @@ cabal-version: 1.12
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: b14d8728f91d3beea208feccf38b1d33430e2e1779648977c216cf01506f1957
 
 name:                json-autotype
 version:             3.1.2
@@ -113,8 +112,8 @@ library
   build-depends:
       GenericPretty ==1.2.*
     , QuickCheck >=2.4 && <3.0
-    , aeson >=1.2.1 && <1.5
-    , base >=4.9 && <5
+    , aeson >=1.2.1 && <1.6
+    , base >=4.3 && <5
     , containers >=0.3 && <0.7
     , data-default ==0.7.*
     , filepath >=1.3 && <1.5
@@ -152,9 +151,9 @@ executable json-autotype
       DeriveGeneric
       RecordWildCards
   build-depends:
-      GenericPretty ==1.2.*
-    , aeson >=1.2.1 && <1.5
-    , base >=4.9 && <5
+      GenericPretty >=1.2 && <1.3
+    , aeson >=1.2.1 && <1.6
+    , base >=4.3 && <5
     , bytestring >=0.9 && <0.11
     , containers >=0.3 && <0.7
     , filepath >=1.3 && <1.5
@@ -196,8 +195,8 @@ test-suite json-autotype-examples
   build-depends:
       GenericPretty ==1.2.*
     , QuickCheck >=2.4 && <3.0
-    , aeson >=1.2.1 && <1.5
-    , base >=4.9 && <5
+    , aeson >=1.2.1 && <1.6
+    , base >=4.3 && <5
     , containers >=0.3 && <0.7
     , directory >=1.1 && <1.4
     , filepath >=1.3 && <1.5
@@ -239,8 +238,8 @@ test-suite json-autotype-gen-test
   build-depends:
       GenericPretty ==1.2.*
     , QuickCheck >=2.4 && <3.0
-    , aeson >=1.2.1 && <1.5
-    , base >=4.9 && <5
+    , aeson >=1.2.1 && <1.6
+    , base >=4.3 && <5
     , bytestring >=0.9 && <0.11
     , containers >=0.3 && <0.7
     , directory >=1.1 && <1.4
@@ -283,8 +282,8 @@ test-suite json-autotype-qc-test
   build-depends:
       GenericPretty ==1.2.*
     , QuickCheck >=2.4 && <3.0
-    , aeson >=1.2.1 && <1.5
-    , base >=4.9 && <5
+    , aeson >=1.2.1 && <1.6
+    , base >=4.3 && <5
     , containers >=0.3 && <0.7
     , filepath >=1.3 && <1.5
     , hashable >=1.2 && <1.4

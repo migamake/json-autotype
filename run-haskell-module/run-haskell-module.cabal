@@ -1,10 +1,10 @@
 cabal-version: 1.12
 
--- This file has been generated from package.yaml by hpack version 0.33.0.
+-- This file has been generated from package.yaml by hpack version 0.34.4.
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: f1d389aa2f37dcbecf3a47435f8585ee46026dc6d891387ac3a677cad60acc6e
+-- hash: 565c6db58234f9ab7ba7ce72551e39421368670a38685bda46789308263fd078
 
 name:                run-haskell-module
 version:             0.0.2
@@ -24,7 +24,8 @@ build-type:          Simple
 extra-source-files:
     README.md
     changelog.md
-tested-with:         GHC==8.4.4 GHC==8.6.5 GHC==8.8.2 GHC==8.10.1
+tested-with:
+    GHC==8.4.4 GHC==8.6.5 GHC==8.8.2 GHC==8.10.1
 
 source-repository head
   type: git
@@ -39,7 +40,7 @@ library
       src
   build-depends:
       base >=4.3 && <5
-    , data-default >=0.7 && <0.8
+    , data-default ==0.7.*
     , filepath >=1.3 && <1.5
     , process >=1.1 && <1.7
   default-language: Haskell2010

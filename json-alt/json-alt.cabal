@@ -1,10 +1,10 @@
 cabal-version: 1.12
 
--- This file has been generated from package.yaml by hpack version 0.33.0.
+-- This file has been generated from package.yaml by hpack version 0.34.4.
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: 50882ba4b5afe99b10c863f3ca7ba3aa9a791a89c6bc92313ad570c45122a88a
+-- hash: 90a0dc55ad7bdd32fe34a6071aef29e893591fa7170541f109500239706364ae
 
 name:                json-alt
 version:             1.0.0
@@ -55,7 +55,15 @@ library
       Data.Aeson.AutoType.Alternative
   other-modules:
       Paths_json_alt
-  other-extensions: TemplateHaskell ScopedTypeVariables OverloadedStrings FlexibleInstances MultiParamTypeClasses DeriveDataTypeable DeriveGeneric RecordWildCards
+  other-extensions:
+      TemplateHaskell
+      ScopedTypeVariables
+      OverloadedStrings
+      FlexibleInstances
+      MultiParamTypeClasses
+      DeriveDataTypeable
+      DeriveGeneric
+      RecordWildCards
   build-depends:
       aeson >=1.2.1 && <1.5
     , base >=4.3 && <5

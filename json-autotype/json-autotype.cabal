@@ -1,10 +1,10 @@
 cabal-version: 1.12
 
--- This file has been generated from package.yaml by hpack version 0.33.0.
+-- This file has been generated from package.yaml by hpack version 0.34.4.
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: 284ee102820ec2e6f94fe118266cdb759c0049a5e95f88fd6c42a73e39aeff04
+-- hash: b14d8728f91d3beea208feccf38b1d33430e2e1779648977c216cf01506f1957
 
 name:                json-autotype
 version:             3.1.2
@@ -72,7 +72,8 @@ extra-source-files:
     test/iPhoneMenu.json
     test/productsdb.json
 bug-reports:         https://github.com/mgajda/json-autotype.git/issues
-tested-with:         GHC==8.0.2 GHC==8.2.2 GHC==8.4.4 GHC==8.6.5 GHC==8.8.2 GHC==8.10.1
+tested-with:
+    GHC==8.0.2 GHC==8.2.2 GHC==8.4.4 GHC==8.6.5 GHC==8.8.2 GHC==8.10.1
 
 source-repository head
   type: git
@@ -100,14 +101,22 @@ library
       Paths_json_autotype
   hs-source-dirs:
       src
-  other-extensions: TemplateHaskell ScopedTypeVariables OverloadedStrings FlexibleInstances MultiParamTypeClasses DeriveDataTypeable DeriveGeneric RecordWildCards
+  other-extensions:
+      TemplateHaskell
+      ScopedTypeVariables
+      OverloadedStrings
+      FlexibleInstances
+      MultiParamTypeClasses
+      DeriveDataTypeable
+      DeriveGeneric
+      RecordWildCards
   build-depends:
-      GenericPretty >=1.2 && <1.3
+      GenericPretty ==1.2.*
     , QuickCheck >=2.4 && <3.0
     , aeson >=1.2.1 && <1.5
     , base >=4.9 && <5
     , containers >=0.3 && <0.7
-    , data-default >=0.7 && <0.8
+    , data-default ==0.7.*
     , filepath >=1.3 && <1.5
     , hashable >=1.2 && <1.4
     , json-alt
@@ -120,8 +129,8 @@ library
     , smallcheck >=1.0 && <1.2
     , template-haskell
     , text >=1.1 && <1.4
-    , uniplate >=1.6 && <1.7
-    , unordered-containers >=0.2 && <0.3
+    , uniplate ==1.6.*
+    , unordered-containers ==0.2.*
     , vector >=0.9 && <0.13
   default-language: Haskell2010
 
@@ -133,9 +142,17 @@ executable json-autotype
   other-modules:
       CommonCLI
       Paths_json_autotype
-  other-extensions: TemplateHaskell ScopedTypeVariables OverloadedStrings FlexibleInstances MultiParamTypeClasses DeriveDataTypeable DeriveGeneric RecordWildCards
+  other-extensions:
+      TemplateHaskell
+      ScopedTypeVariables
+      OverloadedStrings
+      FlexibleInstances
+      MultiParamTypeClasses
+      DeriveDataTypeable
+      DeriveGeneric
+      RecordWildCards
   build-depends:
-      GenericPretty >=1.2 && <1.3
+      GenericPretty ==1.2.*
     , aeson >=1.2.1 && <1.5
     , base >=4.9 && <5
     , bytestring >=0.9 && <0.11
@@ -152,8 +169,8 @@ executable json-autotype
     , scientific >=0.3 && <0.5
     , template-haskell
     , text >=1.1 && <1.4
-    , uniplate >=1.6 && <1.7
-    , unordered-containers >=0.2 && <0.3
+    , uniplate ==1.6.*
+    , unordered-containers ==0.2.*
     , vector >=0.9 && <0.13
     , yaml >=0.8 && <0.12
   default-language: Haskell2010
@@ -167,9 +184,17 @@ test-suite json-autotype-examples
   hs-source-dirs:
       test
       common
-  other-extensions: TemplateHaskell ScopedTypeVariables OverloadedStrings FlexibleInstances MultiParamTypeClasses DeriveDataTypeable DeriveGeneric RecordWildCards
+  other-extensions:
+      TemplateHaskell
+      ScopedTypeVariables
+      OverloadedStrings
+      FlexibleInstances
+      MultiParamTypeClasses
+      DeriveDataTypeable
+      DeriveGeneric
+      RecordWildCards
   build-depends:
-      GenericPretty >=1.2 && <1.3
+      GenericPretty ==1.2.*
     , QuickCheck >=2.4 && <3.0
     , aeson >=1.2.1 && <1.5
     , base >=4.9 && <5
@@ -188,8 +213,8 @@ test-suite json-autotype-examples
     , smallcheck >=1.0 && <1.2
     , template-haskell
     , text >=1.1 && <1.4
-    , uniplate >=1.6 && <1.7
-    , unordered-containers >=0.2 && <0.3
+    , uniplate ==1.6.*
+    , unordered-containers ==0.2.*
     , vector >=0.9 && <0.13
   default-language: Haskell2010
 
@@ -202,9 +227,17 @@ test-suite json-autotype-gen-test
   other-modules:
       CommonCLI
       Paths_json_autotype
-  other-extensions: TemplateHaskell ScopedTypeVariables OverloadedStrings FlexibleInstances MultiParamTypeClasses DeriveDataTypeable DeriveGeneric RecordWildCards
+  other-extensions:
+      TemplateHaskell
+      ScopedTypeVariables
+      OverloadedStrings
+      FlexibleInstances
+      MultiParamTypeClasses
+      DeriveDataTypeable
+      DeriveGeneric
+      RecordWildCards
   build-depends:
-      GenericPretty >=1.2 && <1.3
+      GenericPretty ==1.2.*
     , QuickCheck >=2.4 && <3.0
     , aeson >=1.2.1 && <1.5
     , base >=4.9 && <5
@@ -224,8 +257,8 @@ test-suite json-autotype-gen-test
     , smallcheck >=1.0 && <1.2
     , template-haskell
     , text >=1.1 && <1.4
-    , uniplate >=1.6 && <1.7
-    , unordered-containers >=0.2 && <0.3
+    , uniplate ==1.6.*
+    , unordered-containers ==0.2.*
     , vector >=0.9 && <0.13
   default-language: Haskell2010
 
@@ -238,9 +271,17 @@ test-suite json-autotype-qc-test
   hs-source-dirs:
       test/qc
       common
-  other-extensions: TemplateHaskell ScopedTypeVariables OverloadedStrings FlexibleInstances MultiParamTypeClasses DeriveDataTypeable DeriveGeneric RecordWildCards
+  other-extensions:
+      TemplateHaskell
+      ScopedTypeVariables
+      OverloadedStrings
+      FlexibleInstances
+      MultiParamTypeClasses
+      DeriveDataTypeable
+      DeriveGeneric
+      RecordWildCards
   build-depends:
-      GenericPretty >=1.2 && <1.3
+      GenericPretty ==1.2.*
     , QuickCheck >=2.4 && <3.0
     , aeson >=1.2.1 && <1.5
     , base >=4.9 && <5
@@ -258,7 +299,7 @@ test-suite json-autotype-qc-test
     , smallcheck >=1.0 && <1.2
     , template-haskell
     , text >=1.1 && <1.4
-    , uniplate >=1.6 && <1.7
-    , unordered-containers >=0.2 && <0.3
+    , uniplate ==1.6.*
+    , unordered-containers ==0.2.*
     , vector >=0.9 && <0.13
   default-language: Haskell2010

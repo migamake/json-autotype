@@ -1,5 +1,8 @@
 Changelog
 =========
+    3.1.3  Mar 2022
+        * Relaxed bounds, fixes #47.
+
     3.1.2  Apr 2020
         * Future-proof nested code gen interface
           with parametric `CodeFrag`ment that can

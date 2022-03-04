@@ -3,10 +3,9 @@ cabal-version: 1.12
 -- This file has been generated from package.yaml by hpack version 0.34.4.
 --
 -- see: https://github.com/sol/hpack
---
 
 name:                json-autotype
-version:             3.1.2
+version:             3.1.3
 synopsis:            Automatic type declaration for JSON input data
 description:         Generates datatype declarations with Aeson''s ''Data.Aeson.FromJSON''
                      .
@@ -113,7 +112,7 @@ library
       GenericPretty ==1.2.*
     , QuickCheck >=2.4 && <3.0
     , aeson >=1.2.1 && <1.6
-    , base >=4.3 && <5
+    , base >=4.9 && <5
     , containers >=0.3 && <0.7
     , data-default ==0.7.*
     , filepath >=1.3 && <1.5
@@ -151,9 +150,9 @@ executable json-autotype
       DeriveGeneric
       RecordWildCards
   build-depends:
-      GenericPretty >=1.2 && <1.3
+      GenericPretty ==1.2.*
     , aeson >=1.2.1 && <1.6
-    , base >=4.3 && <5
+    , base >=4.9 && <5
     , bytestring >=0.9 && <0.11
     , containers >=0.3 && <0.7
     , filepath >=1.3 && <1.5
@@ -196,7 +195,7 @@ test-suite json-autotype-examples
       GenericPretty ==1.2.*
     , QuickCheck >=2.4 && <3.0
     , aeson >=1.2.1 && <1.6
-    , base >=4.3 && <5
+    , base >=4.9 && <5
     , containers >=0.3 && <0.7
     , directory >=1.1 && <1.4
     , filepath >=1.3 && <1.5
@@ -239,7 +238,7 @@ test-suite json-autotype-gen-test
       GenericPretty ==1.2.*
     , QuickCheck >=2.4 && <3.0
     , aeson >=1.2.1 && <1.6
-    , base >=4.3 && <5
+    , base >=4.9 && <5
     , bytestring >=0.9 && <0.11
     , containers >=0.3 && <0.7
     , directory >=1.1 && <1.4
@@ -283,7 +282,7 @@ test-suite json-autotype-qc-test
       GenericPretty ==1.2.*
     , QuickCheck >=2.4 && <3.0
     , aeson >=1.2.1 && <1.6
-    , base >=4.3 && <5
+    , base >=4.9 && <5
     , containers >=0.3 && <0.7
     , filepath >=1.3 && <1.5
     , hashable >=1.2 && <1.4

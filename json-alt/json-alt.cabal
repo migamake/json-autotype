@@ -6,7 +6,7 @@ cabal-version: 1.12
 --
 
 name:                json-alt
-version:             1.0.0
+version:             1.0.1
 synopsis:            Union 'alternative' or Either that has untagged JSON encoding.
 description:         Parsing JSON with Aeson often requires decoding fields
                      that have more than one Haskell type.

@@ -1,4 +1,5 @@
-resolver: lts-12.26
+resolver: lts-17.2
+compiler: ghc-8.10.7
 
 packages:
 - json-autotype

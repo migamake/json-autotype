@@ -1,12 +1,11 @@
 cabal-version: 1.12
 
--- This file has been generated from package.yaml by hpack version 0.34.4.
+-- This file has been generated from package.yaml by hpack version 0.34.5.
 --
 -- see: https://github.com/sol/hpack
---
 
 name:                json-alt
-version:             1.0.1
+version:             1.0.0
 synopsis:            Union 'alternative' or Either that has untagged JSON encoding.
 description:         Parsing JSON with Aeson often requires decoding fields
                      that have more than one Haskell type.

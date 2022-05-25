@@ -95,6 +95,8 @@ library
       Data.Aeson.AutoType.Nested
   other-modules:
       Data.Aeson.AutoType.CodeGen.Common
+      Data.Aeson.AutoType.CodeGen.Elixir
+      Data.Aeson.AutoType.CodeGen.ElixirFormat
       Data.Aeson.AutoType.Plugin.Subtype
       Paths_json_autotype
   hs-source-dirs:

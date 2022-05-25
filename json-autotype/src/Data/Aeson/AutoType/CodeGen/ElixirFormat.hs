@@ -23,7 +23,7 @@ import qualified Data.Set                   as Set
 import qualified Data.Text                  as Text
 import           Data.Text                 (Text)
 import           Data.Set                  (Set )
-import           Data.List                 (foldl1')
+import           Data.List                 (foldl1', map)
 import           Data.Char                 (isAlpha, isDigit)
 import           Control.Monad.State.Class
 import           Control.Monad.State.Strict(State, runState)
@@ -61,14 +61,16 @@ tShow = Text.pack . show
 
 -- | Wrap a type alias.
 wrapAlias :: Text -> Text -> Text
-wrapAlias identifier contents = Text.unwords ["type", identifier, "=", contents]
+wrapAlias identifier contents = Text.unwords ["@type", identifier, "::", contents]
 
 -- | Wrap a data type declaration
-wrapDecl ::  Text -> Text -> Text
-wrapDecl identifier contents = Text.unlines [header, contents, "  } deriving (Show,Eq,GHC.Generics.Generic)"]
-                                            --,"\nderiveJSON defaultOptions ''" `Text.append` identifier]
+wrapDecl ::  Text -> Text -> [(Text, Text, Text, Bool)] -> Text
+wrapDecl identifier contents attrs = Text.unlines [header, struct, "", type_, "end"]
   where
-    header = Text.concat ["data ", identifier, " = ", identifier, " { "]
+    header = Text.concat ["defmodule ", identifier, " do"]
+    struct = Text.concat ["  defstruct [", fields, "]"]
+    fields = Text.intercalate ",\n             " $ map (\(_,x,_,_) -> Text.concat [":", x]) attrs
+    type_  = Text.concat ["  @type t :: %__MODULE__{\n", contents, "\n  }"]
 
 -- | Explanatory type alias for making declarations
 -- First element of the triple is original JSON identifier,
@@ -130,15 +132,15 @@ genericIdentifier = do
 newDecl :: Text -> [(Text, Type)] -> DeclM Text
 newDecl identifier kvs = do attrs <- forM kvs $ \(k, v) -> do
                               formatted <- formatType v
-                              return (k, normalizeFieldName identifier k, formatted, isNullable v)
-                            let decl = Text.unlines [wrapDecl     identifier $ fieldDecls attrs, ""]
+                              return (k, escapeKeywords k, formatted, isNullable v)
+                            let decl = Text.unlines [wrapDecl     identifier (fieldDecls attrs) attrs, ""]
                             addDecl decl
                             return identifier
   where
     fieldDecls attrList = Text.intercalate ",\n" $ map fieldDecl attrList
     fieldDecl :: (Text, Text, Text, Bool) -> Text
     fieldDecl (_jsonName, haskellName, fType, _nullable) = Text.concat [
-                                                             "    ", (escapeKeywords haskellName), " :: ", fType]
+                                                             "    ", (escapeKeywords haskellName), ": ", fType]
 
 addDecl decl = decls %%= (\ds -> ((), decl:ds))
 
@@ -150,7 +152,7 @@ newAlias identifier content = do formatted <- formatType content
 
 -- | Convert a JSON key name given by second argument,
 -- from within a dictionary keyed with first argument,
--- into a name of Elixir record field (hopefully distinct from other such selectors.)
+-- into a name of Elixir struct field (hopefully distinct from other such selectors.)
 normalizeFieldName ::  Text -> Text -> Text
 normalizeFieldName identifier =  escapeKeywords             .
                                  uncapitalize               .
@@ -167,15 +169,15 @@ escapeKeywords k                           = k
 -- | Format the type within DeclM monad, that records
 -- the separate declarations on which this one is dependent.
 formatType :: Type -> DeclM Text
-formatType  TString                          = return "Text"
-formatType  TInt                             = return "Int"
-formatType  TDouble                          = return "Double"
-formatType  TBool                            = return "Bool"
-formatType (TLabel l)                        = return $ normalizeTypeName l
+formatType  TString                          = return "String.t"
+formatType  TInt                             = return "integer"
+formatType  TDouble                          = return "float"
+formatType  TBool                            = return "boolean"
+formatType (TLabel l)                        = return $ (normalizeTypeName l) <> ".t"
 formatType (TUnion u)                        = wrap <$> case length nonNull of
                                                           0 -> return emptyTypeRepr
                                                           1 -> formatType $ head nonNull
-                                                          _ -> Text.intercalate ":|:" <$> mapM formatType nonNull
+                                                          _ -> Text.intercalate " | " <$> mapM formatType nonNull
   where
     nonNull       = Set.toList $ Set.filter (TNull /=) u
     wrap                                :: Text -> Text
@@ -191,7 +193,7 @@ formatType  e | e `Set.member` emptySetLikes = return emptyTypeRepr
 formatType  t                                = return $ "ERROR: Don't know how to handle: " `Text.append` tShow t
 
 emptyTypeRepr :: Text
-emptyTypeRepr = "(Maybe Value)" -- default, accepts future extension where we found no data
+emptyTypeRepr = "any" -- default, accepts future extension where we found no data
 
 runDecl ::  DeclM a -> Text
 runDecl decl = Text.unlines $ finalState ^. decls

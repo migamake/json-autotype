@@ -19,6 +19,7 @@ RUN  cabal v2-install -j --lib
 WORKDIR /src/json-autotype
 RUN  ls *.cabal
 RUN  cabal v2-install -j --dependencies-only --keep-going --lib || (sleep 60; cabal v2-install -j --dependencies-only --lib)
+COPY README.md            /src/README.md
 RUN  cabal v2-install -j exe:json-autotype --symlink-bindir=/usr/bin
 RUN  mkdir /workdir
 WORKDIR /workdir

@@ -15,11 +15,13 @@ import           System.Exit
 
 import           Data.Aeson.AutoType.CodeGen.Haskell
 import           Data.Aeson.AutoType.CodeGen.Elm
+import           Data.Aeson.AutoType.CodeGen.Elixir
 
 -- | Available output languages.
 data Lang = Haskell
           | HaskellStrict
           | Elm
+          | Elixir
 
 -- | Default output filname is used, when there is no explicit output file path, or it is "-" (stdout).
 -- Default module name is consistent with it.
@@ -27,12 +29,14 @@ defaultOutputFilename :: Lang -> FilePath
 defaultOutputFilename Haskell       = defaultHaskellFilename
 defaultOutputFilename HaskellStrict = defaultHaskellFilename
 defaultOutputFilename Elm           = defaultElmFilename
+defaultOutputFilename Elixir        = defaultElixirFilename
 
 -- | Write a Haskell module to an output file, or stdout if `-` filename is given.
 writeModule :: Lang -> FilePath -> Text -> Map.HashMap Text Type -> IO ()
 writeModule Haskell       = writeHaskellModule
 writeModule HaskellStrict = writeHaskellModule
 writeModule Elm           = writeElmModule
+writeModule Elixir        = writeElixirModule
 
 -- | Run module in a given language.
 runModule :: Lang -> FilePath -> [String] -> IO ExitCode

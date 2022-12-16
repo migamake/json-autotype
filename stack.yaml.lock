@@ -3,17 +3,10 @@
 # For more information, please see the documentation at:
 #   https://docs.haskellstack.org/en/stable/lock_files
 
-packages:
-- completed:
-    hackage: GenericPretty-1.2.2@sha256:65fd4aeedc326c356a866169e3511ef14fd6b3284ff9c29273f8a3b90dc9e5eb,3698
-    pantry-tree:
-      size: 719
-      sha256: 1e9f020c022023084c2a0e1650d21ea7cd87fe9a97a9f21c691b664d65142250
-  original:
-    hackage: GenericPretty-1.2.2
+packages: []
 snapshots:
 - completed:
-    size: 509471
-    url: https://raw.githubusercontent.com/commercialhaskell/stackage-snapshots/master/lts/12/26.yaml
-    sha256: 95f014df58d0679b1c4a2b7bf2b652b61da8d30de5f571abb0d59015ef678646
-  original: lts-12.26
+    sha256: 3770dfd79f5aed67acdcc65c4e7730adddffe6dba79ea723cfb0918356fc0f94
+    size: 648660
+    url: https://raw.githubusercontent.com/commercialhaskell/stackage-snapshots/master/lts/20/4.yaml
+  original: lts-20.4

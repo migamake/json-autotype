@@ -13,6 +13,8 @@ import System.Environment as Env
 import System.Process             (rawSystem)
 import Data.Aeson.AutoType.CodeGen(runModule, Lang(Haskell))
 import Data.Aeson ( Result,  Object, FromJSON, Value(Null,Number), (.:?) )
+import Data.Aeson.Key (fromText)
+import Data.Aeson.KeyMap (fromHashMapText)
 import Data.Aeson.Types ( Parser, parse )
 import Data.Text ( Text, pack )
 import Data.HashMap.Lazy ( singleton, empty )
@@ -82,16 +84,16 @@ runAutotype source arguments = do
 
 verifyAesonOperators :: IO ()
 verifyAesonOperators = do
-  parseTest (singleton (pack "foo") (Number 1))
-  parseTest (singleton (pack "foo")  Null     )
-  parseTest (singleton (pack "bar")  Null     )
-  parseTest empty
+  parseTest (fromHashMapText $ singleton (pack "foo") (Number 1))
+  parseTest (fromHashMapText $ singleton (pack "foo")  Null     )
+  parseTest (fromHashMapText $ singleton (pack "bar")  Null     )
+  parseTest $ fromHashMapText empty
 
 (.:??) :: FromJSON a => Object -> Text -> Parser (Maybe a)
-o .:?? val = fmap join (o .:? val)
+o .:?? val = fmap join (o .:? fromText val)
 
 parseTest :: Object -> IO ()
 parseTest o = unless (r1 == r2) (fail (show r1 ++ " /= " ++ show r2))
   where r1, r2 :: Result (Maybe Int)
-        r1 = parse (.:? (pack "foo")) o
+        r1 = parse (.:? fromText(pack "foo")) o
         r2 = parse (.:?? (pack "foo")) o

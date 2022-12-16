@@ -8,6 +8,7 @@ module Data.Aeson.AutoType.Extract(valueSize, valueTypeSize,
 import           Control.Arrow ((&&&))
 import           Control.Exception               (assert)
 import           Data.Aeson.AutoType.Type
+import           Data.Aeson.KeyMap               (toHashMapText)
 import qualified Data.Graph          as Graph
 import qualified Data.HashMap.Strict      as Map
 import           Data.HashMap.Strict             (HashMap)
@@ -31,7 +32,7 @@ valueSize (Bool   _) = 1
 valueSize (Number _) = 1
 valueSize (String _) = 1
 valueSize (Array  a) = V.foldl' (+) 1 $ V.map valueSize a
-valueSize (Object o) = (1+) . sum . map valueSize . Map.elems $ o
+valueSize (Object o) = (1+) . sum . map valueSize . Map.elems $ toHashMapText o
 
 -- | Compute total size of the type of the @Value@.
 -- For:
@@ -45,7 +46,7 @@ valueTypeSize (Bool   _) = 1
 valueTypeSize (Number _) = 1
 valueTypeSize (String _) = 1
 valueTypeSize (Array  a) = (1+) . V.foldl' max 0 $ V.map valueTypeSize a
-valueTypeSize (Object o) = (1+) . sum . map valueTypeSize . Map.elems $ o
+valueTypeSize (Object o) = (1+) . sum . map valueTypeSize . Map.elems $ toHashMapText o
 
 -- | Compute total depth of the value.
 -- For:
@@ -57,13 +58,13 @@ valueDepth (Bool   _) = 1
 valueDepth (Number _) = 1
 valueDepth (String _) = 1
 valueDepth (Array  a) = (1+) . V.foldl' max 0 $ V.map valueDepth a
-valueDepth (Object o) = (1+) . maximum . (0:) . map valueDepth . Map.elems $ o
+valueDepth (Object o) = (1+) . maximum . (0:) . map valueDepth . Map.elems $ toHashMapText o
 
 -- | Check if a number is integral, or floating point
 -- | Extract @Type@ from the JSON @Value@.
 -- Unifying types of array elements, if necessary.
 extractType                            :: Value -> Type
-extractType (Object o)                  = TObj $ Dict $ Map.map extractType o
+extractType (Object o)                  = TObj $ Dict $ Map.map extractType $ toHashMapText o
 extractType  Null                       = TNull
 extractType (Bool   _)                  = TBool
 extractType (Number n) | isInteger n    = TInt
@@ -86,11 +87,11 @@ typeCheck (Number _)     TDouble          = True
 typeCheck (Array  elts) (TArray  eltType) = (`typeCheck` eltType) `all` V.toList elts
 typeCheck (Object d)    (TObj    e      ) = typeCheckKey `all` keysOfBoth
   where
-    typeCheckKey k = getValue k d `typeCheck` get k e
+    typeCheckKey k = getValue k (toHashMapText d) `typeCheck` get k e
     getValue   :: Text -> HashMap Text Value -> Value
     getValue    = Map.lookupDefault Null
     keysOfBoth :: [Text]
-    keysOfBoth  =  Set.toList $ Set.fromList (Map.keys d) `Set.union` keys e
+    keysOfBoth  =  Set.toList $ Set.fromList (Map.keys $ toHashMapText d) `Set.union` keys e
 typeCheck         _     (TLabel  _      ) = error "Cannot typecheck labels without environment!"
 typeCheck   {-a-} _      _ {-b-}          = {-trace msg $-} False
   where

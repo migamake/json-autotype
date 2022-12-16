@@ -5,8 +5,6 @@ module Data.Aeson.AutoType.Util( withFileOrHandle
                                , withFileOrDefaultHandle
                                ) where
 
-import           Data.Hashable
-import qualified Data.Set as Set
 import           System.IO                 (withFile, IOMode(..), Handle, stdin, stdout)
 
 -- | Generic function for opening file if the filename is not empty nor "-",
@@ -27,8 +25,3 @@ withFileOrDefaultHandle "-"      otherMode        _      = error $ "Incompatible
                                                                 ++ show otherMode
                                                                 ++ ") for `-` in withFileOrDefaultHandle."
 withFileOrDefaultHandle filename ioMode           action = withFile filename ioMode action
-
--- Missing instances
-instance Hashable a => Hashable (Set.Set a) where
-  hashWithSalt = Set.foldr (flip hashWithSalt)
-

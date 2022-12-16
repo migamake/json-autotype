@@ -1,12 +1,9 @@
-resolver: lts-12.26
+resolver: lts-20.4
 
 packages:
 - json-autotype
 - json-alt
 - run-haskell-module
-
-extra-deps:
-  - GenericPretty-1.2.2
 
 flags: {}
 

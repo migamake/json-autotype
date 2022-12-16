@@ -1,7 +1,5 @@
 {-# LANGUAGE ScopedTypeVariables #-}
 {-# LANGUAGE OverloadedStrings   #-}
-{-# LANGUAGE DeriveGeneric       #-}
-{-# LANGUAGE StandaloneDeriving  #-}
 {-# LANGUAGE ViewPatterns        #-}
 {-# LANGUAGE CPP                 #-}
 {-# OPTIONS_GHC -fno-warn-orphans #-}
@@ -13,6 +11,8 @@ module Data.Aeson.AutoType.Pretty() where
 import qualified Data.HashMap.Strict as Hash
 import           Data.HashMap.Strict(HashMap)
 import           Data.Aeson
+import           Data.Aeson.KeyMap(KeyMap, toHashMapText)
+import           Data.Aeson.Key
 import qualified Data.Text                  as Text
 import           Data.Text                 (Text)
 import           Data.Set                   as Set(Set, toList)
@@ -34,6 +34,10 @@ instance (Out a) => Out (Vector a) where
   docPrec _ = doc
 
 instance Out Value
+
+instance (Out a) => Out (KeyMap a) where
+  doc     (toHashMapText -> s) = doc s
+  docPrec _                    = doc
 
 instance (Out a) => Out (Set a) where
   doc     (Set.toList -> s) = "{" <+> doc s <+> "}"

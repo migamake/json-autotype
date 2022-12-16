@@ -1,5 +1,5 @@
 name: json-alt
-version: '1.0.0'
+version: '1.0.1'
 synopsis: Union 'alternative' or Either that has untagged JSON encoding.
 description: ! 'Parsing JSON with Aeson often requires decoding fields
 
@@ -61,7 +61,7 @@ other-extensions:
 - RecordWildCards
 dependencies:
 - base >=4.3 && <5
-- aeson >=1.2.1 && <1.6
+- aeson >=1.2.1 && <2.1
 library:
   exposed-modules:
   - Data.Aeson.AutoType.Alternative

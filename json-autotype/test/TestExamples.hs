@@ -13,9 +13,10 @@ import System.Environment as Env
 import System.Process             (rawSystem)
 import Data.Aeson.AutoType.CodeGen(runModule, Lang(Haskell))
 import Data.Aeson ( Result,  Object, FromJSON, Value(Null,Number), (.:?) )
+import qualified Data.Aeson.KeyMap as KM
+import Data.Aeson.Key (fromString, fromText)
 import Data.Aeson.Types ( Parser, parse )
 import Data.Text ( Text, pack )
-import Data.HashMap.Lazy ( singleton, empty )
 
 
 -- |  <http://book.realworldhaskell.org/read/io-case-study-a-library-for-searching-the-filesystem.html>
@@ -82,16 +83,16 @@ runAutotype source arguments = do
 
 verifyAesonOperators :: IO ()
 verifyAesonOperators = do
-  parseTest (singleton (pack "foo") (Number 1))
-  parseTest (singleton (pack "foo")  Null     )
-  parseTest (singleton (pack "bar")  Null     )
-  parseTest empty
+  parseTest (KM.singleton (fromString "foo") (Number 1))
+  parseTest (KM.singleton (fromString "foo")  Null     )
+  parseTest (KM.singleton (fromString "bar")  Null     )
+  parseTest KM.empty
 
 (.:??) :: FromJSON a => Object -> Text -> Parser (Maybe a)
-o .:?? val = fmap join (o .:? val)
+o .:?? val = fmap join (o .:? fromText val)
 
 parseTest :: Object -> IO ()
 parseTest o = unless (r1 == r2) (fail (show r1 ++ " /= " ++ show r2))
   where r1, r2 :: Result (Maybe Int)
-        r1 = parse (.:? (pack "foo")) o
+        r1 = parse (.:? (fromString "foo")) o
         r2 = parse (.:?? (pack "foo")) o

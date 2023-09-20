@@ -26,9 +26,7 @@ import           Data.HashMap.Strict(HashMap)
 import           Data.List          (sort)
 import           Data.Ord           (comparing)
 import           Data.Generics.Uniplate
-import           Text.PrettyPrint.GenericPretty
-
-import           Data.Aeson.AutoType.Pretty ()
+import           GHC.Generics      (Generic)
 
 -- * Dictionary types for overloading of usual class instances.
 -- | Type alias for HashMap
@@ -37,10 +35,6 @@ type Map = HashMap
 -- | Dictionary of types indexed by names.
 newtype Dict = Dict { unDict :: Map Text Type }
   deriving (Eq, Data, Typeable, Generic)
-
-instance Out Dict where
-  doc       = doc       . unDict
-  docPrec p = docPrec p . unDict
 
 instance Show Dict where
   show = show . sort . Hash.toList . unDict
@@ -64,8 +58,6 @@ data Type = TNull | TBool | TString        |
             TObj    Dict                   |
             TArray  Type
   deriving (Show,Eq, Ord, Data, Typeable, Generic)
-
-instance Out Type
 
 -- These are missing Uniplate instances...
 {-

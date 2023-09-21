@@ -109,25 +109,6 @@ removeDuplicates list = filterM checkDup list `evalState` Set.empty
                         State.put $ x `Set.insert` seen
                         return True
 
--- TODO: check for generic Ord?
-instance Ord Value where
-  Null       `compare`  Null      = EQ
-  Null       `compare`  _         = LT
-  _          `compare`  Null      = GT
-  (Bool   a) `compare` (Bool   b) = a `compare` b
-  (Bool   a) `compare`  _         = LT
-  _          `compare` (Bool   b) = GT
-  (Number a) `compare` (Number b) = a `compare` b
-  (Number _) `compare`  _         = LT
-  _          `compare` (Number _) = GT
-  (String a) `compare` (String b) = a `compare` b
-  (String a) `compare` _          = LT
-  _          `compare` (String b) = GT
-  (Array  a) `compare` (Array  b) = a `compare` b
-  (Array  a) `compare` _          = LT
-  _          `compare` (Array  b) = GT
-  (Object a) `compare` (Object b) = Map.toList a `compare` Map.toList b
-
 -- | Take a set of JSON input filenames, Haskell output filename, and generate module parsing these JSON files.
 generateTestJSONs :: Options -> IO ()
 generateTestJSONs Options {tyOpts=TyOptions {..},

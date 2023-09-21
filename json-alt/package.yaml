@@ -60,8 +60,8 @@ other-extensions:
 - DeriveGeneric
 - RecordWildCards
 dependencies:
-- base >=4.3 && <5
-- aeson >=1.2.1 && <1.6
+- base >= 4.0.0 && <= 5.0
+- aeson
 library:
   exposed-modules:
   - Data.Aeson.AutoType.Alternative

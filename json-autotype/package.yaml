@@ -73,21 +73,21 @@ other-extensions:
 - DeriveGeneric
 - RecordWildCards
 dependencies:
-- base >=4.9 && <5
-- GenericPretty >=1.2 && <1.3
-- aeson >=1.2.1 && <1.6
-- containers >=0.3 && <0.7
-- filepath >=1.3 && <1.5
-- hashable >=1.2 && <1.4
-- lens >=4.1 && <4.20
-- mtl >=2.1 && <2.3
-- pretty >=1.1 && <1.3
-- process >=1.1 && <1.7
-- scientific >=0.3 && <0.5
-- text >=1.1 && <1.4
-- uniplate >=1.6 && <1.7
-- unordered-containers >=0.2 && <0.3
-- vector >=0.9 && <0.13
+- base >= 4.0.0 && < 5.0
+- GenericPretty
+- aeson
+- containers
+- filepath
+- hashable
+- lens
+- mtl
+- pretty
+- process
+- scientific
+- text
+- uniplate
+- unordered-containers
+- vector
 - json-alt
 - template-haskell
 library:
@@ -101,16 +101,16 @@ library:
   - Data.Aeson.AutoType.CodeGen.Generic
   - Data.Aeson.AutoType.CodeGen.Elm
   - Data.Aeson.AutoType.CodeGen.ElmFormat
-  - Data.Aeson.AutoType.Pretty
   - Data.Aeson.AutoType.Split
   - Data.Aeson.AutoType.Type
   - Data.Aeson.AutoType.Test
   - Data.Aeson.AutoType.Util
   - Data.Aeson.AutoType.Nested
+  - Data.Aeson.AutoType.Pretty
   dependencies:
-  - data-default >=0.7 && <0.8
-  - smallcheck >=1.0 && <1.2
-  - QuickCheck >=2.4 && <3.0
+  - data-default
+  - smallcheck
+  - QuickCheck
   - run-haskell-module
 executables:
   json-autotype:
@@ -119,9 +119,9 @@ executables:
     - app
     - common
     dependencies:
-    - bytestring >=0.9 && <0.11
-    - optparse-applicative >=0.12 && <1.0
-    - yaml >=0.8 && <0.12
+    - bytestring
+    - optparse-applicative
+    - yaml
     - json-autotype
 tests:
   json-autotype-examples:
@@ -130,10 +130,10 @@ tests:
     - test
     - common
     dependencies:
-    - directory >=1.1 && <1.4
-    - optparse-applicative >=0.11 && <1.0
-    - smallcheck >=1.0 && <1.2
-    - QuickCheck >=2.4 && <3.0
+    - directory
+    - optparse-applicative
+    - smallcheck
+    - QuickCheck
     - json-autotype
   json-autotype-qc-test:
     main: TestQC.hs
@@ -141,9 +141,9 @@ tests:
     - test/qc
     - common
     dependencies:
-    - smallcheck >=1.0 && <1.2
-    - optparse-applicative >=0.12 && <1.0
-    - QuickCheck >=2.4 && <3.0
+    - smallcheck
+    - optparse-applicative
+    - QuickCheck
     - json-autotype
   json-autotype-gen-test:
     main: GenerateTestJSON.hs
@@ -151,10 +151,10 @@ tests:
     - test/gen
     - common
     dependencies:
-    - bytestring >=0.9 && <0.11
-    - directory >=1.1 && <1.4
-    - optparse-applicative >=0.12 && <1.0
-    - smallcheck >=1.0 && <1.2
-    - QuickCheck >=2.4 && <3.0
+    - bytestring
+    - directory
+    - optparse-applicative
+    - smallcheck
+    - QuickCheck
     - json-autotype
 stability: stable
